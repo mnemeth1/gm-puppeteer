@@ -21,6 +21,7 @@ import { foundryScreenshotTool } from './foundry-screenshot.js';
 import { getActorInventoryTool } from './get-actor-inventory.js';
 import { getActorStateTool } from './get-actor-state.js';
 import { getAvailableConditionsTool } from './get-available-conditions.js';
+import { getChatMessagesTool } from './get-chat-messages.js';
 import { getCombatStateTool } from './get-combat-state.js';
 import { getCreatureDetailsTool } from './get-creature-details.js';
 import { getCurrentSceneTool } from './get-current-scene.js';
@@ -41,6 +42,7 @@ import { moveItemToContainerTool } from './move-item-to-container.js';
 import { moveTokenTool } from './move-token.js';
 import { placeTokenAtGridTool } from './place-token-at-grid.js';
 import { placeTokenAtScreenPixelTool } from './place-token-at-screen-pixel.js';
+import { postChatMessageTool } from './post-chat-message.js';
 import { removeActorOwnershipTool } from './remove-actor-ownership.js';
 import { removeCombatantsTool } from './remove-combatants.js';
 import { removeConditionTool } from './remove-condition.js';
@@ -86,6 +88,7 @@ export const tools: ReadonlyArray<ToolDefinition<z.ZodTypeAny>> = [
   getActorInventoryTool,
   getActorStateTool,
   getAvailableConditionsTool,
+  getChatMessagesTool,
   getCombatStateTool,
   getCreatureDetailsTool,
   getCurrentSceneTool,
@@ -106,6 +109,7 @@ export const tools: ReadonlyArray<ToolDefinition<z.ZodTypeAny>> = [
   moveTokenTool,
   placeTokenAtGridTool,
   placeTokenAtScreenPixelTool,
+  postChatMessageTool,
   removeActorOwnershipTool,
   removeCombatantsTool,
   removeConditionTool,
