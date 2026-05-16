@@ -1,9 +1,6 @@
 import { z } from 'zod';
 import { ToolError } from '../errors.js';
-import {
-  addItemToActorBody,
-  type AddItemToActorResult,
-} from '../evaluators/add-item-to-actor.js';
+import { addItemToActorBody, type AddItemToActorResult } from '../evaluators/add-item-to-actor.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
 const AddItemToActorInput = z
@@ -67,7 +64,7 @@ export const addItemToActorTool: ToolDefinition<typeof AddItemToActorInput> = {
   description:
     'Grant a physical inventory item from a compendium source to a world actor. Handles ' +
     'quantity, container placement, identification status, and automatic stack-merging ' +
-    "(matching the Foundry UI's drag-to-merge behavior). Returns either {operation: \"merged\", " +
+    '(matching the Foundry UI\'s drag-to-merge behavior). Returns either {operation: "merged", ' +
     'mergedInto} when the new stack folded into an existing one, or {operation: "created", item, ' +
     'cascadeGranted?} when a fresh item was created. Cascade-granted items (PF2e GrantItem rules) ' +
     'are surfaced explicitly. Physical inventory only — weapons, armor, shields, consumables, ' +

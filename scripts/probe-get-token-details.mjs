@@ -89,7 +89,18 @@ try {
         // Q2 — diff a handful of fields between live and toObject()
         if (obj) {
           const diffs = {};
-          for (const k of ['x', 'y', 'width', 'height', 'rotation', 'elevation', 'sort', 'alpha', 'disposition', 'hidden']) {
+          for (const k of [
+            'x',
+            'y',
+            'width',
+            'height',
+            'rotation',
+            'elevation',
+            'sort',
+            'alpha',
+            'disposition',
+            'hidden',
+          ]) {
             const live = t[k];
             const flat = obj[k];
             if (live !== flat) diffs[k] = { live, toObject: flat };
@@ -104,7 +115,8 @@ try {
         if (tint === null) tintDistribution.null += 1;
         else if (tint === undefined) tintDistribution.undefined += 1;
         else if (tint === '') tintDistribution.emptyString += 1;
-        else if (typeof tint === 'string' && /^#[0-9a-f]{6}$/i.test(tint)) tintDistribution.hex += 1;
+        else if (typeof tint === 'string' && /^#[0-9a-f]{6}$/i.test(tint))
+          tintDistribution.hex += 1;
         else tintDistribution.other += 1;
 
         // Q7 — detection modes (sample up to 5)
@@ -223,7 +235,9 @@ try {
 
     // --- Q2 ---
     if (survey.liveVsToObjectDiffs.length === 0) {
-      log.info('Q2: no diffs found between live document and toObject() for x/y/width/height/rotation/elevation/sort/alpha/disposition/hidden');
+      log.info(
+        'Q2: no diffs found between live document and toObject() for x/y/width/height/rotation/elevation/sort/alpha/disposition/hidden',
+      );
     } else {
       log.warn(
         { diffs: survey.liveVsToObjectDiffs },
@@ -232,7 +246,10 @@ try {
     }
 
     // --- Q3 + Q4 ---
-    log.info({ sampleRows: survey.sampleRows }, 'Q3 (img source) + Q4 (default-value types) — per-token sample');
+    log.info(
+      { sampleRows: survey.sampleRows },
+      'Q3 (img source) + Q4 (default-value types) — per-token sample',
+    );
 
     const q4Anomalies = survey.sampleRows.filter(
       (r) =>
@@ -286,10 +303,7 @@ try {
           'Follow-up: place a creature with darkvision (any goblin) on a scene and re-run.',
       );
     } else {
-      log.info(
-        { samples: survey.detectionModeSamples },
-        'Q7: detectionModes shape samples',
-      );
+      log.info({ samples: survey.detectionModeSamples }, 'Q7: detectionModes shape samples');
     }
 
     // --- Q8 ---
@@ -374,7 +388,7 @@ try {
       if (
         threw?.name !== 'ToolError' ||
         threw.code !== 'INVALID_INPUT' ||
-        threw.details?.code !== undefined && threw.details.code !== 'TOKEN_NOT_FOUND'
+        (threw.details?.code !== undefined && threw.details.code !== 'TOKEN_NOT_FOUND')
       ) {
         // details.code may not be set when the evaluator omits it; the
         // throw with INVALID_INPUT and a message mentioning the tokenId

@@ -181,9 +181,7 @@ describe('listCompendiumPacksBody', () => {
       },
     ]);
 
-    const ids = listCompendiumPacksBody({ system: 'pf2e-bestiary-tokens' }).packs.map(
-      (p) => p.id,
-    );
+    const ids = listCompendiumPacksBody({ system: 'pf2e-bestiary-tokens' }).packs.map((p) => p.id);
     expect(ids).toEqual(['pf2e-bestiary-tokens.x']);
   });
 

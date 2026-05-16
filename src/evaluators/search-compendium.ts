@@ -128,20 +128,21 @@ export async function searchCompendiumBody(
   const wantQuery = typeof input.query === 'string' ? input.query.toLowerCase() : null;
   const wantType = input.type ?? null;
   const wantPackSingle = input.pack ?? null;
-  const wantPacks = Array.isArray(input.packs) && input.packs.length > 0
-    ? new Set(input.packs)
-    : null;
+  const wantPacks =
+    Array.isArray(input.packs) && input.packs.length > 0 ? new Set(input.packs) : null;
   const wantActorType = input.actorType ?? null;
   const wantItemType = input.itemType ?? null;
   const levelMin = input.level?.min ?? null;
   const levelMax = input.level?.max ?? null;
-  const wantTraits = Array.isArray(input.traits) && input.traits.length > 0
-    ? input.traits.map((t) => t.toLowerCase())
-    : null;
+  const wantTraits =
+    Array.isArray(input.traits) && input.traits.length > 0
+      ? input.traits.map((t) => t.toLowerCase())
+      : null;
   const wantRarity = input.rarity ?? null;
-  const wantSources = Array.isArray(input.source) && input.source.length > 0
-    ? input.source.map((s) => s.toLowerCase())
-    : null;
+  const wantSources =
+    Array.isArray(input.source) && input.source.length > 0
+      ? input.source.map((s) => s.toLowerCase())
+      : null;
   const wantDescMatch =
     typeof input.descriptionMatch === 'string' && input.descriptionMatch.length > 0
       ? input.descriptionMatch.toLowerCase()
@@ -163,7 +164,8 @@ export async function searchCompendiumBody(
   // Inlined utilities — evaluator scope only.
   const arr = (v: unknown): unknown[] => (Array.isArray(v) ? v : []);
   const str = (v: unknown): string => (typeof v === 'string' ? v : '');
-  const num = (v: unknown): number | null => (typeof v === 'number' && Number.isFinite(v) ? v : null);
+  const num = (v: unknown): number | null =>
+    typeof v === 'number' && Number.isFinite(v) ? v : null;
 
   const extractLevel = (system: Record<string, unknown> | undefined): number | null => {
     const sys = (system ?? {}) as {
@@ -230,8 +232,7 @@ export async function searchCompendiumBody(
     return '';
   };
 
-  const truncate = (s: string, n: number): string =>
-    s.length > n ? `${s.slice(0, n - 3)}...` : s;
+  const truncate = (s: string, n: number): string => (s.length > n ? `${s.slice(0, n - 3)}...` : s);
 
   const excerpt = (text: string, hitIdx: number, window = 80): string => {
     if (text.length === 0) return '';
@@ -266,7 +267,13 @@ export async function searchCompendiumBody(
 
     // Stage A: widened-index filters. Collect entries that pass; we
     // run descriptionMatch in Stage B over the survivor list.
-    const survivors: Array<{ entry: FoundryIndexEntry; level: number | null; traits: string[]; rarity: 'common' | 'uncommon' | 'rare' | 'unique' | null; source: string | null }> = [];
+    const survivors: Array<{
+      entry: FoundryIndexEntry;
+      level: number | null;
+      traits: string[];
+      rarity: 'common' | 'uncommon' | 'rare' | 'unique' | null;
+      source: string | null;
+    }> = [];
     for (const entry of index.contents) {
       if (!entry.name || !entry._id) continue;
 
@@ -364,8 +371,7 @@ export async function searchCompendiumBody(
         hits.push({
           id: s.entry._id!,
           uuid:
-            s.entry.uuid ??
-            `Compendium.${pack.collection}.${pack.documentName}.${s.entry._id!}`,
+            s.entry.uuid ?? `Compendium.${pack.collection}.${pack.documentName}.${s.entry._id!}`,
           name: s.entry.name!,
           type: entryType,
           pack: pack.collection,

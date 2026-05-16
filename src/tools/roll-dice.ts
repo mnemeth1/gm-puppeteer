@@ -62,7 +62,7 @@ export const rollDiceTool: ToolDefinition<typeof RollDiceInput> = {
     'visibility, speaker:{actorId, alias}, chatMessageId}. ' +
     "For an NPC's real stat-block check (the Redcap's actual Stealth modifier, degree of " +
     'success) use roll_check. To ask a player to roll a check for their own character, ' +
-    'use request_check — never roll a PC\'s checks for them with this tool.',
+    "use request_check — never roll a PC's checks for them with this tool.",
   inputSchema: RollDiceInput,
   async handler(input, ctx) {
     const { page } = await ctx.browser.ensureStarted();

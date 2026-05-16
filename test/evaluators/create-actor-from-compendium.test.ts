@@ -88,9 +88,7 @@ function installFoundryGlobals(opts: {
       folder: data.folder ?? null,
     };
   };
-  (globalThis as { fromUuid?: unknown }).fromUuid = vi
-    .fn()
-    .mockResolvedValue(opts.fromUuidReturn);
+  (globalThis as { fromUuid?: unknown }).fromUuid = vi.fn().mockResolvedValue(opts.fromUuidReturn);
   (globalThis as { Actor?: unknown }).Actor = {
     implementation: {
       create: opts.createImpl ?? defaultCreate,

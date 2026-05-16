@@ -119,8 +119,7 @@ try {
     if (!actor) return { error: 'actor missing' };
     const orphans = actor.items.contents
       .filter(
-        (i) =>
-          typeof i.name === 'string' && i.name.startsWith('__probe_create_scroll_or_wand_'),
+        (i) => typeof i.name === 'string' && i.name.startsWith('__probe_create_scroll_or_wand_'),
       )
       .map((i) => i.id);
     if (orphans.length > 0) {
@@ -196,9 +195,7 @@ try {
       const entries = idx.contents ?? [];
 
       const findByName = async (needle) => {
-        const hit = entries.find(
-          (e) => (e.name ?? '').toLowerCase() === needle.toLowerCase(),
-        );
+        const hit = entries.find((e) => (e.name ?? '').toLowerCase() === needle.toLowerCase());
         if (!hit) return null;
         return {
           uuid: hit.uuid ?? `Compendium.${spellsPack.collection}.Item.${hit._id}`,
@@ -259,8 +256,7 @@ try {
         const ridx = await ritPack.getIndex();
         const rfirst = ridx.contents?.[0];
         if (rfirst) {
-          out.ritualUuid =
-            rfirst.uuid ?? `Compendium.${ritPack.collection}.Item.${rfirst._id}`;
+          out.ritualUuid = rfirst.uuid ?? `Compendium.${ritPack.collection}.Item.${rfirst._id}`;
         }
       }
     }
@@ -312,9 +308,7 @@ try {
         return { error: 'game.pf2e not present' };
       }
       const topKeys = Object.keys(pf2e).sort();
-      const interesting = topKeys.filter((k) =>
-        /scroll|wand|consumable|spell|item|trick/i.test(k),
-      );
+      const interesting = topKeys.filter((k) => /scroll|wand|consumable|spell|item|trick/i.test(k));
       // For each interesting key, dump its type and (if function) its
       // own static method names.
       const detail = {};
@@ -454,8 +448,7 @@ try {
       const sampleConsumable = idx.contents?.find((e) => e.type === 'consumable');
       if (!sampleConsumable) return { error: 'no consumable found in equipment-srd' };
       const uuid =
-        sampleConsumable.uuid ??
-        `Compendium.${equipPack.collection}.Item.${sampleConsumable._id}`;
+        sampleConsumable.uuid ?? `Compendium.${equipPack.collection}.Item.${sampleConsumable._id}`;
       const src = await fromUuid(uuid);
       const created = await actor.createEmbeddedDocuments('Item', [
         {
@@ -516,9 +509,7 @@ try {
       };
       const collected = collectStatics(ctor);
       // Highlight anything matching /spell|scroll|wand|from|create/i.
-      const interesting = collected.names.filter((n) =>
-        /spell|scroll|wand|from|create/i.test(n),
-      );
+      const interesting = collected.names.filter((n) => /spell|scroll|wand|from|create/i.test(n));
 
       await actor.deleteEmbeddedDocuments('Item', [item.id]);
       return {
@@ -607,10 +598,7 @@ try {
       // Fall back to the first discovery.scrollTemplates entry if the
       // map didn't populate (defensive).
       const rank1ScrollUuid =
-        scrollByRank[1] ??
-        scrollByRank['1'] ??
-        discovery.scrollTemplates[0]?.uuid ??
-        null;
+        scrollByRank[1] ?? scrollByRank['1'] ?? discovery.scrollTemplates[0]?.uuid ?? null;
       log.info({ rank1ScrollUuid }, 'Q5: using rank-1 scroll template');
       const probe = await page.evaluate(
         async (actorId, spellUuid, sampleScrollUuid) => {
@@ -669,7 +657,10 @@ try {
           };
 
           // Candidate A: CONFIG.PF2E.Item.documentClasses.consumable
-          const candidateA = await tryFromSpell(ConsumablePF2e, 'CONFIG.PF2E.Item.documentClasses.consumable');
+          const candidateA = await tryFromSpell(
+            ConsumablePF2e,
+            'CONFIG.PF2E.Item.documentClasses.consumable',
+          );
 
           // Candidate B: game.pf2e.ConsumablePF2e (if exposed there).
           const exposedConsumable = globalThis.game?.pf2e?.ConsumablePF2e ?? null;
@@ -789,7 +780,10 @@ try {
         };
         createdItemShape = probe.persisted;
         log.info(
-          { workingApi, persistedSummary: { name: probe.persisted.name, category: probe.persisted.category } },
+          {
+            workingApi,
+            persistedSummary: { name: probe.persisted.name, category: probe.persisted.category },
+          },
           'Q5: working API path identified',
         );
       } else {
@@ -972,8 +966,7 @@ try {
       const probe = await page.evaluate(
         async (actorId, spellUuid, scrollMap) => {
           const scrollKeys = Object.keys(scrollMap);
-          const mapHasRank = (rank) =>
-            scrollMap[rank] != null || scrollMap[String(rank)] != null;
+          const mapHasRank = (rank) => scrollMap[rank] != null || scrollMap[String(rank)] != null;
           return {
             scrollMapKeys: scrollKeys,
             rank0HasTemplate: mapHasRank(0),
@@ -1104,9 +1097,9 @@ try {
           detailsOk: details.ok === true,
           consumablePresent: details.ok && details.data?.consumable != null,
           consumableSpellPresent: details.ok && details.data?.consumable?.spell != null,
-          consumableSpellName: details.ok ? details.data?.consumable?.spell?.name ?? null : null,
-          consumableCategory: details.ok ? details.data?.consumable?.category ?? null : null,
-          consumableUses: details.ok ? details.data?.consumable?.uses ?? null : null,
+          consumableSpellName: details.ok ? (details.data?.consumable?.spell?.name ?? null) : null,
+          consumableCategory: details.ok ? (details.data?.consumable?.category ?? null) : null,
+          consumableUses: details.ok ? (details.data?.consumable?.uses ?? null) : null,
         });
 
         // Cleanup the Q10 scroll.
@@ -1202,7 +1195,8 @@ try {
       }
       const missing = [];
       for (const [k, n] of snapSig) {
-        if ((liveSig.get(k) ?? 0) !== n) missing.push({ k, expected: n, actual: liveSig.get(k) ?? 0 });
+        if ((liveSig.get(k) ?? 0) !== n)
+          missing.push({ k, expected: n, actual: liveSig.get(k) ?? 0 });
       }
       const extras = [];
       for (const [k, n] of liveSig) {

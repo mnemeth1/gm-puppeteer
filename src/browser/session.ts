@@ -312,10 +312,7 @@ export class BrowserSession {
     );
   }
 
-  private async launchBrowser(opts: {
-    headless: boolean;
-    profileDir?: string;
-  }): Promise<Browser> {
+  private async launchBrowser(opts: { headless: boolean; profileDir?: string }): Promise<Browser> {
     this.log.info(
       { headless: opts.headless, profileDir: opts.profileDir ?? null },
       'launching chromium',

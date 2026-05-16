@@ -214,8 +214,7 @@ try {
           typeof globalThis.TextEditor?.enrichHTML === 'function' ||
           typeof globalThis.foundry?.applications?.ux?.TextEditor?.enrichHTML === 'function',
         markedPresent:
-          typeof globalThis.marked === 'function' ||
-          typeof globalThis.marked?.parse === 'function',
+          typeof globalThis.marked === 'function' || typeof globalThis.marked?.parse === 'function',
         showdownPresent: typeof globalThis.showdown !== 'undefined',
       };
 
@@ -465,14 +464,8 @@ try {
             ),
             entryClearedKeys: Object.keys(entryCleared).sort(),
             pageClearedKeys: Object.keys(pageCleared).sort(),
-            entryScratchCleared: !Object.prototype.hasOwnProperty.call(
-              entryCleared,
-              scratchId,
-            ),
-            pageScratchCleared: !Object.prototype.hasOwnProperty.call(
-              pageCleared,
-              scratchId,
-            ),
+            entryScratchCleared: !Object.prototype.hasOwnProperty.call(entryCleared, scratchId),
+            pageScratchCleared: !Object.prototype.hasOwnProperty.call(pageCleared, scratchId),
           };
         },
         q1EntryId,

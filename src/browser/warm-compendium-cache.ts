@@ -43,11 +43,7 @@ import type { Logger } from '../logging.js';
  * propagates; the .catch on the puppeteer promise swallows shutdown-
  * driven rejections (browser.close mid-warm).
  */
-export function startCompendiumWarm(
-  page: Page,
-  log: Logger,
-  phase2Packs: readonly string[],
-): void {
+export function startCompendiumWarm(page: Page, log: Logger, phase2Packs: readonly string[]): void {
   void page
     .evaluate(warmCompendiumCacheBody, {
       widenedFields: [
@@ -183,9 +179,7 @@ async function warmCompendiumCacheBody(args: WarmArgs): Promise<WarmResult> {
     if (!pack) {
       phase2ErrorCount += 1;
       // eslint-disable-next-line no-console
-      console.warn(
-        `[gm-puppeteer:warm] phase2 pack not found ${JSON.stringify({ collection })}`,
-      );
+      console.warn(`[gm-puppeteer:warm] phase2 pack not found ${JSON.stringify({ collection })}`);
       continue;
     }
     const packStart = performance.now();
@@ -201,9 +195,7 @@ async function warmCompendiumCacheBody(args: WarmArgs): Promise<WarmResult> {
 
       for (let i = 0; i < ids.length; i += args.phase2ChunkSize) {
         const chunk = ids.slice(i, i + args.phase2ChunkSize);
-        const results = await Promise.allSettled(
-          chunk.map((id) => pack.getDocument(id)),
-        );
+        const results = await Promise.allSettled(chunk.map((id) => pack.getDocument(id)));
         for (const r of results) {
           if (r.status === 'fulfilled' && r.value) packDocCount += 1;
           else phase2ErrorCount += 1;

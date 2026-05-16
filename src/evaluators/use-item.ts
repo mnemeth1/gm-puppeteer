@@ -168,10 +168,7 @@ export async function useItemBody(input: UseItemInput): Promise<UseItemResult> {
     messages?: MessagesCollectionLike;
   }
 
-  const fail = (
-    message: string,
-    details: Record<string, unknown>,
-  ): UseItemErr => ({
+  const fail = (message: string, details: Record<string, unknown>): UseItemErr => ({
     ok: false,
     error: { code: 'INVALID_INPUT', message, details },
   });
@@ -196,7 +193,9 @@ export async function useItemBody(input: UseItemInput): Promise<UseItemResult> {
 
   // Snapshot a small set of fields we'll use for before/after comparison
   // and for the response payload.
-  const snapshotState = (item: ItemDocLike): {
+  const snapshotState = (
+    item: ItemDocLike,
+  ): {
     qty: number | null;
     usesValue: number | null;
     usesMax: number | null;
@@ -223,14 +222,11 @@ export async function useItemBody(input: UseItemInput): Promise<UseItemResult> {
   // -- Resolve target item.
   const target = actor.items?.get?.(input.itemId);
   if (!target || !target.id) {
-    return fail(
-      `No item found on actor ${actor.id ?? input.actorId} for itemId: ${input.itemId}`,
-      {
-        actorId: input.actorId,
-        itemId: input.itemId,
-        reason: 'ITEM_NOT_FOUND_ON_ACTOR',
-      },
-    );
+    return fail(`No item found on actor ${actor.id ?? input.actorId} for itemId: ${input.itemId}`, {
+      actorId: input.actorId,
+      itemId: input.itemId,
+      reason: 'ITEM_NOT_FOUND_ON_ACTOR',
+    });
   }
 
   const targetType: string = typeof target.type === 'string' ? target.type : '';
@@ -251,10 +247,7 @@ export async function useItemBody(input: UseItemInput): Promise<UseItemResult> {
   }
 
   // -- Reject physical types that have no meaningful use verb.
-  if (
-    targetType !== 'consumable' &&
-    targetType !== 'equipment'
-  ) {
+  if (targetType !== 'consumable' && targetType !== 'equipment') {
     return fail(
       `use_item does not support type '${targetType}'. Only 'consumable' items (potions, ` +
         `scrolls, wands, elixirs, talismans, etc.) and 'equipment' items with activations are ` +
@@ -346,15 +339,12 @@ export async function useItemBody(input: UseItemInput): Promise<UseItemResult> {
     }
 
     if (threw !== null) {
-      return fail(
-        `consume() threw for item '${targetName}': ${threw}`,
-        {
-          itemId: input.itemId,
-          subtype,
-          error: threw,
-          reason: 'CONSUME_FAILED',
-        },
-      );
+      return fail(`consume() threw for item '${targetName}': ${threw}`, {
+        itemId: input.itemId,
+        subtype,
+        error: threw,
+        reason: 'CONSUME_FAILED',
+      });
     }
 
     // Re-resolve after consume — autoDestroy may have deleted the item.
@@ -369,9 +359,7 @@ export async function useItemBody(input: UseItemInput): Promise<UseItemResult> {
     // (Phase-1 Q3 finding). Without this guard, callers would see
     // ok: true for a call that did nothing.
     const nothingChanged =
-      !deleted &&
-      before.qty === after.qty &&
-      before.usesValue === after.usesValue;
+      !deleted && before.qty === after.qty && before.usesValue === after.usesValue;
     if (nothingChanged) {
       const hint =
         subtype === 'wand' || subtype === 'scroll'
@@ -380,16 +368,13 @@ export async function useItemBody(input: UseItemInput): Promise<UseItemResult> {
             `aborts consume() when no compatible spellcasting source is available.`
           : `consume() returned without modifying the item. The item may have an unusual ` +
             `rules configuration that aborts the use pipeline.`;
-      return fail(
-        `Calling consume() on '${targetName}' had no effect. ${hint}`,
-        {
-          itemId: input.itemId,
-          subtype,
-          qtyBefore: before.qty,
-          usesBefore: before.usesValue,
-          reason: 'USE_HAD_NO_EFFECT',
-        },
-      );
+      return fail(`Calling consume() on '${targetName}' had no effect. ${hint}`, {
+        itemId: input.itemId,
+        subtype,
+        qtyBefore: before.qty,
+        usesBefore: before.usesValue,
+        reason: 'USE_HAD_NO_EFFECT',
+      });
     }
 
     const msgCountAfter = game?.messages?.size ?? 0;
@@ -412,7 +397,7 @@ export async function useItemBody(input: UseItemInput): Promise<UseItemResult> {
     };
     if (typeof before.usesMax === 'number' && before.usesMax > 0) {
       item.usesBefore = before.usesValue ?? 0;
-      item.usesAfter = deleted ? 0 : after.usesValue ?? 0;
+      item.usesAfter = deleted ? 0 : (after.usesValue ?? 0);
     }
 
     return {
@@ -475,14 +460,11 @@ export async function useItemBody(input: UseItemInput): Promise<UseItemResult> {
     eqThrew = e instanceof Error ? e.message : String(e);
   }
   if (eqThrew !== null) {
-    return fail(
-      `toMessage() threw for item '${targetName}': ${eqThrew}`,
-      {
-        itemId: input.itemId,
-        error: eqThrew,
-        reason: 'TOMESSAGE_FAILED',
-      },
-    );
+    return fail(`toMessage() threw for item '${targetName}': ${eqThrew}`, {
+      itemId: input.itemId,
+      error: eqThrew,
+      reason: 'TOMESSAGE_FAILED',
+    });
   }
 
   // Decrement uses.value if this equipment tracks charges. Per Phase-1

@@ -1,9 +1,6 @@
 import { z } from 'zod';
 import { ToolError } from '../errors.js';
-import {
-  getCombatStateBody,
-  type GetCombatStateResult,
-} from '../evaluators/get-combat-state.js';
+import { getCombatStateBody, type GetCombatStateResult } from '../evaluators/get-combat-state.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
 const GetCombatStateInput = z
@@ -33,7 +30,7 @@ export const getCombatStateTool: ToolDefinition<typeof GetCombatStateInput> = {
     'When the scene has no encounter, `combat` is null — that is a normal ' +
     'state, not an error. Use this to discover the combatantId values that ' +
     'remove_combatants needs, and to see whose turn it is. NOT for advancing ' +
-    'turns or rolling initiative — those remain the human GM\'s job.',
+    "turns or rolling initiative — those remain the human GM's job.",
   inputSchema: GetCombatStateInput,
   async handler(input, ctx) {
     const { page } = await ctx.browser.ensureStarted();

@@ -201,8 +201,7 @@ try {
           idx.contents.find((e) => (e.name ?? '').toLowerCase() === 'healing potion (minor)') ??
           idx.contents.find((e) => /minor healing potion/i.test(e.name ?? ''));
         if (hit) {
-          minorHealingPotionUuid =
-            hit.uuid ?? `Compendium.${equipPack.collection}.Item.${hit._id}`;
+          minorHealingPotionUuid = hit.uuid ?? `Compendium.${equipPack.collection}.Item.${hit._id}`;
         }
       }
 
@@ -260,9 +259,7 @@ try {
               containerId: arrows.system?.containerId ?? null,
             }
           : null,
-        backpack: backpack
-          ? { id: backpack.id, name: backpack.name }
-          : null,
+        backpack: backpack ? { id: backpack.id, name: backpack.name } : null,
         minorHealingPotionUuid,
         physicalChoiceSetUuid,
         otherActorUuid,
@@ -326,14 +323,18 @@ try {
     log.info({ probe: 1, res }, 'probe 1: simple longsword grant');
     assert(res.ok === true, 'probe 1: ok', { res });
     if (res.ok) {
-      assert(res.data.operation === 'created', 'probe 1: operation=created', { op: res.data.operation });
-      assert(res.data.item?.quantity === 1, 'probe 1: quantity=1', { qty: res.data.item?.quantity });
-      assert(res.data.item?.type === 'weapon', 'probe 1: type=weapon', { type: res.data.item?.type });
-      assert(
-        res.data.item?.sourceUuid === LONGSWORD_UUID,
-        'probe 1: sourceUuid matches input',
-        { sourceUuid: res.data.item?.sourceUuid },
-      );
+      assert(res.data.operation === 'created', 'probe 1: operation=created', {
+        op: res.data.operation,
+      });
+      assert(res.data.item?.quantity === 1, 'probe 1: quantity=1', {
+        qty: res.data.item?.quantity,
+      });
+      assert(res.data.item?.type === 'weapon', 'probe 1: type=weapon', {
+        type: res.data.item?.type,
+      });
+      assert(res.data.item?.sourceUuid === LONGSWORD_UUID, 'probe 1: sourceUuid matches input', {
+        sourceUuid: res.data.item?.sourceUuid,
+      });
       assert(
         res.data.cascadeGranted === undefined,
         'probe 1: no cascadeGranted (Longsword has no GrantItem)',
@@ -355,8 +356,12 @@ try {
     log.info({ probe: 2, res }, 'probe 2: minor healing potion x5');
     assert(res.ok === true, 'probe 2: ok', { res });
     if (res.ok) {
-      assert(res.data.operation === 'created', 'probe 2: operation=created', { op: res.data.operation });
-      assert(res.data.item?.quantity === 5, 'probe 2: quantity=5', { qty: res.data.item?.quantity });
+      assert(res.data.operation === 'created', 'probe 2: operation=created', {
+        op: res.data.operation,
+      });
+      assert(res.data.item?.quantity === 5, 'probe 2: quantity=5', {
+        qty: res.data.item?.quantity,
+      });
     }
   }
 
@@ -372,12 +377,12 @@ try {
     log.info({ probe: 3, res }, 'probe 3: arrows +5 merge');
     assert(res.ok === true, 'probe 3: ok', { res });
     if (res.ok) {
-      assert(res.data.operation === 'merged', 'probe 3: operation=merged', { op: res.data.operation });
-      assert(
-        res.data.mergedInto?.id === arrowsId,
-        'probe 3: merged into existing arrows id',
-        { mergedInto: res.data.mergedInto },
-      );
+      assert(res.data.operation === 'merged', 'probe 3: operation=merged', {
+        op: res.data.operation,
+      });
+      assert(res.data.mergedInto?.id === arrowsId, 'probe 3: merged into existing arrows id', {
+        mergedInto: res.data.mergedInto,
+      });
       assert(
         res.data.mergedInto?.previousQuantity === baselineArrowsQty,
         'probe 3: previousQuantity matches baseline',
@@ -388,11 +393,9 @@ try {
         'probe 3: newQuantity = baseline + 5',
         { newQuantity: res.data.mergedInto?.newQuantity },
       );
-      assert(
-        res.data.mergedInto?.addedQuantity === 5,
-        'probe 3: addedQuantity=5',
-        { added: res.data.mergedInto?.addedQuantity },
-      );
+      assert(res.data.mergedInto?.addedQuantity === 5, 'probe 3: addedQuantity=5', {
+        added: res.data.mergedInto?.addedQuantity,
+      });
     }
   }
 
@@ -409,12 +412,12 @@ try {
     log.info({ probe: 4, res }, 'probe 4: arrows into backpack');
     assert(res.ok === true, 'probe 4: ok', { res });
     if (res.ok) {
-      assert(res.data.operation === 'created', 'probe 4: operation=created', { op: res.data.operation });
-      assert(
-        res.data.item?.containerId === backpackId,
-        'probe 4: containerId set on new entry',
-        { containerId: res.data.item?.containerId },
-      );
+      assert(res.data.operation === 'created', 'probe 4: operation=created', {
+        op: res.data.operation,
+      });
+      assert(res.data.item?.containerId === backpackId, 'probe 4: containerId set on new entry', {
+        containerId: res.data.item?.containerId,
+      });
     }
   }
 
@@ -431,7 +434,9 @@ try {
     log.info({ probe: 5, res }, 'probe 5: arrows +5 merge=never');
     assert(res.ok === true, 'probe 5: ok', { res });
     if (res.ok) {
-      assert(res.data.operation === 'created', 'probe 5: operation=created', { op: res.data.operation });
+      assert(res.data.operation === 'created', 'probe 5: operation=created', {
+        op: res.data.operation,
+      });
       assert(res.data.item?.quantity === 5, 'probe 5: separate stack qty=5', {
         qty: res.data.item?.quantity,
       });
@@ -450,12 +455,12 @@ try {
     log.info({ probe: 6, res }, 'probe 6: longsword in backpack');
     assert(res.ok === true, 'probe 6: ok', { res });
     if (res.ok) {
-      assert(res.data.operation === 'created', 'probe 6: operation=created', { op: res.data.operation });
-      assert(
-        res.data.item?.containerId === backpackId,
-        'probe 6: containerId reflected',
-        { containerId: res.data.item?.containerId },
-      );
+      assert(res.data.operation === 'created', 'probe 6: operation=created', {
+        op: res.data.operation,
+      });
+      assert(res.data.item?.containerId === backpackId, 'probe 6: containerId reflected', {
+        containerId: res.data.item?.containerId,
+      });
     }
   }
 
@@ -550,9 +555,12 @@ try {
     const res = await call({ actorId: 'deadbeef', sourceUuid: LONGSWORD_UUID });
     log.info({ probe: 9, res }, 'probe 9: bogus actorId');
     assert(res.isError === true, 'probe 9: error', { res });
-    assert(res.error?.code === 'INVALID_INPUT', 'probe 9: INVALID_INPUT', { code: res.error?.code });
+    assert(res.error?.code === 'INVALID_INPUT', 'probe 9: INVALID_INPUT', {
+      code: res.error?.code,
+    });
     assert(
-      typeof res.error?.message === 'string' && res.error.message.startsWith('No actor found for actorId:'),
+      typeof res.error?.message === 'string' &&
+        res.error.message.startsWith('No actor found for actorId:'),
       'probe 9: actor-not-found message',
       { msg: res.error?.message },
     );
@@ -772,9 +780,7 @@ try {
       // 1. Delete orphans (one-by-one to tolerate cascade auto-deletes).
       const deleted = [];
       const deleteFailures = [];
-      const orphanIds = actor.items.contents
-        .filter((i) => !snapshotIds.has(i.id))
-        .map((i) => i.id);
+      const orphanIds = actor.items.contents.filter((i) => !snapshotIds.has(i.id)).map((i) => i.id);
       for (const id of orphanIds) {
         const existing = actor.items.get(id);
         if (!existing) continue; // cascade already removed it
@@ -791,8 +797,7 @@ try {
       for (const item of actor.items.contents) {
         const expected = snapshotQty.get(item.id);
         if (expected === undefined) continue;
-        const current =
-          typeof item.system?.quantity === 'number' ? item.system.quantity : 1;
+        const current = typeof item.system?.quantity === 'number' ? item.system.quantity : 1;
         if (current !== expected) {
           updates.push({ _id: item.id, 'system.quantity': expected });
         }
@@ -807,8 +812,7 @@ try {
       for (const item of actor.items.contents) {
         const expected = snapshotQty.get(item.id);
         if (expected === undefined) continue;
-        const current =
-          typeof item.system?.quantity === 'number' ? item.system.quantity : 1;
+        const current = typeof item.system?.quantity === 'number' ? item.system.quantity : 1;
         if (current !== expected) {
           driftedAfter.push({ id: item.id, name: item.name, expected, actual: current });
         }
@@ -845,16 +849,12 @@ try {
     extraIds: teardown.extraIds,
     missingIds: teardown.missingIds,
   });
-  assert(
-    teardown.driftedAfter.length === 0,
-    'probe 18: every snapshot id has snapshot quantity',
-    { drifted: teardown.driftedAfter },
-  );
-  assert(
-    teardown.deleteFailures.length === 0,
-    'probe 18: no orphan delete failures',
-    { failures: teardown.deleteFailures },
-  );
+  assert(teardown.driftedAfter.length === 0, 'probe 18: every snapshot id has snapshot quantity', {
+    drifted: teardown.driftedAfter,
+  });
+  assert(teardown.deleteFailures.length === 0, 'probe 18: no orphan delete failures', {
+    failures: teardown.deleteFailures,
+  });
 
   if (failures.length > 0) {
     log.error({ failures, failureCount: failures.length }, 'PROBE FAILED');

@@ -153,10 +153,7 @@ try {
     'probe 2: per-scene filter finds exactly the new combat',
     { created },
   );
-  log.info(
-    { hasStartCombat: created.hasStartCombat },
-    'probe note: Combat#startCombat presence',
-  );
+  log.info({ hasStartCombat: created.hasStartCombat }, 'probe note: Combat#startCombat presence');
 
   // --------------------------------------------------------------------
   // Probe 3: add combatants from the scene tokens.
@@ -312,10 +309,7 @@ try {
     started: begun.started,
   });
   if (begun.windowsAfter.length > begun.windowsBefore.length) {
-    log.warn(
-      { begun },
-      'probe 5: begin opened a UI window — possible initiative dialog; review',
-    );
+    log.warn({ begun }, 'probe 5: begin opened a UI window — possible initiative dialog; review');
   }
 
   // --------------------------------------------------------------------
@@ -351,11 +345,9 @@ try {
   assert(removed.removeThrew === null, 'probe 6: removing a real combatant did not throw', {
     removed,
   });
-  assert(
-    removed.afterReal === removed.before - 1,
-    'probe 6: combatant count dropped by one',
-    { removed },
-  );
+  assert(removed.afterReal === removed.before - 1, 'probe 6: combatant count dropped by one', {
+    removed,
+  });
 
   // --------------------------------------------------------------------
   // Probe 7: end combat via combat.delete().
@@ -381,25 +373,28 @@ try {
   // Teardown: delete any probe-flagged combat still present, then assert
   // the combat-id set carries no probe leftovers.
   // --------------------------------------------------------------------
-  const teardown = await page.evaluate(async (snapshotIds) => {
-    const game = globalThis.game;
-    const deleted = [];
-    for (const c of [...(game.combats?.contents ?? [])]) {
-      if (c.getFlag?.('world', 'gmPuppeteerProbe')) {
-        deleted.push(c.id);
-        await c.delete();
+  const teardown = await page.evaluate(
+    async (snapshotIds) => {
+      const game = globalThis.game;
+      const deleted = [];
+      for (const c of [...(game.combats?.contents ?? [])]) {
+        if (c.getFlag?.('world', 'gmPuppeteerProbe')) {
+          deleted.push(c.id);
+          await c.delete();
+        }
       }
-    }
-    const finalIds = (game.combats?.contents ?? []).map((c) => c.id);
-    const snap = new Set(snapshotIds);
-    return {
-      deleted,
-      extraIds: finalIds.filter((id) => !snap.has(id)),
-      flaggedRemaining: (game.combats?.contents ?? [])
-        .filter((c) => c.getFlag?.('world', 'gmPuppeteerProbe'))
-        .map((c) => c.id),
-    };
-  }, [...combatIdSnapshot]);
+      const finalIds = (game.combats?.contents ?? []).map((c) => c.id);
+      const snap = new Set(snapshotIds);
+      return {
+        deleted,
+        extraIds: finalIds.filter((id) => !snap.has(id)),
+        flaggedRemaining: (game.combats?.contents ?? [])
+          .filter((c) => c.getFlag?.('world', 'gmPuppeteerProbe'))
+          .map((c) => c.id),
+      };
+    },
+    [...combatIdSnapshot],
+  );
   log.info({ teardown }, 'teardown: remove probe-flagged combats');
 
   assert(teardown.extraIds.length === 0, 'teardown: no extra combats beyond snapshot', {

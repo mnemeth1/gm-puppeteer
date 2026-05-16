@@ -78,9 +78,7 @@ describe('get_chat_messages', () => {
   });
 
   it('rejects an empty sinceMessageId and unknown keys', () => {
-    expect(getChatMessagesTool.inputSchema.safeParse({ sinceMessageId: '' }).success).toBe(
-      false,
-    );
+    expect(getChatMessagesTool.inputSchema.safeParse({ sinceMessageId: '' }).success).toBe(false);
     expect(getChatMessagesTool.inputSchema.safeParse({ nope: 1 }).success).toBe(false);
   });
 });

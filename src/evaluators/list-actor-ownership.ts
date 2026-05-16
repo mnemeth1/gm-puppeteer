@@ -131,9 +131,7 @@ export function listActorOwnershipBody(input: ListActorOwnershipInput): ListActo
     }
     const userDoc = game.users?.get(key) ?? null;
     const userName =
-      userDoc && typeof userDoc.name === 'string' && userDoc.name.length > 0
-        ? userDoc.name
-        : null;
+      userDoc && typeof userDoc.name === 'string' && userDoc.name.length > 0 ? userDoc.name : null;
     users.push({ userId: key, userName, level });
   }
 

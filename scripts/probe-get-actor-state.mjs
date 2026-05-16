@@ -225,10 +225,18 @@ try {
       assert(typeof res.data.hp?.max === 'number' && res.data.hp.max > 0, 'probe 1: hp.max>0', {
         max: res.data.hp?.max,
       });
-      assert(typeof res.data.ac?.value === 'number' && res.data.ac.value > 0, 'probe 1: ac.value>0', {
-        ac: res.data.ac?.value,
-      });
-      assert(typeof res.data.saves?.fortitude?.modifier === 'number', 'probe 1: fort.modifier number', {});
+      assert(
+        typeof res.data.ac?.value === 'number' && res.data.ac.value > 0,
+        'probe 1: ac.value>0',
+        {
+          ac: res.data.ac?.value,
+        },
+      );
+      assert(
+        typeof res.data.saves?.fortitude?.modifier === 'number',
+        'probe 1: fort.modifier number',
+        {},
+      );
       assert(res.data.attributes?.str === 4, 'probe 1: str mod = 4', {
         s: res.data.attributes?.str,
       });
@@ -336,8 +344,7 @@ try {
         effs: raisedRes.data.effects,
       });
       assert(
-        typeof shieldEffect?.durationLabel === 'string' &&
-          shieldEffect.durationLabel.length > 0,
+        typeof shieldEffect?.durationLabel === 'string' && shieldEffect.durationLabel.length > 0,
         'probe 3: effect has durationLabel',
         { d: shieldEffect?.durationLabel },
       );
@@ -381,7 +388,12 @@ try {
   {
     const res = await call({ actorId: GOBLIN_ID });
     log.info(
-      { probe: 5, actor: res.data?.actor, resources: res.data?.resources, senses: res.data?.perception?.senses },
+      {
+        probe: 5,
+        actor: res.data?.actor,
+        resources: res.data?.resources,
+        senses: res.data?.perception?.senses,
+      },
       'probe 5: clean Goblin Warrior',
     );
     assert(res.ok === true, 'probe 5: ok', { res });
@@ -394,7 +406,9 @@ try {
         hp: res.data.resources?.heroPoints,
       });
       const darkvision = res.data.perception.senses.find((s) => s.type === 'darkvision');
-      assert(darkvision, 'probe 5: darkvision sense present', { senses: res.data.perception.senses });
+      assert(darkvision, 'probe 5: darkvision sense present', {
+        senses: res.data.perception.senses,
+      });
     }
   }
 
@@ -433,15 +447,23 @@ try {
     );
     assert(res.ok === true, 'probe 7: ok', {});
     if (res.ok) {
-      assert(Array.isArray(res.data.skills) && res.data.skills.length > 0, 'probe 7: skills array populated', {
-        n: res.data.skills?.length,
-      });
+      assert(
+        Array.isArray(res.data.skills) && res.data.skills.length > 0,
+        'probe 7: skills array populated',
+        {
+          n: res.data.skills?.length,
+        },
+      );
       const validProfs = new Set(['untrained', 'trained', 'expert', 'master', 'legendary']);
       const badProf = res.data.skills.find((s) => !validProfs.has(s.proficiency));
       assert(!badProf, 'probe 7: all skill proficiencies are valid PF2e labels', { badProf });
       const athletics = res.data.skills.find((s) => s.slug === 'athletics');
       assert(athletics, 'probe 7: athletics present', {});
-      assert(typeof athletics?.modifier === 'number', 'probe 7: athletics has numeric modifier', {});
+      assert(
+        typeof athletics?.modifier === 'number',
+        'probe 7: athletics has numeric modifier',
+        {},
+      );
     }
   }
 
@@ -450,7 +472,10 @@ try {
   // --------------------------------------------------------------------
   {
     const res = await call({ actorId: VALEROS_ID, includeSpellcasting: true });
-    log.info({ probe: 8, spellcasting: res.data?.spellcasting }, 'probe 8: non-caster spellcasting');
+    log.info(
+      { probe: 8, spellcasting: res.data?.spellcasting },
+      'probe 8: non-caster spellcasting',
+    );
     assert(res.ok === true, 'probe 8: ok', {});
     if (res.ok) {
       assert(Array.isArray(res.data.spellcasting), 'probe 8: spellcasting is array', {});
@@ -572,7 +597,11 @@ try {
       assert(res.data.encounter.initiative === 20, 'probe 11: initiative=20', {
         i: res.data.encounter.initiative,
       });
-      assert(res.data.encounter.isCurrentTurn === true, 'probe 11: Valeros is current turn (init 20 vs goblin 15)', {});
+      assert(
+        res.data.encounter.isCurrentTurn === true,
+        'probe 11: Valeros is current turn (init 20 vs goblin 15)',
+        {},
+      );
       assert(res.data.encounter.round === 1, 'probe 11: round=1', {});
     }
   }
@@ -609,11 +638,9 @@ try {
     log.info({ probe: 13, err: res.error }, 'probe 13: ACTOR_NOT_FOUND');
     assert(res.isError === true, 'probe 13: error', { res });
     assert(res.error?.code === 'INVALID_INPUT', 'probe 13: INVALID_INPUT code', {});
-    assert(
-      res.error?.details?.reason === 'ACTOR_NOT_FOUND',
-      'probe 13: reason=ACTOR_NOT_FOUND',
-      { d: res.error?.details },
-    );
+    assert(res.error?.details?.reason === 'ACTOR_NOT_FOUND', 'probe 13: reason=ACTOR_NOT_FOUND', {
+      d: res.error?.details,
+    });
   }
 
   // --------------------------------------------------------------------
@@ -700,7 +727,7 @@ try {
       const sig = (actor) => ({
         conditionSlugs: actor.itemTypes.condition.map((c) => c.system?.slug ?? '').sort(),
         effectSources: actor.itemTypes.effect
-          .map((e) => e.system?.duration ? (e._stats?.compendiumSource ?? '') : '')
+          .map((e) => (e.system?.duration ? (e._stats?.compendiumSource ?? '') : ''))
           .sort(),
       });
       const final = {
@@ -709,20 +736,12 @@ try {
       };
       const expected = {
         valeros: {
-          conditionSlugs: (startSnap.valeros?.conditions ?? [])
-            .map((c) => c.slug)
-            .sort(),
-          effectSources: (startSnap.valeros?.effects ?? [])
-            .map((e) => e.sourceUuid ?? '')
-            .sort(),
+          conditionSlugs: (startSnap.valeros?.conditions ?? []).map((c) => c.slug).sort(),
+          effectSources: (startSnap.valeros?.effects ?? []).map((e) => e.sourceUuid ?? '').sort(),
         },
         goblin: {
-          conditionSlugs: (startSnap.goblin?.conditions ?? [])
-            .map((c) => c.slug)
-            .sort(),
-          effectSources: (startSnap.goblin?.effects ?? [])
-            .map((e) => e.sourceUuid ?? '')
-            .sort(),
+          conditionSlugs: (startSnap.goblin?.conditions ?? []).map((c) => c.slug).sort(),
+          effectSources: (startSnap.goblin?.effects ?? []).map((e) => e.sourceUuid ?? '').sort(),
         },
       };
       const valerosTokensLeft = scene

@@ -186,10 +186,7 @@ try {
     },
     'Q2: collection / documentName presence (expect 0 / 0 / 0 / 0)',
   );
-  log.info(
-    { documentNameCounts: enumeration.documentNameCounts },
-    'Q3: documentName distribution',
-  );
+  log.info({ documentNameCounts: enumeration.documentNameCounts }, 'Q3: documentName distribution');
   log.info(
     {
       metadataKeysUnion: enumeration.metadataKeysUnion,

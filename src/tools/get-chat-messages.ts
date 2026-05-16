@@ -60,10 +60,7 @@ export const getChatMessagesTool: ToolDefinition<typeof GetChatMessagesInput> = 
       limit: input.limit,
       sinceMessageId: input.sinceMessageId ?? null,
     };
-    const result = (await page.evaluate(
-      getChatMessagesBody,
-      args,
-    )) as GetChatMessagesResult;
+    const result = (await page.evaluate(getChatMessagesBody, args)) as GetChatMessagesResult;
     if (!result.ok) {
       throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
     }

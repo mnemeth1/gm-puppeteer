@@ -207,10 +207,7 @@ export async function removeItemFromActorBody(
     actors?: { get(id: string): ActorDocLike | undefined };
   }
 
-  const fail = (
-    message: string,
-    details: Record<string, unknown>,
-  ): RemoveItemFromActorErr => ({
+  const fail = (message: string, details: Record<string, unknown>): RemoveItemFromActorErr => ({
     ok: false,
     error: { code: 'INVALID_INPUT', message, details },
   });
@@ -250,14 +247,11 @@ export async function removeItemFromActorBody(
   // -- Resolve target item on actor.
   const target = actor.items?.get?.(input.itemId);
   if (!target || !target.id) {
-    return fail(
-      `No item found on actor ${actor.id ?? input.actorId} for itemId: ${input.itemId}`,
-      {
-        actorId: input.actorId,
-        itemId: input.itemId,
-        reason: 'ITEM_NOT_FOUND_ON_ACTOR',
-      },
-    );
+    return fail(`No item found on actor ${actor.id ?? input.actorId} for itemId: ${input.itemId}`, {
+      actorId: input.actorId,
+      itemId: input.itemId,
+      reason: 'ITEM_NOT_FOUND_ON_ACTOR',
+    });
   }
 
   const targetType: string = typeof target.type === 'string' ? target.type : '';
@@ -266,10 +260,10 @@ export async function removeItemFromActorBody(
   // -- Decrement-mode-specific validation.
   if (input.mode === 'decrement') {
     if (!Number.isInteger(input.quantity) || input.quantity < 1) {
-      return fail(
-        `quantity must be an integer ≥ 1, got: ${String(input.quantity)}`,
-        { quantity: input.quantity, reason: 'INVALID_QUANTITY' },
-      );
+      return fail(`quantity must be an integer ≥ 1, got: ${String(input.quantity)}`, {
+        quantity: input.quantity,
+        reason: 'INVALID_QUANTITY',
+      });
     }
     if (!isPhysical) {
       return fail(
@@ -395,9 +389,7 @@ export async function removeItemFromActorBody(
   const newQty = Math.max(0, currentQty - input.quantity);
 
   if (newQty > 0) {
-    await actor.updateEmbeddedDocuments('Item', [
-      { _id: target.id, 'system.quantity': newQty },
-    ]);
+    await actor.updateEmbeddedDocuments('Item', [{ _id: target.id, 'system.quantity': newQty }]);
     return {
       ok: true,
       actor: { id: actor.id ?? input.actorId, name: actor.name ?? '' },
@@ -414,9 +406,7 @@ export async function removeItemFromActorBody(
 
   // newQty === 0
   if (!input.deleteIfZero) {
-    await actor.updateEmbeddedDocuments('Item', [
-      { _id: target.id, 'system.quantity': 0 },
-    ]);
+    await actor.updateEmbeddedDocuments('Item', [{ _id: target.id, 'system.quantity': 0 }]);
     return {
       ok: true,
       actor: { id: actor.id ?? input.actorId, name: actor.name ?? '' },

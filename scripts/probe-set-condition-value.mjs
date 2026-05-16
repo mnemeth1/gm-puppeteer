@@ -98,38 +98,50 @@ try {
   // Snapshot conditions/effects/vitals on both actors. Used by Phase 3
   // teardown; safe to capture even when running Phase 1 only.
   // --------------------------------------------------------------------
-  const startSnapshot = await page.evaluate((actorIds) => {
-    const out = {};
-    for (const id of actorIds) {
-      const actor = globalThis.game.actors?.get(id);
-      if (!actor) {
-        out[id] = { error: `actor ${id} not found` };
-        continue;
+  const startSnapshot = await page.evaluate(
+    (actorIds) => {
+      const out = {};
+      for (const id of actorIds) {
+        const actor = globalThis.game.actors?.get(id);
+        if (!actor) {
+          out[id] = { error: `actor ${id} not found` };
+          continue;
+        }
+        out[id] = {
+          name: actor.name,
+          type: actor.type,
+          conditions: actor.itemTypes.condition.map((c) => ({
+            id: c.id,
+            slug: c.system.slug,
+            value: c.system.value.value,
+            grantedById: c.flags?.pf2e?.grantedBy?.id ?? null,
+            payload: c.toObject(),
+          })),
+          effects: actor.itemTypes.effect.map((e) => ({
+            id: e.id,
+            name: e.name,
+            payload: e.toObject(),
+          })),
+          vitals: {
+            dying: {
+              value: actor.system.attributes.dying.value,
+              max: actor.system.attributes.dying.max,
+            },
+            wounded: {
+              value: actor.system.attributes.wounded.value,
+              max: actor.system.attributes.wounded.max,
+            },
+            doomed: {
+              value: actor.system.attributes.doomed.value,
+              max: actor.system.attributes.doomed.max,
+            },
+          },
+        };
       }
-      out[id] = {
-        name: actor.name,
-        type: actor.type,
-        conditions: actor.itemTypes.condition.map((c) => ({
-          id: c.id,
-          slug: c.system.slug,
-          value: c.system.value.value,
-          grantedById: c.flags?.pf2e?.grantedBy?.id ?? null,
-          payload: c.toObject(),
-        })),
-        effects: actor.itemTypes.effect.map((e) => ({
-          id: e.id,
-          name: e.name,
-          payload: e.toObject(),
-        })),
-        vitals: {
-          dying: { value: actor.system.attributes.dying.value, max: actor.system.attributes.dying.max },
-          wounded: { value: actor.system.attributes.wounded.value, max: actor.system.attributes.wounded.max },
-          doomed: { value: actor.system.attributes.doomed.value, max: actor.system.attributes.doomed.max },
-        },
-      };
-    }
-    return out;
-  }, [VALEROS_ID, GOBLIN_ID]);
+      return out;
+    },
+    [VALEROS_ID, GOBLIN_ID],
+  );
   log.info(
     {
       valeros: {
@@ -196,7 +208,9 @@ try {
       ]);
       // Readback.
       const post = actor.getCondition('frightened');
-      const postCount = actor.itemTypes.condition.filter((c) => c.system.slug === 'frightened').length;
+      const postCount = actor.itemTypes.condition.filter(
+        (c) => c.system.slug === 'frightened',
+      ).length;
       return {
         seededValue,
         seededId,
@@ -231,7 +245,9 @@ try {
       await actor.decreaseCondition('frightened');
       await actor.decreaseCondition('frightened');
       const post = actor.getCondition('frightened');
-      const postCount = actor.itemTypes.condition.filter((c) => c.system.slug === 'frightened').length;
+      const postCount = actor.itemTypes.condition.filter(
+        (c) => c.system.slug === 'frightened',
+      ).length;
       return {
         seededValue,
         seededId,
@@ -267,9 +283,7 @@ try {
         .map((c) => c.system.slug)
         .sort();
       // Mutate via item update.
-      await actor.updateEmbeddedDocuments('Item', [
-        { _id: seededId, 'system.value.value': 1 },
-      ]);
+      await actor.updateEmbeddedDocuments('Item', [{ _id: seededId, 'system.value.value': 1 }]);
       const post = actor.getCondition('dying');
       const postCount = actor.itemTypes.condition.filter((c) => c.system.slug === 'dying').length;
       const postCascade = actor.itemTypes.condition
@@ -404,7 +418,7 @@ try {
       phase: 1,
       summary:
         'Inspect the readbacks above. Predicted result: 1.A works (non-vital item ' +
-        "update); 1.C works (vital item update propagates to attribute) OR shows " +
+        'update); 1.C works (vital item update propagates to attribute) OR shows ' +
         'desync (pick 1.D path for vitals); 1.D and 1.E known good.',
     },
     'Phase 1 complete',
@@ -440,7 +454,9 @@ try {
         assert(res.data.condition.previousValue === null, 'probe 1: previousValue=null', {
           previousValue: res.data.condition.previousValue,
         });
-        assert(res.data.condition.value === 2, 'probe 1: value=2', { value: res.data.condition.value });
+        assert(res.data.condition.value === 2, 'probe 1: value=2', {
+          value: res.data.condition.value,
+        });
         assert(res.data.condition.valueRequested === 2, 'probe 1: valueRequested=2', {
           valueRequested: res.data.condition.valueRequested,
         });
@@ -474,7 +490,9 @@ try {
         assert(res.data.condition.previousValue === 2, 'probe 2: previousValue=2', {
           previousValue: res.data.condition.previousValue,
         });
-        assert(res.data.condition.value === 3, 'probe 2: value=3', { value: res.data.condition.value });
+        assert(res.data.condition.value === 3, 'probe 2: value=3', {
+          value: res.data.condition.value,
+        });
         assert(res.data.condition.valueApplied === 3, 'probe 2: valueApplied=3', {
           valueApplied: res.data.condition.valueApplied,
         });
@@ -505,7 +523,9 @@ try {
         assert(res.data.condition.previousValue === 3, 'probe 3: previousValue=3', {
           previousValue: res.data.condition.previousValue,
         });
-        assert(res.data.condition.value === 1, 'probe 3: value=1', { value: res.data.condition.value });
+        assert(res.data.condition.value === 1, 'probe 3: value=1', {
+          value: res.data.condition.value,
+        });
         assert(res.data.condition.valueApplied === 1, 'probe 3: valueApplied=1', {
           valueApplied: res.data.condition.valueApplied,
         });
@@ -531,7 +551,9 @@ try {
         assert(res.data.reason === 'already_at_requested_value', 'probe 4: reason', {
           reason: res.data.reason,
         });
-        assert(res.data.condition.value === 1, 'probe 4: value=1', { value: res.data.condition.value });
+        assert(res.data.condition.value === 1, 'probe 4: value=1', {
+          value: res.data.condition.value,
+        });
       }
     }
     await clearConditions(VALEROS_ID);
@@ -551,7 +573,9 @@ try {
         assert(res.data.condition.valueApplied === 4, 'probe 5: valueApplied=4', {
           valueApplied: res.data.condition.valueApplied,
         });
-        assert(res.data.condition.value === 4, 'probe 5: value=4', { value: res.data.condition.value });
+        assert(res.data.condition.value === 4, 'probe 5: value=4', {
+          value: res.data.condition.value,
+        });
         assert(res.data.condition.clamped === true, 'probe 5: clamped=true', {
           clamped: res.data.condition.clamped,
         });
@@ -569,7 +593,9 @@ try {
       assert(res.ok === true, 'probe 6: ok', { res });
       if (res.ok) {
         assert(res.data.operation === 'applied', 'probe 6: applied', { op: res.data.operation });
-        assert(res.data.condition.value === 2, 'probe 6: dying=2', { value: res.data.condition.value });
+        assert(res.data.condition.value === 2, 'probe 6: dying=2', {
+          value: res.data.condition.value,
+        });
         assert(res.data.condition.existedBefore === false, 'probe 6: existedBefore=false', {
           existedBefore: res.data.condition.existedBefore,
         });
@@ -603,7 +629,9 @@ try {
         assert(res.data.condition.previousValue === 2, 'probe 7: previousValue=2', {
           previousValue: res.data.condition.previousValue,
         });
-        assert(res.data.condition.value === 1, 'probe 7: dying=1', { value: res.data.condition.value });
+        assert(res.data.condition.value === 1, 'probe 7: dying=1', {
+          value: res.data.condition.value,
+        });
         // No cascadeGranted on a going-down.
         assert(
           !res.data.cascadeGranted || res.data.cascadeGranted.length === 0,
@@ -621,7 +649,9 @@ try {
           };
         }, VALEROS_ID);
         assert(post.attr === 1, 'probe 7: actor.system.attributes.dying.value=1', { post });
-        assert(post.cascadeSlugs.includes('unconscious'), 'probe 7: unconscious survives', { post });
+        assert(post.cascadeSlugs.includes('unconscious'), 'probe 7: unconscious survives', {
+          post,
+        });
         assert(post.cascadeSlugs.includes('blinded'), 'probe 7: blinded survives', { post });
         assert(post.cascadeSlugs.includes('prone'), 'probe 7: prone survives', { post });
       }
@@ -635,7 +665,10 @@ try {
     {
       await page.evaluate(async (id) => {
         const actor = globalThis.game.actors?.get(id);
-        await actor.increaseCondition('doomed', { value: 2, max: actor.system.attributes.doomed.max });
+        await actor.increaseCondition('doomed', {
+          value: 2,
+          max: actor.system.attributes.doomed.max,
+        });
       }, VALEROS_ID);
       const res = await call({ actorId: VALEROS_ID, slug: 'dying', value: 4 });
       log.info({ probe: 8, res }, 'probe 8: vital clamp via doomed (dying request 4 → clamped 2)');
@@ -645,9 +678,13 @@ try {
         assert(res.data.condition.valueRequested === 4, 'probe 8: valueRequested=4', {
           valueRequested: res.data.condition.valueRequested,
         });
-        assert(res.data.condition.valueApplied === 2, 'probe 8: valueApplied=2 (dying.max - doomed=2)', {
-          valueApplied: res.data.condition.valueApplied,
-        });
+        assert(
+          res.data.condition.valueApplied === 2,
+          'probe 8: valueApplied=2 (dying.max - doomed=2)',
+          {
+            valueApplied: res.data.condition.valueApplied,
+          },
+        );
         assert(res.data.condition.clamped === true, 'probe 8: clamped=true', {
           clamped: res.data.condition.clamped,
         });
@@ -667,7 +704,9 @@ try {
         assert(res.data.actor.id === GOBLIN_ID, 'probe 9: actor id echoed', {
           actorId: res.data.actor.id,
         });
-        assert(res.data.condition.value === 2, 'probe 9: value=2', { value: res.data.condition.value });
+        assert(res.data.condition.value === 2, 'probe 9: value=2', {
+          value: res.data.condition.value,
+        });
       }
     }
     await clearConditions(GOBLIN_ID);
@@ -744,11 +783,9 @@ try {
       const res = await call({ actorId: 'deadbeef', slug: 'frightened', value: 2 });
       log.info({ probe: 14, res }, 'probe 14: bogus actorId');
       assert(res.isError === true, 'probe 14: error', { res });
-      assert(
-        res.error?.details?.reason === 'ACTOR_NOT_FOUND',
-        'probe 14: reason=ACTOR_NOT_FOUND',
-        { reason: res.error?.details?.reason },
-      );
+      assert(res.error?.details?.reason === 'ACTOR_NOT_FOUND', 'probe 14: reason=ACTOR_NOT_FOUND', {
+        reason: res.error?.details?.reason,
+      });
     }
 
     // ------------------------------------------------------------------

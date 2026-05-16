@@ -27,8 +27,8 @@ export const viewSceneTool: ToolDefinition<typeof ViewSceneInput> = {
     'padding, and grid info — the same projection shape as `get_current_scene` ' +
     'so a caller can chain a screenshot without a second metadata fetch. ' +
     'NOT a broadcast: does NOT change `game.scenes.active`, does NOT affect ' +
-    "what players see. Use `activate_scene` when you want to change the " +
-    "world-active scene for everyone. NOT a scene-detail view — use " +
+    'what players see. Use `activate_scene` when you want to change the ' +
+    'world-active scene for everyone. NOT a scene-detail view — use ' +
     '`get_current_scene` after viewing if you also need per-collection counts.',
   inputSchema: ViewSceneInput,
   async handler(input, ctx) {

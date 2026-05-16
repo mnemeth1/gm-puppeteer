@@ -247,12 +247,9 @@ try {
           bContainerId: bLive?.system?.containerId ?? null,
         };
         // Cleanup scratch state.
-        const ids = [
-          stackA.id,
-          stackB.id,
-          containerA.id,
-          containerB.id,
-        ].filter((id) => actor.items.get(id));
+        const ids = [stackA.id, stackB.id, containerA.id, containerB.id].filter((id) =>
+          actor.items.get(id),
+        );
         if (ids.length > 0) {
           await actor.deleteEmbeddedDocuments('Item', ids);
         }
@@ -303,10 +300,8 @@ try {
         const innerLive = actor.items.get(inner.id);
         const out = {
           scratchBpContainerId: scratchLive?.system?.containerId ?? null,
-          scratchBpEqualsCanonical:
-            (scratchLive?.system?.containerId ?? null) === canonical.id,
-          innerContainerIdStillScratch:
-            (innerLive?.system?.containerId ?? null) === scratchBp.id,
+          scratchBpEqualsCanonical: (scratchLive?.system?.containerId ?? null) === canonical.id,
+          innerContainerIdStillScratch: (innerLive?.system?.containerId ?? null) === scratchBp.id,
           innerContainerIdNow: innerLive?.system?.containerId ?? null,
         };
         // Cleanup.
@@ -339,11 +334,7 @@ try {
         const bp = await fromUuid(backpackUuid);
 
         const make = async (name) => {
-          return (
-            await actor.createEmbeddedDocuments('Item', [
-              { ...bp.toObject(), name },
-            ])
-          )[0];
+          return (await actor.createEmbeddedDocuments('Item', [{ ...bp.toObject(), name }]))[0];
         };
 
         const reportInventoryHealth = () => {
@@ -396,8 +387,7 @@ try {
               /* ignore */
             }
           }
-          if (actor.items.get(a.id))
-            await actor.deleteEmbeddedDocuments('Item', [a.id]);
+          if (actor.items.get(a.id)) await actor.deleteEmbeddedDocuments('Item', [a.id]);
         }
 
         // 6b: A contains B; try to set A.containerId = B.id (parent into
@@ -405,9 +395,7 @@ try {
         {
           const a = await make('__probe_p1_cyc_b_parent');
           const bi = await make('__probe_p1_cyc_b_child');
-          await actor.updateEmbeddedDocuments('Item', [
-            { _id: bi.id, 'system.containerId': a.id },
-          ]);
+          await actor.updateEmbeddedDocuments('Item', [{ _id: bi.id, 'system.containerId': a.id }]);
           let threw = null;
           try {
             await actor.updateEmbeddedDocuments('Item', [
@@ -429,9 +417,7 @@ try {
             const live = actor.items.get(id);
             if (live)
               await actor
-                .updateEmbeddedDocuments('Item', [
-                  { _id: id, 'system.containerId': null },
-                ])
+                .updateEmbeddedDocuments('Item', [{ _id: id, 'system.containerId': null }])
                 .catch(() => undefined);
           }
           await actor
@@ -474,9 +460,7 @@ try {
             const live = actor.items.get(id);
             if (live)
               await actor
-                .updateEmbeddedDocuments('Item', [
-                  { _id: id, 'system.containerId': null },
-                ])
+                .updateEmbeddedDocuments('Item', [{ _id: id, 'system.containerId': null }])
                 .catch(() => undefined);
           }
           await actor
@@ -536,9 +520,7 @@ try {
           const live = actor.items.get(id);
           if (live)
             await actor
-              .updateEmbeddedDocuments('Item', [
-                { _id: id, 'system.containerId': null },
-              ])
+              .updateEmbeddedDocuments('Item', [{ _id: id, 'system.containerId': null }])
               .catch(() => undefined);
         }
         await actor
@@ -595,10 +577,7 @@ try {
         const out = {
           threw,
           featContainerIdPersisted: featSys.containerId ?? null,
-          featHasContainerIdField: Object.prototype.hasOwnProperty.call(
-            featSys,
-            'containerId',
-          ),
+          featHasContainerIdField: Object.prototype.hasOwnProperty.call(featSys, 'containerId'),
           featTypeUnchanged: featLive?.type === 'feat',
         };
         // Cleanup.
@@ -630,9 +609,7 @@ try {
         if (!live) continue;
         // Repair containerId to null first to neutralize any cycles.
         await actor
-          .updateEmbeddedDocuments('Item', [
-            { _id: id, 'system.containerId': null },
-          ])
+          .updateEmbeddedDocuments('Item', [{ _id: id, 'system.containerId': null }])
           .catch(() => undefined);
         try {
           await actor.deleteEmbeddedDocuments('Item', [id]);
@@ -688,7 +665,8 @@ try {
       }
       const missing = [];
       for (const [k, n] of snapSig) {
-        if ((liveSig.get(k) ?? 0) !== n) missing.push({ k, expected: n, actual: liveSig.get(k) ?? 0 });
+        if ((liveSig.get(k) ?? 0) !== n)
+          missing.push({ k, expected: n, actual: liveSig.get(k) ?? 0 });
       }
       const extras = [];
       for (const [k, n] of liveSig) {

@@ -15,9 +15,11 @@ function makeCtx(): { browser: BrowserSession; log: Logger } {
   };
 }
 
-async function run(
-  input: { partyLevel: number; partySize: number; difficulty: string },
-): Promise<CalculateEncounterBudgetResult> {
+async function run(input: {
+  partyLevel: number;
+  partySize: number;
+  difficulty: string;
+}): Promise<CalculateEncounterBudgetResult> {
   const ctx = makeCtx();
   const blocks = await calculateEncounterBudgetTool.handler(
     input as Parameters<typeof calculateEncounterBudgetTool.handler>[0],
@@ -102,8 +104,18 @@ describe('calculate_encounter_budget', () => {
     const haz = new Map(r.hazardCosts.map((h) => [h.relativeLevel, h]));
     expect(haz.get(0)).toEqual({ relativeLevel: 0, absoluteLevel: 5, simpleXp: 8, complexXp: 40 });
     expect(haz.get(1)).toEqual({ relativeLevel: 1, absoluteLevel: 6, simpleXp: 12, complexXp: 60 });
-    expect(haz.get(-4)).toEqual({ relativeLevel: -4, absoluteLevel: 1, simpleXp: 2, complexXp: 10 });
-    expect(haz.get(-3)).toEqual({ relativeLevel: -3, absoluteLevel: 2, simpleXp: 3, complexXp: 15 });
+    expect(haz.get(-4)).toEqual({
+      relativeLevel: -4,
+      absoluteLevel: 1,
+      simpleXp: 2,
+      complexXp: 10,
+    });
+    expect(haz.get(-3)).toEqual({
+      relativeLevel: -3,
+      absoluteLevel: 2,
+      simpleXp: 3,
+      complexXp: 15,
+    });
   });
 
   it('every suggestedMix sums to totalXp exactly', async () => {
@@ -137,12 +149,24 @@ describe('calculate_encounter_budget', () => {
 
   it('zod rejects out-of-range and bad-enum inputs', () => {
     const schema = calculateEncounterBudgetTool.inputSchema;
-    expect(schema.safeParse({ partyLevel: 0, partySize: 4, difficulty: 'moderate' }).success).toBe(false);
-    expect(schema.safeParse({ partyLevel: 26, partySize: 4, difficulty: 'moderate' }).success).toBe(false);
-    expect(schema.safeParse({ partyLevel: 5, partySize: 0, difficulty: 'moderate' }).success).toBe(false);
-    expect(schema.safeParse({ partyLevel: 5, partySize: 13, difficulty: 'moderate' }).success).toBe(false);
-    expect(schema.safeParse({ partyLevel: 5, partySize: 4, difficulty: 'easy' }).success).toBe(false);
-    expect(schema.safeParse({ partyLevel: 5.5, partySize: 4, difficulty: 'moderate' }).success).toBe(false);
+    expect(schema.safeParse({ partyLevel: 0, partySize: 4, difficulty: 'moderate' }).success).toBe(
+      false,
+    );
+    expect(schema.safeParse({ partyLevel: 26, partySize: 4, difficulty: 'moderate' }).success).toBe(
+      false,
+    );
+    expect(schema.safeParse({ partyLevel: 5, partySize: 0, difficulty: 'moderate' }).success).toBe(
+      false,
+    );
+    expect(schema.safeParse({ partyLevel: 5, partySize: 13, difficulty: 'moderate' }).success).toBe(
+      false,
+    );
+    expect(schema.safeParse({ partyLevel: 5, partySize: 4, difficulty: 'easy' }).success).toBe(
+      false,
+    );
+    expect(
+      schema.safeParse({ partyLevel: 5.5, partySize: 4, difficulty: 'moderate' }).success,
+    ).toBe(false);
   });
 
   it('zod rejects unexpected input keys (.strict())', () => {

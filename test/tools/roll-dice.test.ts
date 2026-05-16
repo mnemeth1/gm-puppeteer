@@ -32,10 +32,7 @@ describe('roll_dice', () => {
     const evaluate = vi.fn().mockResolvedValueOnce(evalResult);
     const ctx = makeCtx(evaluate);
 
-    const result = await rollDiceTool.handler(
-      { formula: '2d6+3', visibility: 'public' },
-      ctx,
-    );
+    const result = await rollDiceTool.handler({ formula: '2d6+3', visibility: 'public' }, ctx);
 
     expect(evaluate).toHaveBeenCalledTimes(1);
     expect(result).toHaveLength(1);

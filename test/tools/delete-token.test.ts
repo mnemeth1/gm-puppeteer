@@ -21,7 +21,9 @@ describe('delete_token recovery path', () => {
     const evaluate = vi
       .fn()
       // First call: deleteTokenBody — throws CDP flake.
-      .mockRejectedValueOnce(new Error('Protocol error (Runtime.callFunctionOn): Promise was collected'))
+      .mockRejectedValueOnce(
+        new Error('Protocol error (Runtime.callFunctionOn): Promise was collected'),
+      )
       // Second call: verifyTokensPresentBody — reports all absent.
       .mockResolvedValueOnce({
         ok: true,
@@ -56,7 +58,9 @@ describe('delete_token recovery path', () => {
   it('throws EVAL_FAILED when CDP drops the response and tokens remain', async () => {
     const evaluate = vi
       .fn()
-      .mockRejectedValueOnce(new Error('Protocol error (Runtime.callFunctionOn): Promise was collected'))
+      .mockRejectedValueOnce(
+        new Error('Protocol error (Runtime.callFunctionOn): Promise was collected'),
+      )
       .mockResolvedValueOnce({
         ok: true,
         sceneId: 'scene-1',
@@ -96,10 +100,7 @@ describe('delete_token recovery path', () => {
     });
     const ctx = makeCtx(evaluate);
 
-    const result = await deleteTokenTool.handler(
-      { tokenIds: ['tok-a', 'tok-bogus'] },
-      ctx,
-    );
+    const result = await deleteTokenTool.handler({ tokenIds: ['tok-a', 'tok-bogus'] }, ctx);
 
     const text = result[0] as { type: 'text'; text: string };
     const payload = JSON.parse(text.text);

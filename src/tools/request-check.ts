@@ -87,12 +87,12 @@ export const requestCheckTool: ToolDefinition<typeof RequestCheckInput> = {
     'Ask a player to roll a check for their own character. Posts a PF2e @Check inline ' +
     'button to Foundry\'s chat — "Valeros, roll Perception" — whispered to the actor\'s ' +
     'owner(s) and GMs. The player clicks the button to roll, keeping agency over their ' +
-    "own dice; this tool rolls nothing itself. The message speaker is set to the target " +
+    'own dice; this tool rolls nothing itself. The message speaker is set to the target ' +
     'PC so the button resolves the roll to that character. Supports an optional DC, the ' +
     'basic-save flag (saves only), trait slugs, and whether the DC is visible to the ' +
     'player (default: GM-only). Returns {actor:{id, name}, checkType, dc, basic, ' +
     'checkExpression, whisperedTo:[{id, name}], chatMessageId}. ' +
-    'Use this for player characters only — it is the deputy\'s player-facing roll path. ' +
+    "Use this for player characters only — it is the deputy's player-facing roll path. " +
     "To roll an NPC's real check yourself use roll_check; for raw dice use roll_dice.",
   inputSchema: RequestCheckInput,
   async handler(input, ctx) {

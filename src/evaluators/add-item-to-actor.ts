@@ -124,7 +124,8 @@ export async function addItemToActorBody(
     'ammo',
   ]);
   const CHOICE_SET_KEY = 'ChoiceSet';
-  const PHYSICAL_TYPES_LIST = 'weapon, armor, shield, consumable, equipment, backpack, treasure, ammo';
+  const PHYSICAL_TYPES_LIST =
+    'weapon, armor, shield, consumable, equipment, backpack, treasure, ammo';
 
   type AnyRecord = Record<string, unknown> & { [k: string]: unknown };
   interface ItemDocLike {
@@ -277,8 +278,7 @@ export async function addItemToActorBody(
       if (!candidate || !candidate.id) continue;
       const csys = (candidate.system as AnyRecord | undefined) ?? {};
       const candidateSourceRaw = candidate._stats?.compendiumSource;
-      const candidateSource =
-        typeof candidateSourceRaw === 'string' ? candidateSourceRaw : null;
+      const candidateSource = typeof candidateSourceRaw === 'string' ? candidateSourceRaw : null;
       if (candidateSource !== input.sourceUuid) continue;
       const candidateContainerRaw = csys.containerId;
       const candidateContainer =
@@ -362,9 +362,12 @@ export async function addItemToActorBody(
   const createdArr = await actor.createEmbeddedDocuments('Item', [data]);
   const created = createdArr?.[0];
   if (!created || !created.id) {
-    return fail(`createEmbeddedDocuments returned no document for sourceUuid: ${input.sourceUuid}`, {
-      sourceUuid: input.sourceUuid,
-    });
+    return fail(
+      `createEmbeddedDocuments returned no document for sourceUuid: ${input.sourceUuid}`,
+      {
+        sourceUuid: input.sourceUuid,
+      },
+    );
   }
 
   // -- Cascade detection: items on the actor whose flags.pf2e.grantedBy.id
@@ -397,8 +400,7 @@ export async function addItemToActorBody(
   const createdStatus: 'identified' | 'unidentified' =
     createdIdent?.status === 'unidentified' ? 'unidentified' : 'identified';
   const createdSourceRaw = created._stats?.compendiumSource;
-  const createdSource =
-    typeof createdSourceRaw === 'string' ? createdSourceRaw : input.sourceUuid;
+  const createdSource = typeof createdSourceRaw === 'string' ? createdSourceRaw : input.sourceUuid;
   const createdQty =
     typeof createdSys.quantity === 'number' && Number.isFinite(createdSys.quantity)
       ? createdSys.quantity

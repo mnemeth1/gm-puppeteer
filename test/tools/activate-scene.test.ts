@@ -103,9 +103,7 @@ describe('activate_scene', () => {
     };
     const ctx = makeCtx(vi.fn().mockResolvedValue(mockResult));
 
-    const err = await activateSceneTool
-      .handler({ sceneId: 's' }, ctx)
-      .catch((e) => e as ToolError);
+    const err = await activateSceneTool.handler({ sceneId: 's' }, ctx).catch((e) => e as ToolError);
 
     expect((err as ToolError).code).toBe('EVAL_FAILED');
   });

@@ -194,11 +194,9 @@ try {
   // Probe 1: consumable happy path (potion qty=2 → qty=1).
   // ====================================================================
   {
-    const temp = await makeTempFromCompendium(
-      '__probe_use_item_p1_potion',
-      HEALING_POTION_UUID,
-      { quantity: 2 },
-    );
+    const temp = await makeTempFromCompendium('__probe_use_item_p1_potion', HEALING_POTION_UUID, {
+      quantity: 2,
+    });
     const res = await call({ actorId: PROBE_ACTOR_ID, itemId: temp.id });
     log.info({ probe: 1, res }, 'probe 1: consumable happy path');
     assert(res.ok === true, 'probe 1: ok', { res });
@@ -206,10 +204,18 @@ try {
       assert(res.data.operation === 'used', 'probe 1: operation=used', { op: res.data.operation });
       assert(res.data.mode === 'consume', 'probe 1: mode=consume', { mode: res.data.mode });
       assert(res.data.item?.id === temp.id, 'probe 1: item.id matches', { id: res.data.item?.id });
-      assert(res.data.item?.subtype === 'potion', 'probe 1: subtype=potion', { subtype: res.data.item?.subtype });
-      assert(res.data.item?.qtyBefore === 2, 'probe 1: qtyBefore=2', { qty: res.data.item?.qtyBefore });
-      assert(res.data.item?.qtyAfter === 1, 'probe 1: qtyAfter=1', { qty: res.data.item?.qtyAfter });
-      assert(res.data.item?.deleted === false, 'probe 1: deleted=false', { d: res.data.item?.deleted });
+      assert(res.data.item?.subtype === 'potion', 'probe 1: subtype=potion', {
+        subtype: res.data.item?.subtype,
+      });
+      assert(res.data.item?.qtyBefore === 2, 'probe 1: qtyBefore=2', {
+        qty: res.data.item?.qtyBefore,
+      });
+      assert(res.data.item?.qtyAfter === 1, 'probe 1: qtyAfter=1', {
+        qty: res.data.item?.qtyAfter,
+      });
+      assert(res.data.item?.deleted === false, 'probe 1: deleted=false', {
+        d: res.data.item?.deleted,
+      });
     }
     await deleteTemp(temp.id);
   }
@@ -228,8 +234,12 @@ try {
     assert(res.ok === true, 'probe 2: ok', { res });
     if (res.ok) {
       assert(res.data.mode === 'consume', 'probe 2: mode=consume', { mode: res.data.mode });
-      assert(res.data.item?.qtyBefore === 1, 'probe 2: qtyBefore=1', { q: res.data.item?.qtyBefore });
-      assert(res.data.item?.deleted === true, 'probe 2: deleted=true', { d: res.data.item?.deleted });
+      assert(res.data.item?.qtyBefore === 1, 'probe 2: qtyBefore=1', {
+        q: res.data.item?.qtyBefore,
+      });
+      assert(res.data.item?.deleted === true, 'probe 2: deleted=true', {
+        d: res.data.item?.deleted,
+      });
       // Verify item is actually gone.
       const stillThere = await page.evaluate(
         (actorId, id) => !!globalThis.game.actors?.get(actorId)?.items?.get(id),
@@ -288,11 +298,9 @@ try {
       assert(res.data.item?.deleted === true, 'probe 4: deleted=true', {
         d: res.data.item?.deleted,
       });
-      assert(
-        typeof res.data.chatMessageId === 'string',
-        'probe 4: chatMessageId populated',
-        { id: res.data.chatMessageId },
-      );
+      assert(typeof res.data.chatMessageId === 'string', 'probe 4: chatMessageId populated', {
+        id: res.data.chatMessageId,
+      });
     }
     // Teardown handles snapshot-id cleanup of the deleted scroll.
   }
@@ -343,11 +351,9 @@ try {
       assert(res.data.item?.deleted === false, 'probe 6: deleted=false', {
         d: res.data.item?.deleted,
       });
-      assert(
-        typeof res.data.chatMessageId === 'string',
-        'probe 6: chatMessageId populated',
-        { id: res.data.chatMessageId },
-      );
+      assert(typeof res.data.chatMessageId === 'string', 'probe 6: chatMessageId populated', {
+        id: res.data.chatMessageId,
+      });
       assert(
         res.data.item?.usesBefore === undefined && res.data.item?.usesAfter === undefined,
         'probe 6: no uses fields for no-uses equipment',
@@ -381,11 +387,9 @@ try {
       assert(res.data.item?.usesAfter === 1, 'probe 7: usesAfter=1', {
         u: res.data.item?.usesAfter,
       });
-      assert(
-        typeof res.data.chatMessageId === 'string',
-        'probe 7: chatMessageId populated',
-        { id: res.data.chatMessageId },
-      );
+      assert(typeof res.data.chatMessageId === 'string', 'probe 7: chatMessageId populated', {
+        id: res.data.chatMessageId,
+      });
     }
     await deleteTemp(temp.id);
   }
@@ -420,11 +424,9 @@ try {
   // Probe 9: weapon rejection.
   // ====================================================================
   {
-    const temp = await makeTempFromCompendium(
-      '__probe_use_item_p9_longsword',
-      LONGSWORD_UUID,
-      { quantity: 1 },
-    );
+    const temp = await makeTempFromCompendium('__probe_use_item_p9_longsword', LONGSWORD_UUID, {
+      quantity: 1,
+    });
     const res = await call({ actorId: PROBE_ACTOR_ID, itemId: temp.id });
     log.info({ probe: 9, res }, 'probe 9: weapon rejection');
     assert(res.isError === true, 'probe 9: error returned', { res });
@@ -468,11 +470,9 @@ try {
     log.info({ probe: 11, res }, 'probe 11: bogus actorId');
     assert(res.isError === true, 'probe 11: error returned', { res });
     if (res.isError) {
-      assert(
-        res.error?.details?.reason === 'ACTOR_NOT_FOUND',
-        'probe 11: reason=ACTOR_NOT_FOUND',
-        { reason: res.error?.details?.reason },
-      );
+      assert(res.error?.details?.reason === 'ACTOR_NOT_FOUND', 'probe 11: reason=ACTOR_NOT_FOUND', {
+        reason: res.error?.details?.reason,
+      });
     }
   }
 
@@ -543,8 +543,7 @@ try {
       }
       if (updates.length > 0) await actor.updateEmbeddedDocuments('Item', updates);
 
-      const sigOf = (s) =>
-        `${s.name ?? ''}|${s.type ?? ''}|${s.qty}|${s.containerId ?? ''}`;
+      const sigOf = (s) => `${s.name ?? ''}|${s.type ?? ''}|${s.qty}|${s.containerId ?? ''}`;
       const liveSig = new Map();
       for (const item of actor.items.contents) {
         const k = sigOf({
@@ -562,7 +561,8 @@ try {
       }
       const missing = [];
       for (const [k, n] of snapSig) {
-        if ((liveSig.get(k) ?? 0) !== n) missing.push({ k, expected: n, actual: liveSig.get(k) ?? 0 });
+        if ((liveSig.get(k) ?? 0) !== n)
+          missing.push({ k, expected: n, actual: liveSig.get(k) ?? 0 });
       }
       const extras = [];
       for (const [k, n] of liveSig) {

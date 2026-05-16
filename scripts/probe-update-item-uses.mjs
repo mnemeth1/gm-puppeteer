@@ -151,8 +151,7 @@ try {
         type: i.type ?? '',
         qty: typeof i.system?.quantity === 'number' ? i.system.quantity : 1,
         containerId: i.system?.containerId ?? null,
-        usesValue:
-          typeof i.system?.uses?.value === 'number' ? i.system.uses.value : null,
+        usesValue: typeof i.system?.uses?.value === 'number' ? i.system.uses.value : null,
         payload: i.toObject(),
       })),
     };
@@ -421,11 +420,9 @@ try {
   // the write.
   // --------------------------------------------------------------------
   {
-    const potion = await makeTempFromCompendium(
-      '__probe_uius_p7_potion__',
-      HEALING_POTION_UUID,
-      { quantity: 2 },
-    );
+    const potion = await makeTempFromCompendium('__probe_uius_p7_potion__', HEALING_POTION_UUID, {
+      quantity: 2,
+    });
     // Sanity: confirm the compendium potion ships with uses.max === 1.
     assert(potion.usesMax === 1, 'probe 7: precondition — potion uses.max === 1', {
       max: potion.usesMax,
@@ -471,11 +468,9 @@ try {
     assert(res.error?.code === 'INVALID_INPUT', 'probe 8: INVALID_INPUT', {
       code: res.error?.code,
     });
-    assert(
-      res.error?.details?.reason === 'INVALID_VALUE',
-      'probe 8: reason=INVALID_VALUE',
-      { d: res.error?.details },
-    );
+    assert(res.error?.details?.reason === 'INVALID_VALUE', 'probe 8: reason=INVALID_VALUE', {
+      d: res.error?.details,
+    });
   }
 
   // --------------------------------------------------------------------
@@ -498,10 +493,7 @@ try {
   // Probe 10: longsword (no system.uses) → ITEM_HAS_NO_USES_FIELD.
   // --------------------------------------------------------------------
   {
-    const longsword = await makeTempFromCompendium(
-      '__probe_uius_p10_longsword__',
-      LONGSWORD_UUID,
-    );
+    const longsword = await makeTempFromCompendium('__probe_uius_p10_longsword__', LONGSWORD_UUID);
     const res = await call({
       actorId: PROBE_ACTOR_ID,
       itemId: longsword.id,
@@ -515,8 +507,7 @@ try {
       { d: res.error?.details },
     );
     assert(
-      typeof res.error?.message === 'string' &&
-        res.error.message.includes('get_item_details'),
+      typeof res.error?.message === 'string' && res.error.message.includes('get_item_details'),
       'probe 10: message points at get_item_details',
       { msg: res.error?.message },
     );
@@ -672,9 +663,7 @@ try {
       }
       const snapSig = new Map();
       for (const s of snapshot.items) {
-        const k = `${s.name}|${s.type}|${s.qty}|${s.containerId ?? ''}|${
-          s.usesValue ?? ''
-        }`;
+        const k = `${s.name}|${s.type}|${s.qty}|${s.containerId ?? ''}|${s.usesValue ?? ''}`;
         snapSig.set(k, (snapSig.get(k) ?? 0) + 1);
       }
       const missingSigs = [];

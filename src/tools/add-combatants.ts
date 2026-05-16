@@ -20,8 +20,7 @@ const AddCombatantsInput = z
       .min(1)
       .optional()
       .describe(
-        'Scene id whose combat encounter to add to; defaults to the ' +
-          'world-active scene.',
+        'Scene id whose combat encounter to add to; defaults to the ' + 'world-active scene.',
       ),
   })
   .strict();

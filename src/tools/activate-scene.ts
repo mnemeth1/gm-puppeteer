@@ -1,9 +1,6 @@
 import { z } from 'zod';
 import { ToolError } from '../errors.js';
-import {
-  activateSceneBody,
-  type ActivateSceneResult,
-} from '../evaluators/activate-scene.js';
+import { activateSceneBody, type ActivateSceneResult } from '../evaluators/activate-scene.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
 const ActivateSceneInput = z

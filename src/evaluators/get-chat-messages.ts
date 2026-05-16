@@ -50,11 +50,7 @@ export interface GetChatMessagesInput {
   sinceMessageId: string | null;
 }
 
-export type DegreeOfSuccess =
-  | 'criticalSuccess'
-  | 'success'
-  | 'failure'
-  | 'criticalFailure';
+export type DegreeOfSuccess = 'criticalSuccess' | 'success' | 'failure' | 'criticalFailure';
 
 export interface ChatCardCheck {
   kind: 'check';
@@ -131,9 +127,7 @@ export type GetChatMessagesResult =
       };
     };
 
-export function getChatMessagesBody(
-  input: GetChatMessagesInput,
-): GetChatMessagesResult {
+export function getChatMessagesBody(input: GetChatMessagesInput): GetChatMessagesResult {
   interface RollLike {
     total?: unknown;
     instances?: unknown;
@@ -179,10 +173,7 @@ export function getChatMessagesBody(
     messages?: MessagesCollectionLike;
   }
 
-  const fail = (
-    message: string,
-    details: Record<string, unknown>,
-  ): GetChatMessagesResult => ({
+  const fail = (message: string, details: Record<string, unknown>): GetChatMessagesResult => ({
     ok: false,
     error: { code: 'INVALID_INPUT', message, details },
   });
@@ -196,9 +187,7 @@ export function getChatMessagesBody(
 
   const DEFAULT_LIMIT = 20;
   const limit =
-    typeof input.limit === 'number' && Number.isFinite(input.limit)
-      ? input.limit
-      : DEFAULT_LIMIT;
+    typeof input.limit === 'number' && Number.isFinite(input.limit) ? input.limit : DEFAULT_LIMIT;
 
   // -- HTML strip. In the browser page `document` is available and gives
   // the robust parse (entities, nested tags); under the node unit-test
@@ -228,9 +217,7 @@ export function getChatMessagesBody(
     if (typeof uuid !== 'string' || uuid.length === 0) return null;
     const parts = uuid.split('.');
     const idx = parts.lastIndexOf('Actor');
-    return idx >= 0 && typeof parts[idx + 1] === 'string'
-      ? (parts[idx + 1] as string)
-      : null;
+    return idx >= 0 && typeof parts[idx + 1] === 'string' ? (parts[idx + 1] as string) : null;
   };
 
   const sumRollTotals = (rolls: RollLike[] | undefined): number | null => {
@@ -267,10 +254,7 @@ export function getChatMessagesBody(
     if (!ctx || typeof ctx.type !== 'string') {
       return { kind: 'other', pf2eCardType: null };
     }
-    const outcome =
-      typeof ctx.outcome === 'string'
-        ? (ctx.outcome as DegreeOfSuccess)
-        : null;
+    const outcome = typeof ctx.outcome === 'string' ? (ctx.outcome as DegreeOfSuccess) : null;
 
     if (ctx.type === 'damage-roll') {
       const instances: ChatDamageInstance[] = [];
@@ -281,10 +265,7 @@ export function getChatMessagesBody(
           instances.push({
             damageType: typeof inst.type === 'string' ? inst.type : null,
             category: typeof inst.category === 'string' ? inst.category : null,
-            total:
-              typeof inst.total === 'number' && Number.isFinite(inst.total)
-                ? inst.total
-                : 0,
+            total: typeof inst.total === 'number' && Number.isFinite(inst.total) ? inst.total : 0,
             persistent: inst.persistent === true,
           });
         }
@@ -315,9 +296,7 @@ export function getChatMessagesBody(
         dc,
         outcome,
         domains: Array.isArray(ctx.domains)
-          ? (ctx.domains as unknown[]).filter(
-              (d): d is string => typeof d === 'string',
-            )
+          ? (ctx.domains as unknown[]).filter((d): d is string => typeof d === 'string')
           : [],
         rollTotal: sumRollTotals(m.rolls),
       };
@@ -327,9 +306,7 @@ export function getChatMessagesBody(
   };
 
   // -- Select the window.
-  const contents = Array.isArray(game.messages.contents)
-    ? game.messages.contents
-    : [];
+  const contents = Array.isArray(game.messages.contents) ? game.messages.contents : [];
   let candidates = contents;
   if (input.sinceMessageId !== null) {
     const idx = contents.findIndex((m) => m.id === input.sinceMessageId);
@@ -356,11 +333,8 @@ export function getChatMessagesBody(
       author: {
         userId:
           (m.author && typeof m.author.id === 'string' ? m.author.id : null) ??
-          (m._source && typeof m._source.author === 'string'
-            ? m._source.author
-            : null),
-        name:
-          m.author && typeof m.author.name === 'string' ? m.author.name : null,
+          (m._source && typeof m._source.author === 'string' ? m._source.author : null),
+        name: m.author && typeof m.author.name === 'string' ? m.author.name : null,
       },
       speaker: {
         actorId: typeof speaker.actor === 'string' ? speaker.actor : null,
@@ -374,9 +348,7 @@ export function getChatMessagesBody(
       isRoll,
       rollTotal: isRoll ? sumRollTotals(m.rolls) : null,
       whisper: Array.isArray(m.whisper)
-        ? (m.whisper as unknown[]).filter(
-            (w): w is string => typeof w === 'string',
-          )
+        ? (m.whisper as unknown[]).filter((w): w is string => typeof w === 'string')
         : [],
       blind: m.blind === true,
       style: styleNum !== undefined ? (STYLE_NAMES[styleNum] ?? null) : null,

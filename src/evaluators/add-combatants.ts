@@ -69,9 +69,7 @@ export type AddCombatantsResult =
       };
     };
 
-export async function addCombatantsBody(
-  input: AddCombatantsInput,
-): Promise<AddCombatantsResult> {
+export async function addCombatantsBody(input: AddCombatantsInput): Promise<AddCombatantsResult> {
   interface FoundryCombatantLike {
     id?: string;
     tokenId?: string | null;
@@ -154,7 +152,11 @@ export async function addCombatantsBody(
   // tokenId -> existing combatantId (first match).
   const existingByToken = new Map<string, string>();
   for (const c of combat.combatants?.contents ?? []) {
-    if (typeof c.tokenId === 'string' && typeof c.id === 'string' && !existingByToken.has(c.tokenId)) {
+    if (
+      typeof c.tokenId === 'string' &&
+      typeof c.id === 'string' &&
+      !existingByToken.has(c.tokenId)
+    ) {
       existingByToken.set(c.tokenId, c.id);
     }
   }
@@ -191,7 +193,13 @@ export async function addCombatantsBody(
         error: {
           code: 'ADD_FAILED',
           message: `combat.createEmbeddedDocuments threw: ${message}`,
-          details: { sceneId, combatId: combat.id ?? '', attempted: toAdd, notFound, cause: message },
+          details: {
+            sceneId,
+            combatId: combat.id ?? '',
+            attempted: toAdd,
+            notFound,
+            cause: message,
+          },
         },
       };
     }

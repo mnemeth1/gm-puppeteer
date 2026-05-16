@@ -124,9 +124,7 @@ try {
       (e) => e.type === 'consumable' && e.system?.category === 'scroll',
     );
     // Wands: type=consumable, system.category=wand.
-    const wandEntry = entries.find(
-      (e) => e.type === 'consumable' && e.system?.category === 'wand',
-    );
+    const wandEntry = entries.find((e) => e.type === 'consumable' && e.system?.category === 'wand');
     // Equipment-with-uses: type=equipment. We probe the full doc for
     // each candidate to find one with system.uses.max > 0 or
     // system.frequency.max > 0. Scan up to first 40 to bound time.
@@ -154,9 +152,7 @@ try {
       }
     }
     return {
-      scrollUuid: scrollEntry
-        ? `Compendium.pf2e.equipment-srd.Item.${scrollEntry._id}`
-        : null,
+      scrollUuid: scrollEntry ? `Compendium.pf2e.equipment-srd.Item.${scrollEntry._id}` : null,
       scrollName: scrollEntry?.name ?? null,
       wandUuid: wandEntry ? `Compendium.pf2e.equipment-srd.Item.${wandEntry._id}` : null,
       wandName: wandEntry?.name ?? null,
@@ -188,7 +184,8 @@ try {
           subtype: item.system?.category ?? null,
           typeofConsume: typeof item.consume,
           consumeIsAsync:
-            typeof item.consume === 'function' && item.consume.constructor?.name === 'AsyncFunction',
+            typeof item.consume === 'function' &&
+            item.consume.constructor?.name === 'AsyncFunction',
           // What methods exist on the item? Filter to candidates.
           relevantMethods: [
             'consume',
@@ -730,8 +727,7 @@ try {
       }
       if (updates.length > 0) await actor.updateEmbeddedDocuments('Item', updates);
 
-      const sigOf = (s) =>
-        `${s.name ?? ''}|${s.type ?? ''}|${s.qty}|${s.containerId ?? ''}`;
+      const sigOf = (s) => `${s.name ?? ''}|${s.type ?? ''}|${s.qty}|${s.containerId ?? ''}`;
       const liveSig = new Map();
       for (const item of actor.items.contents) {
         const k = sigOf({
@@ -749,7 +745,8 @@ try {
       }
       const missing = [];
       for (const [k, n] of snapSig) {
-        if ((liveSig.get(k) ?? 0) !== n) missing.push({ k, expected: n, actual: liveSig.get(k) ?? 0 });
+        if ((liveSig.get(k) ?? 0) !== n)
+          missing.push({ k, expected: n, actual: liveSig.get(k) ?? 0 });
       }
       const extras = [];
       for (const [k, n] of liveSig) {

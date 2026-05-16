@@ -21,14 +21,14 @@ const CreateScrollOrWandInput = z
         'Full compendium Spell UUID (e.g. "Compendium.pf2e.spells-srd.Item.gKKqvLohtrSJj3BM"), ' +
           'as returned by search_compendium with documentType: "Item" and filter type: "spell". ' +
           'Must resolve to an Item whose type is "spell". Cantrips, focus spells, and rituals ' +
-          'are rejected — they don\'t have a meaningful scroll/wand equivalent in PF2e.',
+          "are rejected — they don't have a meaningful scroll/wand equivalent in PF2e.",
       ),
     kind: z
       .enum(['scroll', 'wand'])
       .describe(
         'Which consumable to create. Scrolls are single-use (uses.max: 1, autoDestroy: true); ' +
           'wands are once-per-day reusable (uses.max: 1, uses.value: 1, autoDestroy: false). ' +
-          'Note that PF2e\'s remaster does not define a rank-10 wand — wand rank must be 1–9.',
+          "Note that PF2e's remaster does not define a rank-10 wand — wand rank must be 1–9.",
       ),
     rank: z
       .number()
@@ -36,7 +36,7 @@ const CreateScrollOrWandInput = z
       .min(1)
       .max(10)
       .describe(
-        'The spell rank to scribe at. Must be ≥ the spell\'s base rank (heightening up is allowed; ' +
+        "The spell rank to scribe at. Must be ≥ the spell's base rank (heightening up is allowed; " +
           'heightening down is not). Scrolls accept ranks 1–10; wands accept ranks 1–9.',
       ),
     quantity: z
@@ -77,8 +77,8 @@ export const createScrollOrWandTool: ToolDefinition<typeof CreateScrollOrWandInp
     '(5th-Rank Spell)") and embeds the source spell at the chosen rank. The resulting item is a ' +
     'fully-functional consumable that the PF2e use pipeline accepts. Returns ' +
     '{operation: "created", item} where item carries id, uuid, name, kind, rank, spellUuid, ' +
-    'and containerId. Scrolls accept ranks 1–10; wands accept ranks 1–9 (PF2e\'s remaster has no ' +
-    'rank-10 wand template). Cantrips, focus spells, and rituals are rejected — they don\'t ' +
+    "and containerId. Scrolls accept ranks 1–10; wands accept ranks 1–9 (PF2e's remaster has no " +
+    "rank-10 wand template). Cantrips, focus spells, and rituals are rejected — they don't " +
     'have a meaningful scroll/wand equivalent in the PF2e rules. For PF2e rules text on specific ' +
     'spells, look up the spell at https://2e.aonprd.com/ rather than parsing the embedded ' +
     'description. For granting an existing physical compendium item (a Wand of Heal compendium ' +
@@ -96,10 +96,7 @@ export const createScrollOrWandTool: ToolDefinition<typeof CreateScrollOrWandInp
       containerId: input.containerId ?? null,
       identified: input.identified ?? true,
     };
-    const result = (await page.evaluate(
-      createScrollOrWandBody,
-      args,
-    )) as CreateScrollOrWandResult;
+    const result = (await page.evaluate(createScrollOrWandBody, args)) as CreateScrollOrWandResult;
     if (!result.ok) {
       throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
     }

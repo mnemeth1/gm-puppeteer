@@ -48,13 +48,7 @@ try {
   const enumeration = await page.evaluate(() => {
     const VITALS_SLUGS = new Set(['dying', 'wounded', 'doomed']);
     const NON_VITAL_VALUED_CAP = 4;
-    const PREVIEW_SLUGS = [
-      'frightened',
-      'off-guard',
-      'dying',
-      'persistent-damage',
-      'blinded',
-    ];
+    const PREVIEW_SLUGS = ['frightened', 'off-guard', 'dying', 'persistent-damage', 'blinded'];
 
     const game = globalThis.game;
     const CM = game?.pf2e?.ConditionManager;
@@ -62,9 +56,7 @@ try {
       return { error: 'ConditionManager unavailable' };
     }
 
-    const slugs = Array.isArray(CM.conditionsSlugs)
-      ? CM.conditionsSlugs.slice().sort()
-      : null;
+    const slugs = Array.isArray(CM.conditionsSlugs) ? CM.conditionsSlugs.slice().sort() : null;
     if (!slugs) {
       return { error: 'conditionsSlugs is not an array', actualType: typeof CM.conditionsSlugs };
     }
@@ -147,7 +139,11 @@ try {
           systemKeys:
             system && typeof system === 'object'
               ? (() => {
-                  try { return Object.keys(system); } catch { return null; }
+                  try {
+                    return Object.keys(system);
+                  } catch {
+                    return null;
+                  }
                 })()
               : null,
         };
@@ -223,14 +219,8 @@ try {
     );
 
     // Detail dump: per-slug rows, paginated for readability.
-    log.info(
-      { rows: enumeration.perSlug.slice(0, 22) },
-      'Detail: per-slug rows (1/2)',
-    );
-    log.info(
-      { rows: enumeration.perSlug.slice(22) },
-      'Detail: per-slug rows (2/2)',
-    );
+    log.info({ rows: enumeration.perSlug.slice(0, 22) }, 'Detail: per-slug rows (1/2)');
+    log.info({ rows: enumeration.perSlug.slice(22) }, 'Detail: per-slug rows (2/2)');
 
     process.exitCode = 0;
   }

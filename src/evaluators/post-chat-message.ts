@@ -113,9 +113,7 @@ export async function postChatMessageBody(
   }
   interface ChatMessageStaticLike {
     implementation: {
-      create(
-        data: Record<string, unknown>,
-      ): Promise<{ id?: string } | undefined>;
+      create(data: Record<string, unknown>): Promise<{ id?: string } | undefined>;
     };
     getSpeaker(opts?: { actor?: unknown }): SpeakerDataLike;
   }
@@ -129,21 +127,16 @@ export async function postChatMessageBody(
     messages?: MessagesCollectionLike;
   }
 
-  const fail = (
-    message: string,
-    details: Record<string, unknown>,
-  ): PostChatMessageErr => ({
+  const fail = (message: string, details: Record<string, unknown>): PostChatMessageErr => ({
     ok: false,
     error: { code: 'INVALID_INPUT', message, details },
   });
 
-  const errText = (e: unknown): string =>
-    e instanceof Error ? e.message : String(e);
+  const errText = (e: unknown): string => (e instanceof Error ? e.message : String(e));
 
   const game = (globalThis as unknown as { game?: FoundryGameLike }).game;
-  const ChatMessageCls = (
-    globalThis as unknown as { ChatMessage?: ChatMessageStaticLike }
-  ).ChatMessage;
+  const ChatMessageCls = (globalThis as unknown as { ChatMessage?: ChatMessageStaticLike })
+    .ChatMessage;
 
   if (!game || !ChatMessageCls) {
     return fail('Foundry globals (game / ChatMessage) are unavailable.', {
@@ -245,10 +238,9 @@ export async function postChatMessageBody(
       });
     }
     if (whisperedTo.length === 0) {
-      return fail(
-        'visibility "gm" was requested but this world has no GM users.',
-        { reason: 'NO_GM_USERS' },
-      );
+      return fail('visibility "gm" was requested but this world has no GM users.', {
+        reason: 'NO_GM_USERS',
+      });
     }
   }
 

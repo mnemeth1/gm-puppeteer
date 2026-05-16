@@ -133,10 +133,7 @@ export async function updateItemQuantityBody(
     actors?: { get(id: string): ActorDocLike | undefined };
   }
 
-  const fail = (
-    message: string,
-    details: Record<string, unknown>,
-  ): UpdateItemQuantityErr => ({
+  const fail = (message: string, details: Record<string, unknown>): UpdateItemQuantityErr => ({
     ok: false,
     error: { code: 'INVALID_INPUT', message, details },
   });
@@ -168,14 +165,11 @@ export async function updateItemQuantityBody(
   // -- Resolve target item on actor.
   const target = actor.items?.get?.(input.itemId);
   if (!target || !target.id) {
-    return fail(
-      `No item found on actor ${actor.id ?? input.actorId} for itemId: ${input.itemId}`,
-      {
-        actorId: input.actorId,
-        itemId: input.itemId,
-        reason: 'ITEM_NOT_FOUND_ON_ACTOR',
-      },
-    );
+    return fail(`No item found on actor ${actor.id ?? input.actorId} for itemId: ${input.itemId}`, {
+      actorId: input.actorId,
+      itemId: input.itemId,
+      reason: 'ITEM_NOT_FOUND_ON_ACTOR',
+    });
   }
 
   const targetType: string = typeof target.type === 'string' ? target.type : '';

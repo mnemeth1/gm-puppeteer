@@ -49,7 +49,7 @@ const MoveItemToContainerInput = z
       .nullable()
       .describe(
         'Destination container id (an item of type "backpack" on the same actor), OR null to ' +
-          'move the item to the actor\'s top-level inventory. Foundry does not enforce that this ' +
+          "move the item to the actor's top-level inventory. Foundry does not enforce that this " +
           'points at an actual container; the tool rejects non-backpack ids up front.',
       ),
     merge: z
@@ -68,7 +68,7 @@ const MoveItemToContainerInput = z
 export const moveItemToContainerTool: ToolDefinition<typeof MoveItemToContainerInput> = {
   name: 'move_item_to_container',
   description:
-    "Move a physical item between containers on the same actor, or to/from root inventory. " +
+    'Move a physical item between containers on the same actor, or to/from root inventory. ' +
     'Sibling to add_item_to_actor (compendium → actor) and update_item_quantity (set quantity) — ' +
     'this is the relational-field-mutation member of the inventory cluster, changing only ' +
     '`system.containerId`. ' +

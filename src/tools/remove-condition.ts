@@ -1,9 +1,6 @@
 import { z } from 'zod';
 import { ToolError } from '../errors.js';
-import {
-  removeConditionBody,
-  type RemoveConditionResult,
-} from '../evaluators/remove-condition.js';
+import { removeConditionBody, type RemoveConditionResult } from '../evaluators/remove-condition.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
 /**
@@ -80,7 +77,7 @@ export const removeConditionTool: ToolDefinition<typeof RemoveConditionInput> = 
     '"remove" deletes outright. Non-valued conditions (prone, off-guard, etc.) silently collapse ' +
     'both modes to a full delete — no error on decrement-of-non-valued. ' +
     "Target the condition by 'slug' (natural form, e.g. 'frightened') or by 'conditionId' (the " +
-    "id field returned by get_actor_state); exactly one is required. " +
+    'id field returned by get_actor_state); exactly one is required. ' +
     'Returns one of three operations: {operation: "removed", condition, cascadeDeleted?} when the ' +
     'condition was fully deleted (cascadeDeleted lists children auto-removed by PF2e, e.g. blinded ' +
     'and prone when unconscious is removed); {operation: "decremented", condition} when a valued ' +
@@ -95,7 +92,7 @@ export const removeConditionTool: ToolDefinition<typeof RemoveConditionInput> = 
     'dialog. Use foundry_eval with actor.deleteEmbeddedDocuments for persistent damage. ' +
     'If the actor has multiple items with the same slug (rare — PF2e single-instances same-slug ' +
     'conditions in normal operation), the slug-input path errors with ' +
-    "MULTIPLE_INSTANCES_USE_CONDITION_ID; disambiguate via conditionId. " +
+    'MULTIPLE_INSTANCES_USE_CONDITION_ID; disambiguate via conditionId. ' +
     'Rejected for actor types other than character/npc/familiar. See ' +
     'https://2e.aonprd.com/Conditions.aspx for canonical condition rules text.',
   inputSchema: RemoveConditionInput,

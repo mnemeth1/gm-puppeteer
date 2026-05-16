@@ -69,9 +69,7 @@ export interface PlaceTokenAtScreenPixelErr {
   };
 }
 
-export type PlaceTokenAtScreenPixelResult =
-  | PlaceTokenAtScreenPixelOk
-  | PlaceTokenAtScreenPixelErr;
+export type PlaceTokenAtScreenPixelResult = PlaceTokenAtScreenPixelOk | PlaceTokenAtScreenPixelErr;
 
 interface FoundryGridLike {
   type?: number;

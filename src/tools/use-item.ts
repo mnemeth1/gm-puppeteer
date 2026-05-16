@@ -52,7 +52,7 @@ export const useItemTool: ToolDefinition<typeof UseItemInput> = {
     'Path selection by item type: type=consumable routes through ConsumablePF2e.consume(1); ' +
     'type=equipment routes through Item.toMessage() + uses.value decrement. Charges-tracking ' +
     'items are gated with NO_CHARGES_REMAINING when at zero, since PF2e silently no-ops in ' +
-    "that case. Wand and scroll consumption silently aborts on actors without a spellcasting " +
+    'that case. Wand and scroll consumption silently aborts on actors without a spellcasting ' +
     'entry; the tool detects this and returns USE_HAD_NO_EFFECT with a hint. ' +
     'For pure state edits (set quantity, decrement without chat), use update_item_quantity or ' +
     'remove_item_from_actor. For weapon attacks, armor donning, and other non-use interactions, ' +

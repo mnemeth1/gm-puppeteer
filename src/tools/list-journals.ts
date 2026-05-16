@@ -1,8 +1,5 @@
 import { z } from 'zod';
-import {
-  listJournalsBody,
-  type ListJournalsResult,
-} from '../evaluators/list-journals.js';
+import { listJournalsBody, type ListJournalsResult } from '../evaluators/list-journals.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
 const ListJournalsInput = z.object({}).strict();
@@ -17,7 +14,7 @@ export const listJournalsTool: ToolDefinition<typeof ListJournalsInput> = {
     'page mutation tools, or the journal ownership tools. The pages-as-records pattern ' +
     'is recommended: a "Campaign Story" entry accumulates one page per session, a ' +
     '"Quests" entry has one page per quest, an "NPCs" entry has one page per NPC. To ' +
-    'inspect a specific entry\'s page list (TOC), call get_journal_entry; to read full ' +
+    "inspect a specific entry's page list (TOC), call get_journal_entry; to read full " +
     'page content, call get_journal_page; to find content by keyword across the whole ' +
     'world, call search_journals. NOT for compendium journals — this lists world-level ' +
     'entries only. NOT for PF2e rules text (use https://2e.aonprd.com/ via web-fetch).',

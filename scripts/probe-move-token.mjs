@@ -91,16 +91,11 @@ try {
   // Case 1: {ij} input — move 2 cells east, 1 south.
   const newI = Math.round(origY / size) + 1;
   const newJ = Math.round(origX / size) + 2;
-  const r1blocks = await tool.handler(
-    { tokenId: target.id, ij: { i: newI, j: newJ } },
-    ctx,
-  );
+  const r1blocks = await tool.handler({ tokenId: target.id, ij: { i: newI, j: newJ } }, ctx);
   const r1 = JSON.parse(r1blocks[0].text);
-  assert(
-    r1.gridCoords?.i === newI && r1.gridCoords?.j === newJ,
-    'case 1 gridCoords echoes input',
-    { r1 },
-  );
+  assert(r1.gridCoords?.i === newI && r1.gridCoords?.j === newJ, 'case 1 gridCoords echoes input', {
+    r1,
+  });
   assert(
     r1.targetCanvasCoords.x === newJ * size && r1.targetCanvasCoords.y === newI * size,
     'case 1 targetCanvasCoords = ij * size',
@@ -111,11 +106,9 @@ try {
     'case 1 before matches original position',
     { before: r1.before, expected: { x: origX, y: origY } },
   );
-  assert(
-    r1.after.x === newJ * size && r1.after.y === newI * size,
-    'case 1 after matches target',
-    { after: r1.after },
-  );
+  assert(r1.after.x === newJ * size && r1.after.y === newI * size, 'case 1 after matches target', {
+    after: r1.after,
+  });
   assert(r1.animated === false, 'case 1 animated default false', { animated: r1.animated });
 
   // Confirm document actually moved.
@@ -132,10 +125,7 @@ try {
   // Case 2: {xy} input — move to an exact pixel (offset by 7 in both dims).
   const targetX = origX + 7;
   const targetY = origY + 13;
-  const r2blocks = await tool.handler(
-    { tokenId: target.id, xy: { x: targetX, y: targetY } },
-    ctx,
-  );
+  const r2blocks = await tool.handler({ tokenId: target.id, xy: { x: targetX, y: targetY } }, ctx);
   const r2 = JSON.parse(r2blocks[0].text);
   assert(r2.gridCoords === null, 'case 2 gridCoords is null for xy input', { r2 });
   assert(
@@ -143,11 +133,9 @@ try {
     'case 2 targetCanvasCoords matches xy input',
     { targetCanvasCoords: r2.targetCanvasCoords },
   );
-  assert(
-    r2.after.x === targetX && r2.after.y === targetY,
-    'case 2 after matches target',
-    { after: r2.after },
-  );
+  assert(r2.after.x === targetX && r2.after.y === targetY, 'case 2 after matches target', {
+    after: r2.after,
+  });
 
   // Case 3: bogus tokenId.
   try {
@@ -195,11 +183,11 @@ try {
   for (const f of final) {
     const snap = snapshotPositions.get(f.id);
     if (!snap) continue; // new token created elsewhere; ignore
-    assert(
-      f.x === snap.x && f.y === snap.y,
-      `final position matches snapshot for token ${f.id}`,
-      { id: f.id, final: { x: f.x, y: f.y }, snapshot: snap },
-    );
+    assert(f.x === snap.x && f.y === snap.y, `final position matches snapshot for token ${f.id}`, {
+      id: f.id,
+      final: { x: f.x, y: f.y },
+      snapshot: snap,
+    });
   }
 
   if (failures.length === 0) {

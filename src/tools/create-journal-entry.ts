@@ -31,7 +31,7 @@ const CreateJournalEntryInput = z
         'Optional baseline ownership level applied to all users (overridable per-user via ' +
           'assign_journal_ownership). Common pattern: set to OBSERVER on a "Campaign Story" ' +
           'entry so every player sees it in their sidebar without needing per-user grants. ' +
-          'Defaults to Foundry\'s NONE (only GM can see).',
+          "Defaults to Foundry's NONE (only GM can see).",
       ),
   })
   .strict();
@@ -45,7 +45,7 @@ export const createJournalEntryTool: ToolDefinition<typeof CreateJournalEntryInp
     'permission/visibility container; pages carry the content). Recommended pages-as- ' +
     'records pattern: create one stable entry per long-running topic ("Campaign Story", ' +
     '"Quests", "NPCs") and add one page per session/quest/NPC over time, rather than a ' +
-    "new entry per note. To grant per-user visibility after creation, call " +
+    'new entry per note. To grant per-user visibility after creation, call ' +
     'assign_journal_ownership with userId="default" (baseline) or a specific userId. ' +
     'NOT for compendium imports — compendium journals stay in their packs. NOT for the ' +
     'campaign-dashboard or structured-quest abstractions; quest tracking lives in plain ' +

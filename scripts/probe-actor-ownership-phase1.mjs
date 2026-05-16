@@ -62,8 +62,8 @@ try {
   // --------------------------------------------------------------------
   const scrub = await page.evaluate(async (actorId) => {
     const users = globalThis.game.users?.contents ?? [];
-    const orphans = users.filter((u) =>
-      typeof u.name === 'string' && u.name.startsWith('__probe_owner_'),
+    const orphans = users.filter(
+      (u) => typeof u.name === 'string' && u.name.startsWith('__probe_owner_'),
     );
     const deletedUsers = [];
     for (const u of orphans) {
@@ -232,9 +232,7 @@ try {
           beforeDefault: before.default,
           afterDefault: after.default,
           afterScratchLevel: after[scratchId],
-          replaced:
-            !('default' in after) ||
-            Object.keys(after).every((k) => k === scratchId),
+          replaced: !('default' in after) || Object.keys(after).every((k) => k === scratchId),
         };
       },
       PROBE_ACTOR_ID,
@@ -276,8 +274,12 @@ try {
           threw = e?.message ?? String(e);
         }
         const after = JSON.parse(JSON.stringify(actor.ownership ?? {}));
-        const beforeOther = Object.keys(before).filter((k) => k !== scratchId).sort();
-        const afterOther = Object.keys(after).filter((k) => k !== scratchId).sort();
+        const beforeOther = Object.keys(before)
+          .filter((k) => k !== scratchId)
+          .sort();
+        const afterOther = Object.keys(after)
+          .filter((k) => k !== scratchId)
+          .sort();
         const beforeOtherUnchanged = beforeOther.every((k) => before[k] === after[k]);
         return {
           threw,
@@ -569,8 +571,10 @@ try {
             userLookupType: typeof lookupAfter,
             updateThrew,
             orphanDeleteThrew,
-            orphanDeletedSuccessfully:
-              !Object.prototype.hasOwnProperty.call(afterOrphanDelete, victimId),
+            orphanDeletedSuccessfully: !Object.prototype.hasOwnProperty.call(
+              afterOrphanDelete,
+              victimId,
+            ),
           };
         },
         PROBE_ACTOR_ID,

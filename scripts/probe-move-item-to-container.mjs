@@ -145,9 +145,13 @@ try {
   log.info(
     {
       itemCount: startSnapshot.itemCount,
-      sample: startSnapshot.items
-        .slice(0, 3)
-        .map((i) => ({ id: i.id, name: i.name, type: i.type, qty: i.qty, containerId: i.containerId })),
+      sample: startSnapshot.items.slice(0, 3).map((i) => ({
+        id: i.id,
+        name: i.name,
+        type: i.type,
+        qty: i.qty,
+        containerId: i.containerId,
+      })),
     },
     'snapshot captured',
   );
@@ -227,11 +231,9 @@ try {
       assert(res.data.operation === 'moved', 'probe 1: operation=moved', {
         op: res.data.operation,
       });
-      assert(
-        res.data.item?.containerIdBefore === null,
-        'probe 1: containerIdBefore=null',
-        { c: res.data.item?.containerIdBefore },
-      );
+      assert(res.data.item?.containerIdBefore === null, 'probe 1: containerIdBefore=null', {
+        c: res.data.item?.containerIdBefore,
+      });
       assert(
         res.data.item?.containerIdAfter === canonicalBackpackId,
         'probe 1: containerIdAfter=canonicalBackpackId',
@@ -275,11 +277,9 @@ try {
         'probe 2: containerIdBefore=canonicalBackpackId',
         { c: res.data.item?.containerIdBefore },
       );
-      assert(
-        res.data.item?.containerIdAfter === null,
-        'probe 2: containerIdAfter=null',
-        { c: res.data.item?.containerIdAfter },
-      );
+      assert(res.data.item?.containerIdAfter === null, 'probe 2: containerIdAfter=null', {
+        c: res.data.item?.containerIdAfter,
+      });
     }
   }
 
@@ -303,16 +303,12 @@ try {
       assert(res.data.operation === 'moved', 'probe 3: operation=moved', {
         op: res.data.operation,
       });
-      assert(
-        res.data.item?.containerIdBefore === bpA.id,
-        'probe 3: containerIdBefore=bpA.id',
-        { c: res.data.item?.containerIdBefore },
-      );
-      assert(
-        res.data.item?.containerIdAfter === bpB.id,
-        'probe 3: containerIdAfter=bpB.id',
-        { c: res.data.item?.containerIdAfter },
-      );
+      assert(res.data.item?.containerIdBefore === bpA.id, 'probe 3: containerIdBefore=bpA.id', {
+        c: res.data.item?.containerIdBefore,
+      });
+      assert(res.data.item?.containerIdAfter === bpB.id, 'probe 3: containerIdAfter=bpB.id', {
+        c: res.data.item?.containerIdAfter,
+      });
     }
   }
 
@@ -335,16 +331,12 @@ try {
       assert(res.data.operation === 'moved', 'probe 4: operation=moved', {
         op: res.data.operation,
       });
-      assert(
-        res.data.item?.containerIdBefore === bp.id,
-        'probe 4: containerIdBefore=bp.id',
-        { c: res.data.item?.containerIdBefore },
-      );
-      assert(
-        res.data.item?.containerIdAfter === bp.id,
-        'probe 4: containerIdAfter=bp.id',
-        { c: res.data.item?.containerIdAfter },
-      );
+      assert(res.data.item?.containerIdBefore === bp.id, 'probe 4: containerIdBefore=bp.id', {
+        c: res.data.item?.containerIdBefore,
+      });
+      assert(res.data.item?.containerIdAfter === bp.id, 'probe 4: containerIdAfter=bp.id', {
+        c: res.data.item?.containerIdAfter,
+      });
       assert(
         res.data.item?.containerIdBefore === res.data.item?.containerIdAfter,
         'probe 4: before === after signals no-op',
@@ -381,21 +373,15 @@ try {
       assert(res.data.operation === 'merged', 'probe 5: operation=merged', {
         op: res.data.operation,
       });
-      assert(
-        res.data.mergedInto?.id === stay.id,
-        'probe 5: mergedInto.id == stay.id',
-        { mergedInto: res.data.mergedInto },
-      );
-      assert(
-        res.data.mergedInto?.qtyBefore === 13,
-        'probe 5: qtyBefore=13',
-        { q: res.data.mergedInto?.qtyBefore },
-      );
-      assert(
-        res.data.mergedInto?.qtyAfter === 17,
-        'probe 5: qtyAfter=17',
-        { q: res.data.mergedInto?.qtyAfter },
-      );
+      assert(res.data.mergedInto?.id === stay.id, 'probe 5: mergedInto.id == stay.id', {
+        mergedInto: res.data.mergedInto,
+      });
+      assert(res.data.mergedInto?.qtyBefore === 13, 'probe 5: qtyBefore=13', {
+        q: res.data.mergedInto?.qtyBefore,
+      });
+      assert(res.data.mergedInto?.qtyAfter === 17, 'probe 5: qtyAfter=17', {
+        q: res.data.mergedInto?.qtyAfter,
+      });
     }
     // Confirm source no longer exists.
     const srcLive = await page.evaluate(
@@ -491,11 +477,9 @@ try {
       assert(res.data.operation === 'moved', 'probe 7: operation=moved', {
         op: res.data.operation,
       });
-      assert(
-        res.data.item?.containerIdAfter === canonicalBackpackId,
-        'probe 7: container moved',
-        { c: res.data.item?.containerIdAfter },
-      );
+      assert(res.data.item?.containerIdAfter === canonicalBackpackId, 'probe 7: container moved', {
+        c: res.data.item?.containerIdAfter,
+      });
     }
     const inner = await page.evaluate(
       (actorId, innerBpId, aId, bId) => {
@@ -533,20 +517,12 @@ try {
   // --------------------------------------------------------------------
   {
     const bp = await makeScratch('__probe_m8_bp', BACKPACK_UUID);
-    const identifiedSibling = await makeScratch(
-      '__probe_m8_arrows_ident',
-      ARROWS_UUID,
-      {
-        system: { quantity: 8, containerId: bp.id, identification: { status: 'identified' } },
-      },
-    );
-    const unidentifiedMovee = await makeScratch(
-      '__probe_m8_arrows_unident',
-      ARROWS_UUID,
-      {
-        system: { quantity: 3, containerId: null, identification: { status: 'unidentified' } },
-      },
-    );
+    const identifiedSibling = await makeScratch('__probe_m8_arrows_ident', ARROWS_UUID, {
+      system: { quantity: 8, containerId: bp.id, identification: { status: 'identified' } },
+    });
+    const unidentifiedMovee = await makeScratch('__probe_m8_arrows_unident', ARROWS_UUID, {
+      system: { quantity: 3, containerId: null, identification: { status: 'unidentified' } },
+    });
     const res = await call({
       actorId: PROBE_ACTOR_ID,
       itemId: unidentifiedMovee.id,
@@ -703,11 +679,9 @@ try {
     });
     log.info({ probe: 14, res }, 'probe 14: self-cycle');
     assert(res.isError === true, 'probe 14: error', { res });
-    assert(
-      res.error?.details?.reason === 'CYCLE_DETECTED',
-      'probe 14: reason=CYCLE_DETECTED',
-      { d: res.error?.details },
-    );
+    assert(res.error?.details?.reason === 'CYCLE_DETECTED', 'probe 14: reason=CYCLE_DETECTED', {
+      d: res.error?.details,
+    });
   }
 
   // --------------------------------------------------------------------
@@ -727,11 +701,9 @@ try {
     });
     log.info({ probe: 15, res }, 'probe 15: parent into own child');
     assert(res.isError === true, 'probe 15: error', { res });
-    assert(
-      res.error?.details?.reason === 'CYCLE_DETECTED',
-      'probe 15: reason=CYCLE_DETECTED',
-      { d: res.error?.details },
-    );
+    assert(res.error?.details?.reason === 'CYCLE_DETECTED', 'probe 15: reason=CYCLE_DETECTED', {
+      d: res.error?.details,
+    });
   }
 
   // --------------------------------------------------------------------

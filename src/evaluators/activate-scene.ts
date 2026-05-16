@@ -49,9 +49,7 @@ export interface ActivateSceneErr {
 
 export type ActivateSceneResult = ActivateSceneOk | ActivateSceneErr;
 
-export async function activateSceneBody(
-  input: ActivateSceneInput,
-): Promise<ActivateSceneResult> {
+export async function activateSceneBody(input: ActivateSceneInput): Promise<ActivateSceneResult> {
   interface FoundrySceneGrid {
     type?: number;
     size?: number;

@@ -174,9 +174,7 @@ describe('postChatMessageBody', () => {
       ownerUserIds: ['gm1', 'p1'],
     };
     installGlobals({ actors: [pc], users: [GM, PLAYER1] });
-    const result = await postChatMessageBody(
-      makeInput({ visibility: 'gm', whisperTo: ['pc1'] }),
-    );
+    const result = await postChatMessageBody(makeInput({ visibility: 'gm', whisperTo: ['pc1'] }));
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.error.details?.reason).toBe('VISIBILITY_WHISPER_CONFLICT');

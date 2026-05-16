@@ -57,9 +57,7 @@ export interface WorldInfo {
   user: UserDescriptor;
 }
 
-export type GetWorldInfoResult =
-  | { world: WorldInfo }
-  | { world: null; reason: string };
+export type GetWorldInfoResult = { world: WorldInfo } | { world: null; reason: string };
 
 interface FoundryWorld {
   id?: string;

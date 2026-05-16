@@ -120,7 +120,10 @@ try {
         if (a.name === scratchDestName) staleDest.push(a.id);
       }
       for (const id of staleDest) {
-        await globalThis.game.actors.get(id)?.delete().catch(() => undefined);
+        await globalThis.game.actors
+          .get(id)
+          ?.delete()
+          .catch(() => undefined);
       }
       result.deletedDestActors = staleDest.length;
       return result;
@@ -244,21 +247,17 @@ try {
       assert(res.data.operation === 'transferred', 'probe 1: operation=transferred', {
         op: res.data.operation,
       });
-      assert(
-        res.data.item?.oldId === sword.id,
-        'probe 1: item.oldId echoes source id',
-        { oldId: res.data.item?.oldId },
-      );
+      assert(res.data.item?.oldId === sword.id, 'probe 1: item.oldId echoes source id', {
+        oldId: res.data.item?.oldId,
+      });
       assert(
         typeof res.data.item?.newId === 'string' && res.data.item.newId.length > 0,
         'probe 1: item.newId is a non-empty string',
         { newId: res.data.item?.newId },
       );
-      assert(
-        res.data.item?.containerIdAfter === null,
-        'probe 1: containerIdAfter=null',
-        { c: res.data.item?.containerIdAfter },
-      );
+      assert(res.data.item?.containerIdAfter === null, 'probe 1: containerIdAfter=null', {
+        c: res.data.item?.containerIdAfter,
+      });
       const sourceStill = await readItem(SOURCE_ACTOR_ID, sword.id);
       assert(sourceStill === null, 'probe 1: item gone from source', { sourceStill });
       const destLive = await readItem(DEST_ACTOR_ID, res.data.item?.newId);
@@ -283,22 +282,16 @@ try {
     log.info({ probe: 2, res }, 'probe 2: full transfer into dest backpack');
     assert(res.ok === true, 'probe 2: ok', { res });
     if (res.ok) {
-      assert(
-        res.data.operation === 'transferred',
-        'probe 2: operation=transferred',
-        { op: res.data.operation },
-      );
-      assert(
-        res.data.item?.containerIdAfter === destBp.id,
-        'probe 2: containerIdAfter=destBp.id',
-        { c: res.data.item?.containerIdAfter },
-      );
+      assert(res.data.operation === 'transferred', 'probe 2: operation=transferred', {
+        op: res.data.operation,
+      });
+      assert(res.data.item?.containerIdAfter === destBp.id, 'probe 2: containerIdAfter=destBp.id', {
+        c: res.data.item?.containerIdAfter,
+      });
       const destLive = await readItem(DEST_ACTOR_ID, res.data.item?.newId);
-      assert(
-        destLive?.containerId === destBp.id,
-        'probe 2: dest item lives inside dest backpack',
-        { destLive },
-      );
+      assert(destLive?.containerId === destBp.id, 'probe 2: dest item lives inside dest backpack', {
+        destLive,
+      });
     }
   }
 
@@ -314,12 +307,9 @@ try {
     const destStack = await makeScratch(DEST_ACTOR_ID, '__probe_t3_arrows_dest', ARROWS_UUID, {
       system: { quantity: 10, containerId: null },
     });
-    const sourceStack = await makeScratch(
-      SOURCE_ACTOR_ID,
-      '__probe_t3_arrows_src',
-      ARROWS_UUID,
-      { system: { quantity: 7, containerId: null } },
-    );
+    const sourceStack = await makeScratch(SOURCE_ACTOR_ID, '__probe_t3_arrows_src', ARROWS_UUID, {
+      system: { quantity: 7, containerId: null },
+    });
     const res = await call({
       sourceActorId: SOURCE_ACTOR_ID,
       destinationActorId: DEST_ACTOR_ID,
@@ -334,26 +324,18 @@ try {
         'probe 3: operation=transferredAndMerged',
         { op: res.data.operation },
       );
-      assert(
-        res.data.mergedInto?.id === destStack.id,
-        'probe 3: mergedInto.id=destStack.id',
-        { mergedInto: res.data.mergedInto },
-      );
-      assert(
-        res.data.mergedInto?.previousQuantity === 10,
-        'probe 3: previousQuantity=10',
-        { q: res.data.mergedInto?.previousQuantity },
-      );
-      assert(
-        res.data.mergedInto?.newQuantity === 17,
-        'probe 3: newQuantity=17',
-        { q: res.data.mergedInto?.newQuantity },
-      );
-      assert(
-        res.data.mergedInto?.addedQuantity === 7,
-        'probe 3: addedQuantity=7',
-        { q: res.data.mergedInto?.addedQuantity },
-      );
+      assert(res.data.mergedInto?.id === destStack.id, 'probe 3: mergedInto.id=destStack.id', {
+        mergedInto: res.data.mergedInto,
+      });
+      assert(res.data.mergedInto?.previousQuantity === 10, 'probe 3: previousQuantity=10', {
+        q: res.data.mergedInto?.previousQuantity,
+      });
+      assert(res.data.mergedInto?.newQuantity === 17, 'probe 3: newQuantity=17', {
+        q: res.data.mergedInto?.newQuantity,
+      });
+      assert(res.data.mergedInto?.addedQuantity === 7, 'probe 3: addedQuantity=7', {
+        q: res.data.mergedInto?.addedQuantity,
+      });
       assert(
         res.data.sourceDeletedId === sourceStack.id,
         'probe 3: sourceDeletedId echoes source id',
@@ -375,12 +357,9 @@ try {
   // would split-and-merge.
   // --------------------------------------------------------------------
   {
-    const sourceStack = await makeScratch(
-      SOURCE_ACTOR_ID,
-      '__probe_t4_arrows',
-      ARROWS_UUID,
-      { system: { quantity: 20, containerId: null } },
-    );
+    const sourceStack = await makeScratch(SOURCE_ACTOR_ID, '__probe_t4_arrows', ARROWS_UUID, {
+      system: { quantity: 20, containerId: null },
+    });
     const res = await call({
       sourceActorId: SOURCE_ACTOR_ID,
       destinationActorId: DEST_ACTOR_ID,
@@ -395,21 +374,15 @@ try {
       assert(res.data.operation === 'split', 'probe 4: operation=split', {
         op: res.data.operation,
       });
-      assert(
-        res.data.sourceItem?.qtyBefore === 20,
-        'probe 4: sourceItem.qtyBefore=20',
-        { q: res.data.sourceItem?.qtyBefore },
-      );
-      assert(
-        res.data.sourceItem?.qtyAfter === 15,
-        'probe 4: sourceItem.qtyAfter=15',
-        { q: res.data.sourceItem?.qtyAfter },
-      );
-      assert(
-        res.data.created?.quantity === 5,
-        'probe 4: created.quantity=5',
-        { q: res.data.created?.quantity },
-      );
+      assert(res.data.sourceItem?.qtyBefore === 20, 'probe 4: sourceItem.qtyBefore=20', {
+        q: res.data.sourceItem?.qtyBefore,
+      });
+      assert(res.data.sourceItem?.qtyAfter === 15, 'probe 4: sourceItem.qtyAfter=15', {
+        q: res.data.sourceItem?.qtyAfter,
+      });
+      assert(res.data.created?.quantity === 5, 'probe 4: created.quantity=5', {
+        q: res.data.created?.quantity,
+      });
       const sourceLive = await readItem(SOURCE_ACTOR_ID, sourceStack.id);
       assert(sourceLive?.qty === 15, 'probe 4: source qty=15 post-call', { sourceLive });
       const destLive = await readItem(DEST_ACTOR_ID, res.data.created?.newId);
@@ -431,18 +404,12 @@ try {
     const destBp = await makeScratch(DEST_ACTOR_ID, '__probe_t5_destBp', BACKPACK_UUID, {
       system: { containerId: null },
     });
-    const destStack = await makeScratch(
-      DEST_ACTOR_ID,
-      '__probe_t5_arrows_dest',
-      ARROWS_UUID,
-      { system: { quantity: 10, containerId: destBp.id } },
-    );
-    const sourceStack = await makeScratch(
-      SOURCE_ACTOR_ID,
-      '__probe_t5_arrows_src',
-      ARROWS_UUID,
-      { system: { quantity: 20, containerId: null } },
-    );
+    const destStack = await makeScratch(DEST_ACTOR_ID, '__probe_t5_arrows_dest', ARROWS_UUID, {
+      system: { quantity: 10, containerId: destBp.id },
+    });
+    const sourceStack = await makeScratch(SOURCE_ACTOR_ID, '__probe_t5_arrows_src', ARROWS_UUID, {
+      system: { quantity: 20, containerId: null },
+    });
     const res = await call({
       sourceActorId: SOURCE_ACTOR_ID,
       destinationActorId: DEST_ACTOR_ID,
@@ -453,31 +420,21 @@ try {
     log.info({ probe: 5, res }, 'probe 5: split transfer with merge');
     assert(res.ok === true, 'probe 5: ok', { res });
     if (res.ok) {
-      assert(
-        res.data.operation === 'splitAndMerged',
-        'probe 5: operation=splitAndMerged',
-        { op: res.data.operation },
-      );
-      assert(
-        res.data.sourceItem?.qtyAfter === 16,
-        'probe 5: sourceItem.qtyAfter=16',
-        { q: res.data.sourceItem?.qtyAfter },
-      );
-      assert(
-        res.data.mergedInto?.id === destStack.id,
-        'probe 5: mergedInto.id=destStack.id',
-        { mergedInto: res.data.mergedInto },
-      );
-      assert(
-        res.data.mergedInto?.newQuantity === 14,
-        'probe 5: mergedInto.newQuantity=14',
-        { q: res.data.mergedInto?.newQuantity },
-      );
-      assert(
-        res.data.mergedInto?.addedQuantity === 4,
-        'probe 5: mergedInto.addedQuantity=4',
-        { q: res.data.mergedInto?.addedQuantity },
-      );
+      assert(res.data.operation === 'splitAndMerged', 'probe 5: operation=splitAndMerged', {
+        op: res.data.operation,
+      });
+      assert(res.data.sourceItem?.qtyAfter === 16, 'probe 5: sourceItem.qtyAfter=16', {
+        q: res.data.sourceItem?.qtyAfter,
+      });
+      assert(res.data.mergedInto?.id === destStack.id, 'probe 5: mergedInto.id=destStack.id', {
+        mergedInto: res.data.mergedInto,
+      });
+      assert(res.data.mergedInto?.newQuantity === 14, 'probe 5: mergedInto.newQuantity=14', {
+        q: res.data.mergedInto?.newQuantity,
+      });
+      assert(res.data.mergedInto?.addedQuantity === 4, 'probe 5: mergedInto.addedQuantity=4', {
+        q: res.data.mergedInto?.addedQuantity,
+      });
       const sourceLive = await readItem(SOURCE_ACTOR_ID, sourceStack.id);
       assert(sourceLive?.qty === 16, 'probe 5: source qty=16', { sourceLive });
       const destLive = await readItem(DEST_ACTOR_ID, destStack.id);
@@ -496,24 +453,15 @@ try {
   // containerId tree.
   // --------------------------------------------------------------------
   {
-    const sourceBp = await makeScratch(
-      SOURCE_ACTOR_ID,
-      '__probe_t6_bp',
-      BACKPACK_UUID,
-      { system: { containerId: null } },
-    );
-    const potion = await makeScratch(
-      SOURCE_ACTOR_ID,
-      '__probe_t6_potion',
-      HEALING_POTION_UUID,
-      { system: { quantity: 2, containerId: sourceBp.id } },
-    );
-    const sword = await makeScratch(
-      SOURCE_ACTOR_ID,
-      '__probe_t6_sword',
-      LONGSWORD_UUID,
-      { system: { containerId: sourceBp.id } },
-    );
+    const sourceBp = await makeScratch(SOURCE_ACTOR_ID, '__probe_t6_bp', BACKPACK_UUID, {
+      system: { containerId: null },
+    });
+    const potion = await makeScratch(SOURCE_ACTOR_ID, '__probe_t6_potion', HEALING_POTION_UUID, {
+      system: { quantity: 2, containerId: sourceBp.id },
+    });
+    const sword = await makeScratch(SOURCE_ACTOR_ID, '__probe_t6_sword', LONGSWORD_UUID, {
+      system: { containerId: sourceBp.id },
+    });
     const res = await call({
       sourceActorId: SOURCE_ACTOR_ID,
       destinationActorId: DEST_ACTOR_ID,
@@ -523,16 +471,12 @@ try {
     log.info({ probe: 6, res }, 'probe 6: cascade transfer');
     assert(res.ok === true, 'probe 6: ok', { res });
     if (res.ok) {
-      assert(
-        res.data.operation === 'cascadeTransferred',
-        'probe 6: operation=cascadeTransferred',
-        { op: res.data.operation },
-      );
-      assert(
-        res.data.root?.containerIdAfter === null,
-        'probe 6: root.containerIdAfter=null',
-        { c: res.data.root?.containerIdAfter },
-      );
+      assert(res.data.operation === 'cascadeTransferred', 'probe 6: operation=cascadeTransferred', {
+        op: res.data.operation,
+      });
+      assert(res.data.root?.containerIdAfter === null, 'probe 6: root.containerIdAfter=null', {
+        c: res.data.root?.containerIdAfter,
+      });
       assert(
         Array.isArray(res.data.descendants) && res.data.descendants.length === 2,
         'probe 6: 2 descendants',
@@ -542,11 +486,10 @@ try {
       const allDescendantsPointAtRoot = res.data.descendants?.every(
         (d) => d.containerIdAfter === rootNewId,
       );
-      assert(
-        allDescendantsPointAtRoot,
-        'probe 6: all descendants point at root.newId',
-        { descendants: res.data.descendants, rootNewId },
-      );
+      assert(allDescendantsPointAtRoot, 'probe 6: all descendants point at root.newId', {
+        descendants: res.data.descendants,
+        rootNewId,
+      });
       // Source no longer has any of the subtree items.
       const sourceBpLive = await readItem(SOURCE_ACTOR_ID, sourceBp.id);
       const potionLive = await readItem(SOURCE_ACTOR_ID, potion.id);
@@ -584,12 +527,9 @@ try {
     const innerBp = await makeScratch(SOURCE_ACTOR_ID, '__probe_t7_innerBp', BACKPACK_UUID, {
       system: { containerId: outerBp.id },
     });
-    const potion = await makeScratch(
-      SOURCE_ACTOR_ID,
-      '__probe_t7_potion',
-      HEALING_POTION_UUID,
-      { system: { quantity: 1, containerId: innerBp.id } },
-    );
+    const potion = await makeScratch(SOURCE_ACTOR_ID, '__probe_t7_potion', HEALING_POTION_UUID, {
+      system: { quantity: 1, containerId: innerBp.id },
+    });
     const res = await call({
       sourceActorId: SOURCE_ACTOR_ID,
       destinationActorId: DEST_ACTOR_ID,
@@ -599,16 +539,12 @@ try {
     log.info({ probe: 7, res }, 'probe 7: cascade depth-2');
     assert(res.ok === true, 'probe 7: ok', { res });
     if (res.ok) {
-      assert(
-        res.data.operation === 'cascadeTransferred',
-        'probe 7: operation=cascadeTransferred',
-        { op: res.data.operation },
-      );
-      assert(
-        res.data.descendants?.length === 2,
-        'probe 7: 2 descendants',
-        { count: res.data.descendants?.length },
-      );
+      assert(res.data.operation === 'cascadeTransferred', 'probe 7: operation=cascadeTransferred', {
+        op: res.data.operation,
+      });
+      assert(res.data.descendants?.length === 2, 'probe 7: 2 descendants', {
+        count: res.data.descendants?.length,
+      });
       const rootNewId = res.data.root?.newId;
       const oldToNew = new Map();
       oldToNew.set(outerBp.id, rootNewId);
@@ -619,28 +555,26 @@ try {
       const potionNewId = oldToNew.get(potion.id);
       const innerLive = await readItem(DEST_ACTOR_ID, innerNewId);
       const potionLive = await readItem(DEST_ACTOR_ID, potionNewId);
-      assert(
-        innerLive?.containerId === rootNewId,
-        'probe 7: inner backpack containerId=root',
-        { innerLive, rootNewId },
-      );
-      assert(
-        potionLive?.containerId === innerNewId,
-        'probe 7: potion containerId=inner backpack',
-        { potionLive, innerNewId },
-      );
+      assert(innerLive?.containerId === rootNewId, 'probe 7: inner backpack containerId=root', {
+        innerLive,
+        rootNewId,
+      });
+      assert(potionLive?.containerId === innerNewId, 'probe 7: potion containerId=inner backpack', {
+        potionLive,
+        innerNewId,
+      });
       // Name-and-type cross-check: when oldId → newId is built
       // positionally from createEmbeddedDocuments's return array, this
       // assertion catches a swap. The name (read from dest live state)
       // must match the type captured from source.
       assert(
         innerLive?.type === 'backpack' && innerLive?.name === '__probe_t7_innerBp',
-        "probe 7: dest item at innerNewId is the inner backpack (not the potion)",
+        'probe 7: dest item at innerNewId is the inner backpack (not the potion)',
         { innerLive },
       );
       assert(
         potionLive?.type === 'consumable' && potionLive?.name === '__probe_t7_potion',
-        "probe 7: dest item at potionNewId is the potion (not the inner backpack)",
+        'probe 7: dest item at potionNewId is the potion (not the inner backpack)',
         { potionLive },
       );
     }
@@ -695,16 +629,12 @@ try {
     assert(res.ok === true, 'probe 9: ok', { res });
     if (res.ok) {
       const destLive = await readItem(DEST_ACTOR_ID, res.data.item?.newId);
-      assert(
-        destLive?.equipped?.carryType === 'stowed',
-        'probe 9: dest carryType=stowed',
-        { equipped: destLive?.equipped },
-      );
-      assert(
-        destLive?.equipped?.handsHeld === 0,
-        'probe 9: dest handsHeld=0',
-        { equipped: destLive?.equipped },
-      );
+      assert(destLive?.equipped?.carryType === 'stowed', 'probe 9: dest carryType=stowed', {
+        equipped: destLive?.equipped,
+      });
+      assert(destLive?.equipped?.handsHeld === 0, 'probe 9: dest handsHeld=0', {
+        equipped: destLive?.equipped,
+      });
     }
   }
 
@@ -721,8 +651,7 @@ try {
     log.info({ probe: 10, res }, 'probe 10: bogus source actor');
     assert(res.isError === true, 'probe 10: error', { res });
     assert(
-      res.error?.details?.reason === 'ACTOR_NOT_FOUND' &&
-        res.error?.details?.which === 'source',
+      res.error?.details?.reason === 'ACTOR_NOT_FOUND' && res.error?.details?.which === 'source',
       'probe 10: reason=ACTOR_NOT_FOUND, which=source',
       { details: res.error?.details },
     );
@@ -881,8 +810,7 @@ try {
     log.info({ probe: 17, res }, 'probe 17: quantity 0');
     assert(res.isError === true, 'probe 17: error', { res });
     const surfacedAsValidation = Array.isArray(res.validation);
-    const surfacedAsToolError =
-      res.error?.details?.reason === 'INVALID_QUANTITY';
+    const surfacedAsToolError = res.error?.details?.reason === 'INVALID_QUANTITY';
     assert(
       surfacedAsValidation || surfacedAsToolError,
       'probe 17: zod or tool layer rejected quantity 0',
@@ -906,11 +834,9 @@ try {
     });
     log.info({ probe: 18, res }, 'probe 18: quantity > available');
     assert(res.isError === true, 'probe 18: error', { res });
-    assert(
-      res.error?.details?.reason === 'INVALID_QUANTITY',
-      'probe 18: reason=INVALID_QUANTITY',
-      { details: res.error?.details },
-    );
+    assert(res.error?.details?.reason === 'INVALID_QUANTITY', 'probe 18: reason=INVALID_QUANTITY', {
+      details: res.error?.details,
+    });
     assert(
       res.error?.details?.requested === 10 && res.error?.details?.available === 3,
       'probe 18: details echo requested and available',
@@ -1078,11 +1004,9 @@ try {
     'probe 20: no orphan-delete failures on source',
     { failures: teardownSource.deleteFailures },
   );
-  assert(
-    teardownSource.recreateFailures.length === 0,
-    'probe 20: no recreate failures on source',
-    { failures: teardownSource.recreateFailures },
-  );
+  assert(teardownSource.recreateFailures.length === 0, 'probe 20: no recreate failures on source', {
+    failures: teardownSource.recreateFailures,
+  });
   assert(teardownDest.deleted === true, 'probe 20: scratch destination actor deleted', {
     teardownDest,
   });

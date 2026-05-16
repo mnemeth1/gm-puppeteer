@@ -1,8 +1,5 @@
 import { z } from 'zod';
-import {
-  getWorldInfoBody,
-  type GetWorldInfoResult,
-} from '../evaluators/get-world-info.js';
+import { getWorldInfoBody, type GetWorldInfoResult } from '../evaluators/get-world-info.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
 const GetWorldInfoInput = z.object({}).strict();

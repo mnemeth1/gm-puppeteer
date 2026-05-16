@@ -93,8 +93,7 @@ try {
 
   // Prefer a non-active scene as the target so we exercise the
   // not-already-viewed path. Fall back to whatever's available.
-  const target =
-    allScenes.find((s) => s.id !== startSnapshot.canvasSceneId) ?? allScenes[0];
+  const target = allScenes.find((s) => s.id !== startSnapshot.canvasSceneId) ?? allScenes[0];
   log.info(
     { targetId: target.id, targetName: target.name, targetActive: target.active },
     'discovery: chose target scene',
@@ -137,7 +136,11 @@ try {
   if (shotResp.ok) {
     // Image is blocks[0], transform JSON is blocks[1].
     const imageBlock = shotResp.blocks.find((b) => b.type === 'image');
-    assert(!!imageBlock, 'screenshot returned an image block', shotResp.blocks.map((b) => b.type));
+    assert(
+      !!imageBlock,
+      'screenshot returned an image block',
+      shotResp.blocks.map((b) => b.type),
+    );
     assert(
       typeof imageBlock?.data === 'string' && imageBlock.data.length > 0,
       'screenshot image data is non-empty',

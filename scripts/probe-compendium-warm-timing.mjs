@@ -247,8 +247,7 @@ try {
             loaded,
             ms: +(t1 - t0).toFixed(2),
             msPerDoc: +((t1 - t0) / Math.max(1, ids.length)).toFixed(2),
-            memDeltaBytes:
-              memBefore !== null && memAfter !== null ? memAfter - memBefore : null,
+            memDeltaBytes: memBefore !== null && memAfter !== null ? memAfter - memBefore : null,
           };
         };
         const a = await runChunked(packAColl, 8);
@@ -257,7 +256,11 @@ try {
       },
       { packAColl: q6PackA.collection, packBColl: q6PackB.collection },
     );
-    record('Q6', 'phase 2 chunk-size comparison (chunk 8 vs 16, different packs to keep both cold)', q6);
+    record(
+      'Q6',
+      'phase 2 chunk-size comparison (chunk 8 vs 16, different packs to keep both cold)',
+      q6,
+    );
   } else if (q6PackA) {
     // Fallback: only one bestiary pack. Run chunk 8, then chunk 16 on
     // the same pack and flag the second as warm-cache-suspect.
@@ -298,9 +301,7 @@ try {
   //   internal cache. Captures memory before/after the full warm for the
   //   ceiling estimate.
   // ====================================================================
-  const q7Excluded = new Set(
-    [q6PackA?.collection, q6PackB?.collection].filter(Boolean),
-  );
+  const q7Excluded = new Set([q6PackA?.collection, q6PackB?.collection].filter(Boolean));
   const q7Packs = bestiaryPacks
     .filter((p) => !q7Excluded.has(p.collection))
     .map((p) => p.collection);
@@ -344,8 +345,7 @@ try {
           packCount: collections.length,
           memBefore,
           memAfter,
-          memDeltaBytes:
-            memBefore !== null && memAfter !== null ? memAfter - memBefore : null,
+          memDeltaBytes: memBefore !== null && memAfter !== null ? memAfter - memBefore : null,
           memDeltaMB:
             memBefore !== null && memAfter !== null
               ? +((memAfter - memBefore) / 1024 / 1024).toFixed(1)

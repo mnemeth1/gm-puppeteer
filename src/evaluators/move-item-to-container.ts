@@ -182,10 +182,7 @@ export async function moveItemToContainerBody(
     actors?: { get(id: string): ActorDocLike | undefined };
   }
 
-  const fail = (
-    message: string,
-    details: Record<string, unknown>,
-  ): MoveItemToContainerErr => ({
+  const fail = (message: string, details: Record<string, unknown>): MoveItemToContainerErr => ({
     ok: false,
     error: { code: 'INVALID_INPUT', message, details },
   });
@@ -229,10 +226,11 @@ export async function moveItemToContainerBody(
   // -- Resolve target item.
   const target = actor.items?.get?.(input.itemId);
   if (!target || !target.id) {
-    return fail(
-      `No item found on actor ${actor.id ?? input.actorId} for itemId: ${input.itemId}`,
-      { actorId: input.actorId, itemId: input.itemId, reason: 'ITEM_NOT_FOUND' },
-    );
+    return fail(`No item found on actor ${actor.id ?? input.actorId} for itemId: ${input.itemId}`, {
+      actorId: input.actorId,
+      itemId: input.itemId,
+      reason: 'ITEM_NOT_FOUND',
+    });
   }
 
   const targetType: string = typeof target.type === 'string' ? target.type : '';
@@ -283,10 +281,11 @@ export async function moveItemToContainerBody(
   // ancestor of the destination.
   if (input.containerId !== null && destinationContainer) {
     if (input.containerId === target.id) {
-      return fail(
-        `Cannot move item ${target.id} into itself (self-cycle).`,
-        { itemId: target.id, containerId: input.containerId, reason: 'CYCLE_DETECTED' },
-      );
+      return fail(`Cannot move item ${target.id} into itself (self-cycle).`, {
+        itemId: target.id,
+        containerId: input.containerId,
+        reason: 'CYCLE_DETECTED',
+      });
     }
     // Walk ancestors of destinationContainer. Each step: if we encounter
     // target.id, the move would create a cycle (target is an ancestor of
@@ -352,8 +351,7 @@ export async function moveItemToContainerBody(
       if (!candidate || !candidate.id) continue;
       if (candidate.id === target.id) continue;
       const candidateSourceRaw = candidate._stats?.compendiumSource;
-      const candidateSource =
-        typeof candidateSourceRaw === 'string' ? candidateSourceRaw : null;
+      const candidateSource = typeof candidateSourceRaw === 'string' ? candidateSourceRaw : null;
       if (candidateSource !== targetSource) continue;
       const candidateContainer = containerIdOf(candidate);
       if (candidateContainer !== input.containerId) continue;

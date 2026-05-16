@@ -245,9 +245,7 @@ describe('getChatMessagesBody', () => {
   });
 
   it('maps the numeric style to its name and projects whisper/blind', () => {
-    installMessages([
-      makeMsg({ id: 'ic', style: 2, whisper: ['u1', 'u2'], blind: true }),
-    ]);
+    installMessages([makeMsg({ id: 'ic', style: 2, whisper: ['u1', 'u2'], blind: true })]);
     const result = getChatMessagesBody({ limit: 20, sinceMessageId: null });
     expect(result.ok).toBe(true);
     if (result.ok) {

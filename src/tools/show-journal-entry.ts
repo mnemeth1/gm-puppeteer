@@ -24,14 +24,14 @@ const ShowJournalEntryInput = z
 export const showJournalEntryTool: ToolDefinition<typeof ShowJournalEntryInput> = {
   name: 'show_journal_entry',
   description:
-    "Broadcast a journal entry to connected players — pops it open on their screens via " +
+    'Broadcast a journal entry to connected players — pops it open on their screens via ' +
     "Foundry's JournalEntry#show. This is how shared story notes actually reach the table " +
     'mid-session: write the session log with create_journal_page / update_journal_page, ' +
     'then show_journal_entry to surface it. With force=false the broadcast respects ' +
     'per-user ownership (players see only what they may see); with force=true it overrides ' +
     'ownership entirely. Returns how many users were connected at call time (broadcastTo) ' +
     'so you know whether anyone received it. This does NOT change persistent permissions — ' +
-    'to make an entry permanently visible in a player\'s sidebar, use ' +
+    "to make an entry permanently visible in a player's sidebar, use " +
     'assign_journal_ownership. NOT a scene or canvas operation.',
   inputSchema: ShowJournalEntryInput,
   async handler(input, ctx) {
@@ -45,7 +45,12 @@ export const showJournalEntryTool: ToolDefinition<typeof ShowJournalEntryInput> 
       throw new ToolError(code, result.error.message, result.error.details);
     }
     ctx.log.info(
-      { entryId: result.id, name: result.name, force: result.force, broadcastTo: result.broadcastTo },
+      {
+        entryId: result.id,
+        name: result.name,
+        force: result.force,
+        broadcastTo: result.broadcastTo,
+      },
       'show_journal_entry',
     );
     return [jsonText(result)];

@@ -59,7 +59,7 @@ const PostChatMessageInput = z
 export const postChatMessageTool: ToolDefinition<typeof PostChatMessageInput> = {
   name: 'post_chat_message',
   description:
-    "Post a message to Foundry's chat log — GM narration (\"A cold wind moves through " +
+    'Post a message to Foundry\'s chat log — GM narration ("A cold wind moves through ' +
     'the hall."), NPC dialogue ("as the Redcap: \'You\'re late.\'"), a private GM-only ' +
     'note, or a whisper to a player. `content` is raw HTML, stored verbatim (not ' +
     'Markdown). Optionally speak as an NPC via speakerActorId (omit to speak as the ' +
@@ -80,10 +80,7 @@ export const postChatMessageTool: ToolDefinition<typeof PostChatMessageInput> = 
       visibility: input.visibility,
       whisperTo: input.whisperTo ?? [],
     };
-    const result = (await page.evaluate(
-      postChatMessageBody,
-      args,
-    )) as PostChatMessageResult;
+    const result = (await page.evaluate(postChatMessageBody, args)) as PostChatMessageResult;
     if (!result.ok) {
       throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
     }

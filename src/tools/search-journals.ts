@@ -1,9 +1,6 @@
 import { z } from 'zod';
 import { ToolError } from '../errors.js';
-import {
-  searchJournalsBody,
-  type SearchJournalsResult,
-} from '../evaluators/search-journals.js';
+import { searchJournalsBody, type SearchJournalsResult } from '../evaluators/search-journals.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
 const SearchJournalsInput = z
@@ -46,7 +43,7 @@ const SearchJournalsInput = z
       .min(1)
       .optional()
       .describe(
-        'Optional single-entry restriction — search only this entry\'s pages. Get from ' +
+        "Optional single-entry restriction — search only this entry's pages. Get from " +
           'list_journals. Useful for "find within this campaign log" workflows.',
       ),
   })
@@ -62,7 +59,7 @@ export const searchJournalsTool: ToolDefinition<typeof SearchJournalsInput> = {
     'need to read the full page via get_journal_page. Use this as the "I do not know ' +
     'where it is" path through the journal navigation hierarchy. Image/PDF/video pages ' +
     'are matched on their name only — body content is not searchable. Optional `folder` ' +
-    'and `entryId` filters scope the scan. Foundry\'s built-in journal search is NOT used ' +
+    "and `entryId` filters scope the scan. Foundry's built-in journal search is NOT used " +
     '(it only matches entry names); this scans every entry and page server-side. ' +
     'Performance: ~0.1ms per 6 entries observed; expect well under a second on ' +
     'thousand-entry worlds. NOT for compendium content (use search_compendium) and NOT ' +

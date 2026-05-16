@@ -110,9 +110,13 @@ try {
   // 4. add_combatants again — alreadyPresent + added.
   const a2 = await call('add_combatants', { tokenIds: [tokenA, tokenC] });
   log.info({ step: 4, a2 }, 'add_combatants (alreadyPresent)');
-  assert(a2.ok && a2.data.alreadyPresent.some((e) => e.tokenId === tokenA), '4: tokenA alreadyPresent', {
-    a2,
-  });
+  assert(
+    a2.ok && a2.data.alreadyPresent.some((e) => e.tokenId === tokenA),
+    '4: tokenA alreadyPresent',
+    {
+      a2,
+    },
+  );
   // tokenC may equal tokenB on a 2-token scene; in that case it's alreadyPresent too.
   const tokenCWasNew = tokenC !== tokenA && tokenC !== tokenB;
   assert(

@@ -1,9 +1,6 @@
 import { z } from 'zod';
 import { ToolError } from '../errors.js';
-import {
-  getActorStateBody,
-  type GetActorStateResult,
-} from '../evaluators/get-actor-state.js';
+import { getActorStateBody, type GetActorStateResult } from '../evaluators/get-actor-state.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
 /**
@@ -38,7 +35,7 @@ const GetActorStateInput = z
       .optional()
       .describe(
         'Include the full skills array — slug, name, modifier, proficiency (untrained..legendary) ' +
-          "for every skill on the actor including lore skills. Off by default since most callers " +
+          'for every skill on the actor including lore skills. Off by default since most callers ' +
           "don't need it; opt in for skill-check planning.",
       ),
     includeSpellcasting: z

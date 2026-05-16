@@ -1,8 +1,5 @@
 import { z } from 'zod';
-import {
-  getSceneTokensBody,
-  type GetSceneTokensResult,
-} from '../evaluators/get-scene-tokens.js';
+import { getSceneTokensBody, type GetSceneTokensResult } from '../evaluators/get-scene-tokens.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
 const GetSceneTokensInput = z

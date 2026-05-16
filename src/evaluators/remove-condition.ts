@@ -199,10 +199,7 @@ export async function removeConditionBody(
     pf2e?: { ConditionManager?: ConditionManagerLike };
   }
 
-  const fail = (
-    message: string,
-    details: Record<string, unknown>,
-  ): RemoveConditionErr => ({
+  const fail = (message: string, details: Record<string, unknown>): RemoveConditionErr => ({
     ok: false,
     error: { code: 'INVALID_INPUT', message, details },
   });
@@ -237,10 +234,9 @@ export async function removeConditionBody(
   // and as a system-loaded sanity check).
   const CM = game?.pf2e?.ConditionManager;
   if (!CM) {
-    return fail(
-      `game.pf2e.ConditionManager is unavailable — the PF2e system may not be loaded.`,
-      { reason: 'CONDITION_MANAGER_UNAVAILABLE' },
-    );
+    return fail(`game.pf2e.ConditionManager is unavailable — the PF2e system may not be loaded.`, {
+      reason: 'CONDITION_MANAGER_UNAVAILABLE',
+    });
   }
 
   // -- Resolve target condition item via either input path.
@@ -301,10 +297,9 @@ export async function removeConditionBody(
     resolvedSlug = itemSlug;
   } else {
     if (input.slug === null) {
-      return fail(
-        `Neither 'slug' nor 'conditionId' was provided. Exactly one is required.`,
-        { reason: 'MISSING_TARGET_INPUT' },
-      );
+      return fail(`Neither 'slug' nor 'conditionId' was provided. Exactly one is required.`, {
+        reason: 'MISSING_TARGET_INPUT',
+      });
     }
     resolvedSlug = input.slug;
 
@@ -372,7 +367,7 @@ export async function removeConditionBody(
     ? true
     : Boolean(
         (targetItem.system?.value as AnyRecord | undefined)?.isValued ??
-          (targetItem._source?.system?.value as AnyRecord | undefined)?.isValued,
+        (targetItem._source?.system?.value as AnyRecord | undefined)?.isValued,
       );
 
   // -- Read previousValue.
@@ -383,9 +378,7 @@ export async function removeConditionBody(
       const vital = (attrs[resolvedSlug] as AnyRecord | undefined) ?? {};
       previousValue = typeof vital.value === 'number' ? (vital.value as number) : 0;
     } else {
-      const src = targetItem._source?.system?.value as
-        | { value?: number | null }
-        | undefined;
+      const src = targetItem._source?.system?.value as { value?: number | null } | undefined;
       previousValue = typeof src?.value === 'number' ? src.value : 0;
     }
   } else {
@@ -403,8 +396,7 @@ export async function removeConditionBody(
         if (!c || !c.id || c.id === targetId || seen.has(c.id)) continue;
         const pf2eFlags = (c.flags?.pf2e as AnyRecord | undefined) ?? {};
         const gbRaw = pf2eFlags.grantedBy as AnyRecord | undefined;
-        const gbId =
-          gbRaw && typeof gbRaw.id === 'string' && gbRaw.id.length > 0 ? gbRaw.id : null;
+        const gbId = gbRaw && typeof gbRaw.id === 'string' && gbRaw.id.length > 0 ? gbRaw.id : null;
         if (gbId !== parentId) continue;
         seen.add(c.id);
         cascadeDeleted.push({
@@ -422,14 +414,10 @@ export async function removeConditionBody(
   //   - mode: 'remove' always removes.
   //   - non-valued conditions: decrement === remove (silent equivalence).
   //   - valued at previousValue <= 1: decrement collapses to delete.
-  const willRemove =
-    input.mode === 'remove' || !isValued || (previousValue ?? 0) <= 1;
+  const willRemove = input.mode === 'remove' || !isValued || (previousValue ?? 0) <= 1;
 
   // -- Issue the API call.
-  await actor.decreaseCondition(
-    resolvedSlug,
-    willRemove ? { forceRemove: true } : undefined,
-  );
+  await actor.decreaseCondition(resolvedSlug, willRemove ? { forceRemove: true } : undefined);
 
   // -- Post-call cascade enforcement (mirrors remove_item_from_actor):
   // PF2e's cascade-on-delete hook depends on the parent carrying a
@@ -475,8 +463,7 @@ export async function removeConditionBody(
   } else {
     const reread = actor.items?.get?.(targetId);
     const v = reread?._source?.system?.value as { value?: number | null } | undefined;
-    newValue =
-      typeof v?.value === 'number' ? v.value : Math.max(0, (previousValue ?? 0) - 1);
+    newValue = typeof v?.value === 'number' ? v.value : Math.max(0, (previousValue ?? 0) - 1);
   }
 
   return {

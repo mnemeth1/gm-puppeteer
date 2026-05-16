@@ -87,7 +87,8 @@ try {
 
   // Pick an actor to place.
   const actor = await page.evaluate(() => {
-    const a = globalThis.game.actors?.getName('Goblin Warrior 1') ??
+    const a =
+      globalThis.game.actors?.getName('Goblin Warrior 1') ??
       globalThis.game.actors?.contents?.find((a) => a.type === 'npc');
     return a ? { id: a.id, name: a.name } : null;
   });
@@ -168,10 +169,7 @@ try {
 
   // Case 3: bogus actorId.
   try {
-    await tool.handler(
-      { actorId: 'totally-not-a-real-actor', screenX: 100, screenY: 100 },
-      ctx,
-    );
+    await tool.handler({ actorId: 'totally-not-a-real-actor', screenX: 100, screenY: 100 }, ctx);
     failures.push({ label: 'case 3 should throw on bogus actorId' });
   } catch (err) {
     assert(err?.code === 'INVALID_INPUT', 'case 3 INVALID_INPUT for bogus actorId', {

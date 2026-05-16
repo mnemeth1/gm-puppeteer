@@ -28,7 +28,7 @@ export const listActorOwnershipTool: ToolDefinition<typeof ListActorOwnershipInp
     'OBSERVER | OWNER (numeric 0-3 in Foundry). Orphan-user entries (entries whose user has ' +
     'been deleted from the world) appear with `userName: null` and can be cleaned up via ' +
     'remove_actor_ownership. Companion to list_users (discover user ids) and the two ownership ' +
-    "mutation tools. This tool reads `actor.ownership` only — it does NOT report token-level " +
+    'mutation tools. This tool reads `actor.ownership` only — it does NOT report token-level ' +
     'visibility, scene permissions, journal permissions, or item ownership; those use the same ' +
     'mechanism on different documents but are out of scope for this cluster. GMs and Assistant ' +
     'GMs ignore document-level ownership entirely (they can always see everything); this tool ' +

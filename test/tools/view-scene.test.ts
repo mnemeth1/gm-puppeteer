@@ -80,9 +80,7 @@ describe('view_scene', () => {
     };
     const ctx = makeCtx(vi.fn().mockResolvedValue(mockResult));
 
-    const err = await viewSceneTool
-      .handler({ sceneId: 's' }, ctx)
-      .catch((e) => e as ToolError);
+    const err = await viewSceneTool.handler({ sceneId: 's' }, ctx).catch((e) => e as ToolError);
 
     expect(err).toBeInstanceOf(ToolError);
     expect((err as ToolError).code).toBe('EVAL_FAILED');
@@ -99,9 +97,7 @@ describe('view_scene', () => {
     };
     const ctx = makeCtx(vi.fn().mockResolvedValue(mockResult));
 
-    const err = await viewSceneTool
-      .handler({ sceneId: 's' }, ctx)
-      .catch((e) => e as ToolError);
+    const err = await viewSceneTool.handler({ sceneId: 's' }, ctx).catch((e) => e as ToolError);
 
     expect((err as ToolError).code).toBe('EVAL_FAILED');
   });

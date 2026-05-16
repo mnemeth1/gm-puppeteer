@@ -64,9 +64,7 @@ try {
 
     // A non-GM player user id, for the whisper-target / oversight probes.
     const playerUser = (game.users?.contents ?? []).find((u) => !u.isGM);
-    report.playerUser = playerUser
-      ? { id: playerUser.id, name: playerUser.name }
-      : null;
+    report.playerUser = playerUser ? { id: playerUser.id, name: playerUser.name } : null;
 
     // -- Q1 + Q2: raw HTML round-trip.
     const rawHtml =
@@ -142,8 +140,7 @@ try {
     report.cleanup = {
       deleted: created.length,
       restored:
-        finalIds.size === baselineIds.size &&
-        [...baselineIds].every((id) => finalIds.has(id)),
+        finalIds.size === baselineIds.size && [...baselineIds].every((id) => finalIds.has(id)),
     };
 
     return report;

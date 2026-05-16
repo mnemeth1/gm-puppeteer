@@ -21,7 +21,7 @@ export const getAvailableConditionsTool: ToolDefinition<typeof GetAvailableCondi
     'actor.system.attributes.{slug}.max — and null for non-valued), ' +
     'isVital (true for dying/wounded/doomed, whose max is actor-specific ' +
     'and dynamic — doomed reduces dying.max), and persistentDamage (true ' +
-    "only for slug=persistent-damage; apply_condition rejects that slug " +
+    'only for slug=persistent-damage; apply_condition rejects that slug ' +
     "because PF2e's increaseCondition path for it opens a UI dialog " +
     'that blocks in headless — callers should skip it). Sorted ' +
     'alphabetically by slug. No inputs. ' +

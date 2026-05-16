@@ -101,7 +101,11 @@ export async function createJournalEntryBody(
         error: {
           code: 'INVALID_INPUT',
           message: `Folder "${input.folderId}" is type "${folder.type}", not "JournalEntry".`,
-          details: { reason: 'FOLDER_WRONG_TYPE', folderId: input.folderId, folderType: folder.type },
+          details: {
+            reason: 'FOLDER_WRONG_TYPE',
+            folderId: input.folderId,
+            folderType: folder.type,
+          },
         },
       };
     }

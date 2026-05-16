@@ -40,7 +40,7 @@ export const assignJournalOwnershipTool: ToolDefinition<typeof AssignJournalOwne
   name: 'assign_journal_ownership',
   description:
     "Grant or change a user's permission on a journal entry, or on one page within it. " +
-    'Sets a single entry in the target document\'s ownership map via a surgical update — ' +
+    "Sets a single entry in the target document's ownership map via a surgical update — " +
     'all other ownership entries are left untouched. Omit pageId for entry-level (the ' +
     'common case: make a whole "Campaign Story" entry visible to the party); pass pageId ' +
     'to override one page (e.g. keep a GM-secrets page hidden inside an otherwise-shared ' +

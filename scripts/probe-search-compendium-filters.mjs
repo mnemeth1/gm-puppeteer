@@ -63,7 +63,9 @@ try {
   // ====================================================================
   const goblinByName = await call({ query: 'goblin', limit: 5 });
   assert(
-    goblinByName.ok && Array.isArray(goblinByName.data?.results) && goblinByName.data.results.length > 0,
+    goblinByName.ok &&
+      Array.isArray(goblinByName.data?.results) &&
+      goblinByName.data.results.length > 0,
     'name query "goblin" returns results',
     { count: goblinByName.data?.returned, total: goblinByName.data?.total },
   );
@@ -76,8 +78,7 @@ try {
     goblinByName.data?.results?.[0],
   );
   assert(
-    goblinByName.ok &&
-      goblinByName.data.results.every((r) => r.description === undefined),
+    goblinByName.ok && goblinByName.data.results.every((r) => r.description === undefined),
     'no description when descriptionMatch is not set',
     goblinByName.data?.results?.[0],
   );
@@ -160,11 +161,9 @@ try {
     level: { min: 5, max: 10 },
     limit: 10,
   });
-  assert(
-    weapons.ok && weapons.data.results.length > 0,
-    'itemType=weapon + level returns weapons',
-    { count: weapons.data?.returned },
-  );
+  assert(weapons.ok && weapons.data.results.length > 0, 'itemType=weapon + level returns weapons', {
+    count: weapons.data?.returned,
+  });
   assert(
     weapons.ok && weapons.data.results.every((r) => r.type === 'weapon'),
     'all rows are weapons',

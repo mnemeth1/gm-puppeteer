@@ -221,7 +221,9 @@ try {
   log.info(
     {
       itemCount: startSnapshot.itemCount,
-      sample: startSnapshot.items.slice(0, 3).map((i) => ({ id: i.id, name: i.name, type: i.type, qty: i.qty })),
+      sample: startSnapshot.items
+        .slice(0, 3)
+        .map((i) => ({ id: i.id, name: i.name, type: i.type, qty: i.qty })),
     },
     'snapshot captured',
   );
@@ -292,12 +294,28 @@ try {
     log.info({ probe: 1, res }, 'probe 1: delete physical longsword');
     assert(res.ok === true, 'probe 1: ok', { res });
     if (res.ok) {
-      assert(res.data.operation === 'deleted', 'probe 1: operation=deleted', { op: res.data.operation });
-      assert(res.data.deletedItem?.id === temp.id, 'probe 1: deletedItem.id matches', { di: res.data.deletedItem });
-      assert(res.data.deletedItem?.type === 'weapon', 'probe 1: type=weapon', { type: res.data.deletedItem?.type });
-      assert(res.data.deletedItem?.qtyAtDelete === 1, 'probe 1: qtyAtDelete=1', { qty: res.data.deletedItem?.qtyAtDelete });
-      assert(Array.isArray(res.data.ejectedToTopLevel) && res.data.ejectedToTopLevel.length === 0, 'probe 1: no ejections', { e: res.data.ejectedToTopLevel });
-      assert(Array.isArray(res.data.cascadeDeleted) && res.data.cascadeDeleted.length === 0, 'probe 1: no cascades', { c: res.data.cascadeDeleted });
+      assert(res.data.operation === 'deleted', 'probe 1: operation=deleted', {
+        op: res.data.operation,
+      });
+      assert(res.data.deletedItem?.id === temp.id, 'probe 1: deletedItem.id matches', {
+        di: res.data.deletedItem,
+      });
+      assert(res.data.deletedItem?.type === 'weapon', 'probe 1: type=weapon', {
+        type: res.data.deletedItem?.type,
+      });
+      assert(res.data.deletedItem?.qtyAtDelete === 1, 'probe 1: qtyAtDelete=1', {
+        qty: res.data.deletedItem?.qtyAtDelete,
+      });
+      assert(
+        Array.isArray(res.data.ejectedToTopLevel) && res.data.ejectedToTopLevel.length === 0,
+        'probe 1: no ejections',
+        { e: res.data.ejectedToTopLevel },
+      );
+      assert(
+        Array.isArray(res.data.cascadeDeleted) && res.data.cascadeDeleted.length === 0,
+        'probe 1: no cascades',
+        { c: res.data.cascadeDeleted },
+      );
     }
   }
 
@@ -331,9 +349,17 @@ try {
     log.info({ probe: 2, res }, 'probe 2: delete non-physical feat');
     assert(res.ok === true, 'probe 2: ok', { res });
     if (res.ok) {
-      assert(res.data.operation === 'deleted', 'probe 2: operation=deleted', { op: res.data.operation });
-      assert(res.data.deletedItem?.type === 'feat', 'probe 2: type=feat', { type: res.data.deletedItem?.type });
-      assert(res.data.deletedItem?.qtyAtDelete === null, 'probe 2: qtyAtDelete=null for non-physical', { qty: res.data.deletedItem?.qtyAtDelete });
+      assert(res.data.operation === 'deleted', 'probe 2: operation=deleted', {
+        op: res.data.operation,
+      });
+      assert(res.data.deletedItem?.type === 'feat', 'probe 2: type=feat', {
+        type: res.data.deletedItem?.type,
+      });
+      assert(
+        res.data.deletedItem?.qtyAtDelete === null,
+        'probe 2: qtyAtDelete=null for non-physical',
+        { qty: res.data.deletedItem?.qtyAtDelete },
+      );
     }
   }
 
@@ -350,9 +376,15 @@ try {
     log.info({ probe: 3, res }, 'probe 3: arrows -5');
     assert(res.ok === true, 'probe 3: ok', { res });
     if (res.ok) {
-      assert(res.data.operation === 'decremented', 'probe 3: operation=decremented', { op: res.data.operation });
-      assert(res.data.item?.qtyBefore === CANONICAL_ARROWS_QTY, 'probe 3: qtyBefore=20', { q: res.data.item?.qtyBefore });
-      assert(res.data.item?.qtyAfter === CANONICAL_ARROWS_QTY - 5, 'probe 3: qtyAfter=15', { q: res.data.item?.qtyAfter });
+      assert(res.data.operation === 'decremented', 'probe 3: operation=decremented', {
+        op: res.data.operation,
+      });
+      assert(res.data.item?.qtyBefore === CANONICAL_ARROWS_QTY, 'probe 3: qtyBefore=20', {
+        q: res.data.item?.qtyBefore,
+      });
+      assert(res.data.item?.qtyAfter === CANONICAL_ARROWS_QTY - 5, 'probe 3: qtyAfter=15', {
+        q: res.data.item?.qtyAfter,
+      });
     }
   }
 
@@ -372,13 +404,23 @@ try {
     log.info({ probe: 4, res }, 'probe 4: temp potion qty 1 -1');
     assert(res.ok === true, 'probe 4: ok', { res });
     if (res.ok) {
-      assert(res.data.operation === 'decrementedAndDeleted', 'probe 4: operation=decrementedAndDeleted', { op: res.data.operation });
-      assert(res.data.deletedItem?.qtyBefore === 1, 'probe 4: qtyBefore=1', { q: res.data.deletedItem?.qtyBefore });
+      assert(
+        res.data.operation === 'decrementedAndDeleted',
+        'probe 4: operation=decrementedAndDeleted',
+        { op: res.data.operation },
+      );
+      assert(res.data.deletedItem?.qtyBefore === 1, 'probe 4: qtyBefore=1', {
+        q: res.data.deletedItem?.qtyBefore,
+      });
       assert(Array.isArray(res.data.ejectedToTopLevel), 'probe 4: ejectedToTopLevel present', {});
       assert(Array.isArray(res.data.cascadeDeleted), 'probe 4: cascadeDeleted present', {});
     }
     // Verify item is actually gone
-    const stillExists = await page.evaluate((actorId, itemId) => !!globalThis.game.actors.get(actorId).items.get(itemId), PROBE_ACTOR_ID, temp.id);
+    const stillExists = await page.evaluate(
+      (actorId, itemId) => !!globalThis.game.actors.get(actorId).items.get(itemId),
+      PROBE_ACTOR_ID,
+      temp.id,
+    );
     assert(stillExists === false, 'probe 4: item actually removed from actor', { stillExists });
   }
 
@@ -399,14 +441,26 @@ try {
     log.info({ probe: 5, res }, 'probe 5: temp potion qty 1 -1 deleteIfZero:false');
     assert(res.ok === true, 'probe 5: ok', { res });
     if (res.ok) {
-      assert(res.data.operation === 'decremented', 'probe 5: operation=decremented (entry persists)', { op: res.data.operation });
+      assert(
+        res.data.operation === 'decremented',
+        'probe 5: operation=decremented (entry persists)',
+        { op: res.data.operation },
+      );
       assert(res.data.item?.qtyAfter === 0, 'probe 5: qtyAfter=0', { q: res.data.item?.qtyAfter });
     }
-    const persistsAtZero = await page.evaluate((actorId, itemId) => {
-      const it = globalThis.game.actors.get(actorId).items.get(itemId);
-      return it ? { exists: true, qty: it.system?.quantity } : { exists: false };
-    }, PROBE_ACTOR_ID, temp.id);
-    assert(persistsAtZero.exists === true && persistsAtZero.qty === 0, 'probe 5: item persists with qty 0', { persistsAtZero });
+    const persistsAtZero = await page.evaluate(
+      (actorId, itemId) => {
+        const it = globalThis.game.actors.get(actorId).items.get(itemId);
+        return it ? { exists: true, qty: it.system?.quantity } : { exists: false };
+      },
+      PROBE_ACTOR_ID,
+      temp.id,
+    );
+    assert(
+      persistsAtZero.exists === true && persistsAtZero.qty === 0,
+      'probe 5: item persists with qty 0',
+      { persistsAtZero },
+    );
   }
 
   // --------------------------------------------------------------------
@@ -425,8 +479,16 @@ try {
     log.info({ probe: 6, res }, 'probe 6: temp potion qty 2 -5 (clamp)');
     assert(res.ok === true, 'probe 6: ok', { res });
     if (res.ok) {
-      assert(res.data.operation === 'decrementedAndDeleted', 'probe 6: operation=decrementedAndDeleted', { op: res.data.operation });
-      assert(res.data.deletedItem?.qtyBefore === 2, 'probe 6: qtyBefore=2 (overflow not reflected)', { q: res.data.deletedItem?.qtyBefore });
+      assert(
+        res.data.operation === 'decrementedAndDeleted',
+        'probe 6: operation=decrementedAndDeleted',
+        { op: res.data.operation },
+      );
+      assert(
+        res.data.deletedItem?.qtyBefore === 2,
+        'probe 6: qtyBefore=2 (overflow not reflected)',
+        { q: res.data.deletedItem?.qtyBefore },
+      );
     }
   }
 
@@ -454,7 +516,12 @@ try {
             system: { ...(data.system ?? {}), containerId, quantity: 1 },
           },
         ]);
-        return { id: created[0].id, name: created[0].name, type: created[0].type, containerId: created[0].system?.containerId ?? null };
+        return {
+          id: created[0].id,
+          name: created[0].name,
+          type: created[0].type,
+          containerId: created[0].system?.containerId ?? null,
+        };
       },
       PROBE_ACTOR_ID,
       HEALING_POTION_UUID,
@@ -469,24 +536,49 @@ try {
     log.info({ probe: 7, res }, 'probe 7: delete container with contents');
     assert(res.ok === true, 'probe 7: ok', { res });
     if (res.ok) {
-      assert(res.data.operation === 'deleted', 'probe 7: operation=deleted', { op: res.data.operation });
-      assert(res.data.deletedItem?.id === tempBp.id, 'probe 7: deletedItem is the container', { di: res.data.deletedItem });
-      assert(Array.isArray(res.data.ejectedToTopLevel) && res.data.ejectedToTopLevel.length === 1, 'probe 7: exactly one ejection', { e: res.data.ejectedToTopLevel });
-      assert(res.data.ejectedToTopLevel[0]?.id === tempConsumable.id, 'probe 7: ejection is the inner consumable', { e: res.data.ejectedToTopLevel });
-      assert(Array.isArray(res.data.cascadeDeleted) && res.data.cascadeDeleted.length === 0, 'probe 7: no cascade-deletes', { c: res.data.cascadeDeleted });
+      assert(res.data.operation === 'deleted', 'probe 7: operation=deleted', {
+        op: res.data.operation,
+      });
+      assert(res.data.deletedItem?.id === tempBp.id, 'probe 7: deletedItem is the container', {
+        di: res.data.deletedItem,
+      });
+      assert(
+        Array.isArray(res.data.ejectedToTopLevel) && res.data.ejectedToTopLevel.length === 1,
+        'probe 7: exactly one ejection',
+        { e: res.data.ejectedToTopLevel },
+      );
+      assert(
+        res.data.ejectedToTopLevel[0]?.id === tempConsumable.id,
+        'probe 7: ejection is the inner consumable',
+        { e: res.data.ejectedToTopLevel },
+      );
+      assert(
+        Array.isArray(res.data.cascadeDeleted) && res.data.cascadeDeleted.length === 0,
+        'probe 7: no cascade-deletes',
+        { c: res.data.cascadeDeleted },
+      );
     }
     // Verify post-state: consumable is at top level, container gone.
-    const postState = await page.evaluate((actorId, bpId, consumableId) => {
-      const actor = globalThis.game.actors.get(actorId);
-      return {
-        backpackGone: !actor.items.get(bpId),
-        consumableExists: !!actor.items.get(consumableId),
-        consumableContainerId: actor.items.get(consumableId)?.system?.containerId ?? null,
-      };
-    }, PROBE_ACTOR_ID, tempBp.id, tempConsumable.id);
+    const postState = await page.evaluate(
+      (actorId, bpId, consumableId) => {
+        const actor = globalThis.game.actors.get(actorId);
+        return {
+          backpackGone: !actor.items.get(bpId),
+          consumableExists: !!actor.items.get(consumableId),
+          consumableContainerId: actor.items.get(consumableId)?.system?.containerId ?? null,
+        };
+      },
+      PROBE_ACTOR_ID,
+      tempBp.id,
+      tempConsumable.id,
+    );
     assert(postState.backpackGone === true, 'probe 7: backpack actually gone', { postState });
     assert(postState.consumableExists === true, 'probe 7: consumable survived', { postState });
-    assert(postState.consumableContainerId === null, 'probe 7: consumable containerId cleared to null', { postState });
+    assert(
+      postState.consumableContainerId === null,
+      'probe 7: consumable containerId cleared to null',
+      { postState },
+    );
     probe7OrphanIds.push(tempConsumable.id);
   }
 
@@ -524,20 +616,39 @@ try {
     log.info({ probe: 8, res }, 'probe 8: grant-child cascade');
     assert(res.ok === true, 'probe 8: ok', { res });
     if (res.ok) {
-      assert(res.data.operation === 'deleted', 'probe 8: operation=deleted', { op: res.data.operation });
-      assert(Array.isArray(res.data.cascadeDeleted) && res.data.cascadeDeleted.length === 1, 'probe 8: exactly one cascade entry', { c: res.data.cascadeDeleted });
-      assert(res.data.cascadeDeleted[0]?.id === synth.childId, 'probe 8: cascade entry is the synthetic child', { c: res.data.cascadeDeleted });
-      assert(res.data.cascadeDeleted[0]?.reason === 'grantedBy', 'probe 8: reason=grantedBy', { c: res.data.cascadeDeleted });
+      assert(res.data.operation === 'deleted', 'probe 8: operation=deleted', {
+        op: res.data.operation,
+      });
+      assert(
+        Array.isArray(res.data.cascadeDeleted) && res.data.cascadeDeleted.length === 1,
+        'probe 8: exactly one cascade entry',
+        { c: res.data.cascadeDeleted },
+      );
+      assert(
+        res.data.cascadeDeleted[0]?.id === synth.childId,
+        'probe 8: cascade entry is the synthetic child',
+        { c: res.data.cascadeDeleted },
+      );
+      assert(res.data.cascadeDeleted[0]?.reason === 'grantedBy', 'probe 8: reason=grantedBy', {
+        c: res.data.cascadeDeleted,
+      });
     }
-    const post = await page.evaluate((actorId, parentId, childId) => {
-      const actor = globalThis.game.actors.get(actorId);
-      return {
-        parentGone: !actor.items.get(parentId),
-        childGone: !actor.items.get(childId),
-      };
-    }, PROBE_ACTOR_ID, synth.parentId, synth.childId);
+    const post = await page.evaluate(
+      (actorId, parentId, childId) => {
+        const actor = globalThis.game.actors.get(actorId);
+        return {
+          parentGone: !actor.items.get(parentId),
+          childGone: !actor.items.get(childId),
+        };
+      },
+      PROBE_ACTOR_ID,
+      synth.parentId,
+      synth.childId,
+    );
     assert(post.parentGone === true, 'probe 8: parent actually gone', { post });
-    assert(post.childGone === true, "probe 8: PF2e's auto-cascade actually removed the child", { post });
+    assert(post.childGone === true, "probe 8: PF2e's auto-cascade actually removed the child", {
+      post,
+    });
   }
 
   // --------------------------------------------------------------------
@@ -556,11 +667,22 @@ try {
     log.info({ probe: 9, res }, 'probe 9: copper pieces -5');
     assert(res.ok === true, 'probe 9: ok', { res });
     if (res.ok) {
-      assert(res.data.operation === 'decremented', 'probe 9: operation=decremented', { op: res.data.operation });
-      assert(res.data.item?.qtyAfter === CANONICAL_COPPER_PIECES_QTY - 5, 'probe 9: qtyAfter=4', { q: res.data.item?.qtyAfter });
+      assert(res.data.operation === 'decremented', 'probe 9: operation=decremented', {
+        op: res.data.operation,
+      });
+      assert(res.data.item?.qtyAfter === CANONICAL_COPPER_PIECES_QTY - 5, 'probe 9: qtyAfter=4', {
+        q: res.data.item?.qtyAfter,
+      });
     }
-    const coins = await page.evaluate((actorId) => globalThis.game.actors.get(actorId).inventory?.coins ?? null, PROBE_ACTOR_ID);
-    assert(coins?.cp === CANONICAL_COPPER_PIECES_QTY - 5, 'probe 9: actor.inventory.coins.cp updates', { coins });
+    const coins = await page.evaluate(
+      (actorId) => globalThis.game.actors.get(actorId).inventory?.coins ?? null,
+      PROBE_ACTOR_ID,
+    );
+    assert(
+      coins?.cp === CANONICAL_COPPER_PIECES_QTY - 5,
+      'probe 9: actor.inventory.coins.cp updates',
+      { coins },
+    );
   }
 
   // --------------------------------------------------------------------
@@ -570,8 +692,12 @@ try {
     const res = await call({ actorId: 'deadbeef', itemId: 'whatever', mode: 'delete' });
     log.info({ probe: 10, res }, 'probe 10: bogus actorId');
     assert(res.isError === true, 'probe 10: error', { res });
-    assert(res.error?.code === 'INVALID_INPUT', 'probe 10: INVALID_INPUT', { code: res.error?.code });
-    assert(res.error?.details?.reason === 'ACTOR_NOT_FOUND', 'probe 10: reason=ACTOR_NOT_FOUND', { d: res.error?.details });
+    assert(res.error?.code === 'INVALID_INPUT', 'probe 10: INVALID_INPUT', {
+      code: res.error?.code,
+    });
+    assert(res.error?.details?.reason === 'ACTOR_NOT_FOUND', 'probe 10: reason=ACTOR_NOT_FOUND', {
+      d: res.error?.details,
+    });
   }
 
   // --------------------------------------------------------------------
@@ -581,7 +707,11 @@ try {
     const res = await call({ actorId: PROBE_ACTOR_ID, itemId: 'deadbeefdeadbeef', mode: 'delete' });
     log.info({ probe: 11, res }, 'probe 11: bogus itemId');
     assert(res.isError === true, 'probe 11: error', { res });
-    assert(res.error?.details?.reason === 'ITEM_NOT_FOUND_ON_ACTOR', 'probe 11: reason=ITEM_NOT_FOUND_ON_ACTOR', { d: res.error?.details });
+    assert(
+      res.error?.details?.reason === 'ITEM_NOT_FOUND_ON_ACTOR',
+      'probe 11: reason=ITEM_NOT_FOUND_ON_ACTOR',
+      { d: res.error?.details },
+    );
   }
 
   // --------------------------------------------------------------------
@@ -599,7 +729,9 @@ try {
     });
     log.info({ probe: 12, res }, 'probe 12: delete with quantity');
     assert(res.isError === true, 'probe 12: error', { res });
-    assert(Array.isArray(res.validation), 'probe 12: surfaced as zod validation error', { v: res.validation });
+    assert(Array.isArray(res.validation), 'probe 12: surfaced as zod validation error', {
+      v: res.validation,
+    });
   }
 
   // --------------------------------------------------------------------
@@ -644,8 +776,14 @@ try {
     });
     log.info({ probe: 15, res }, 'probe 15: decrement on feat');
     assert(res.isError === true, 'probe 15: error', { res });
-    assert(res.error?.code === 'INVALID_INPUT', 'probe 15: INVALID_INPUT', { code: res.error?.code });
-    assert(res.error?.details?.reason === 'DECREMENT_ON_NON_PHYSICAL', 'probe 15: reason=DECREMENT_ON_NON_PHYSICAL', { d: res.error?.details });
+    assert(res.error?.code === 'INVALID_INPUT', 'probe 15: INVALID_INPUT', {
+      code: res.error?.code,
+    });
+    assert(
+      res.error?.details?.reason === 'DECREMENT_ON_NON_PHYSICAL',
+      'probe 15: reason=DECREMENT_ON_NON_PHYSICAL',
+      { d: res.error?.details },
+    );
   }
 
   // --------------------------------------------------------------------
@@ -775,10 +913,22 @@ try {
   // --------------------------------------------------------------------
   // Probe 17: post-teardown signature equality.
   // --------------------------------------------------------------------
-  assert(teardown.finalItemCount === startSnapshot.itemCount, 'probe 17: item count equals snapshot', { snap: startSnapshot.itemCount, final: teardown.finalItemCount });
-  assert(teardown.signaturesMatch === true, 'probe 17: name+type+qty+containerId multiset matches snapshot', { missing: teardown.missingSigs, extra: teardown.extraSigs });
-  assert(teardown.deleteFailures.length === 0, 'probe 17: no orphan-delete failures', { failures: teardown.deleteFailures });
-  assert(teardown.recreateFailures.length === 0, 'probe 17: no recreation failures', { failures: teardown.recreateFailures });
+  assert(
+    teardown.finalItemCount === startSnapshot.itemCount,
+    'probe 17: item count equals snapshot',
+    { snap: startSnapshot.itemCount, final: teardown.finalItemCount },
+  );
+  assert(
+    teardown.signaturesMatch === true,
+    'probe 17: name+type+qty+containerId multiset matches snapshot',
+    { missing: teardown.missingSigs, extra: teardown.extraSigs },
+  );
+  assert(teardown.deleteFailures.length === 0, 'probe 17: no orphan-delete failures', {
+    failures: teardown.deleteFailures,
+  });
+  assert(teardown.recreateFailures.length === 0, 'probe 17: no recreation failures', {
+    failures: teardown.recreateFailures,
+  });
 
   if (failures.length > 0) {
     log.error({ failures, failureCount: failures.length }, 'PROBE FAILED');

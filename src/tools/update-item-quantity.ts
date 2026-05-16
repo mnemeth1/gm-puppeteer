@@ -61,7 +61,7 @@ const UpdateItemQuantityInput = z
 export const updateItemQuantityTool: ToolDefinition<typeof UpdateItemQuantityInput> = {
   name: 'update_item_quantity',
   description:
-    "Set the absolute quantity of a physical item on a world actor. Sibling to " +
+    'Set the absolute quantity of a physical item on a world actor. Sibling to ' +
     'add_item_to_actor (merge-add delta) and remove_item_from_actor (decrement delta) — this is ' +
     'the set operation. Useful for currency adjustments ("set Copper Pieces to 50") and stack ' +
     'resets where computing the delta would be awkward. ' +
@@ -85,10 +85,7 @@ export const updateItemQuantityTool: ToolDefinition<typeof UpdateItemQuantityInp
       itemId: input.itemId,
       quantity: input.quantity,
     };
-    const result = (await page.evaluate(
-      updateItemQuantityBody,
-      args,
-    )) as UpdateItemQuantityResult;
+    const result = (await page.evaluate(updateItemQuantityBody, args)) as UpdateItemQuantityResult;
     if (!result.ok) {
       throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
     }

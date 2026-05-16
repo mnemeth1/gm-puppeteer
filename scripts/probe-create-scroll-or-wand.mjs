@@ -125,8 +125,7 @@ try {
     // Phase 1 probe items.
     const phase1Orphans = actor.items.contents
       .filter(
-        (i) =>
-          typeof i.name === 'string' && i.name.startsWith('__probe_create_scroll_or_wand_'),
+        (i) => typeof i.name === 'string' && i.name.startsWith('__probe_create_scroll_or_wand_'),
       )
       .map((i) => i.id);
     if (phase1Orphans.length > 0) {
@@ -155,10 +154,7 @@ try {
       })),
     };
   }, PROBE_ACTOR_ID);
-  log.info(
-    { itemCount: startSnapshot.itemCount },
-    'snapshot: start-of-probe inventory captured',
-  );
+  log.info({ itemCount: startSnapshot.itemCount }, 'snapshot: start-of-probe inventory captured');
 
   // --------------------------------------------------------------------
   // Discovery: spell UUIDs + backpack id + a non-container item id.
@@ -271,11 +267,9 @@ try {
       assert(res.data.item?.containerId === null, 'probe 1: containerId null (top level)', {
         containerId: res.data.item?.containerId,
       });
-      assert(
-        res.data.item?.identificationStatus === 'identified',
-        'probe 1: default identified',
-        { status: res.data.item?.identificationStatus },
-      );
+      assert(res.data.item?.identificationStatus === 'identified', 'probe 1: default identified', {
+        status: res.data.item?.identificationStatus,
+      });
 
       // Sanity: get_item_details should round-trip the consumable.
       const details = await callGetItemDetails(res.data.item.uuid);
@@ -334,11 +328,9 @@ try {
     log.info({ probe: 3, res }, 'probe 3: scroll of Fireball, rank 3, in backpack');
     assert(res.ok === true, 'probe 3: ok', { res });
     if (res.ok) {
-      assert(
-        res.data.item?.containerId === backpackId,
-        'probe 3: containerId set on new entry',
-        { containerId: res.data.item?.containerId },
-      );
+      assert(res.data.item?.containerId === backpackId, 'probe 3: containerId set on new entry', {
+        containerId: res.data.item?.containerId,
+      });
       assert(res.data.item?.rank === 3, 'probe 3: rank=3', { rank: res.data.item?.rank });
     }
   }
@@ -444,11 +436,9 @@ try {
     });
     log.info({ probe: 8, res }, 'probe 8: cantrip rejection');
     assert(res.isError === true, 'probe 8: error', { res });
-    assert(
-      res.error?.message?.includes('cantrip'),
-      'probe 8: cantrip rejection message',
-      { msg: res.error?.message },
-    );
+    assert(res.error?.message?.includes('cantrip'), 'probe 8: cantrip rejection message', {
+      msg: res.error?.message,
+    });
   }
 
   // --------------------------------------------------------------------
@@ -534,9 +524,7 @@ try {
   {
     const weaponId = await page.evaluate((actorId) => {
       const actor = globalThis.game.actors?.get(actorId);
-      const ls = actor.items.contents.find(
-        (i) => i.type === 'weapon' && !i.system?.containerId,
-      );
+      const ls = actor.items.contents.find((i) => i.type === 'weapon' && !i.system?.containerId);
       return ls ? ls.id : null;
     }, PROBE_ACTOR_ID);
     if (!weaponId) {
@@ -577,9 +565,7 @@ try {
 
       const deleted = [];
       const deleteFailures = [];
-      const orphanIds = actor.items.contents
-        .filter((i) => !snapshotIds.has(i.id))
-        .map((i) => i.id);
+      const orphanIds = actor.items.contents.filter((i) => !snapshotIds.has(i.id)).map((i) => i.id);
       for (const id of orphanIds) {
         const existing = actor.items.get(id);
         if (!existing) continue;
@@ -595,8 +581,7 @@ try {
       for (const item of actor.items.contents) {
         const expected = snapshotQty.get(item.id);
         if (expected === undefined) continue;
-        const current =
-          typeof item.system?.quantity === 'number' ? item.system.quantity : 1;
+        const current = typeof item.system?.quantity === 'number' ? item.system.quantity : 1;
         if (current !== expected) {
           updates.push({ _id: item.id, 'system.quantity': expected });
         }
@@ -610,8 +595,7 @@ try {
       for (const item of actor.items.contents) {
         const expected = snapshotQty.get(item.id);
         if (expected === undefined) continue;
-        const current =
-          typeof item.system?.quantity === 'number' ? item.system.quantity : 1;
+        const current = typeof item.system?.quantity === 'number' ? item.system.quantity : 1;
         if (current !== expected) {
           driftedAfter.push({ id: item.id, name: item.name, expected, actual: current });
         }
@@ -647,16 +631,12 @@ try {
     extraIds: teardown.extraIds,
     missingIds: teardown.missingIds,
   });
-  assert(
-    teardown.driftedAfter.length === 0,
-    'probe 14: every snapshot id has snapshot quantity',
-    { drifted: teardown.driftedAfter },
-  );
-  assert(
-    teardown.deleteFailures.length === 0,
-    'probe 14: no orphan delete failures',
-    { failures: teardown.deleteFailures },
-  );
+  assert(teardown.driftedAfter.length === 0, 'probe 14: every snapshot id has snapshot quantity', {
+    drifted: teardown.driftedAfter,
+  });
+  assert(teardown.deleteFailures.length === 0, 'probe 14: no orphan delete failures', {
+    failures: teardown.deleteFailures,
+  });
 
   if (failures.length > 0) {
     log.error({ failures, failureCount: failures.length }, 'PROBE FAILED');

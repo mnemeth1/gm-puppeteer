@@ -125,10 +125,7 @@ export async function updateItemUsesBody(
     actors?: { get(id: string): ActorDocLike | undefined };
   }
 
-  const fail = (
-    message: string,
-    details: Record<string, unknown>,
-  ): UpdateItemUsesErr => ({
+  const fail = (message: string, details: Record<string, unknown>): UpdateItemUsesErr => ({
     ok: false,
     error: { code: 'INVALID_INPUT', message, details },
   });
@@ -160,14 +157,11 @@ export async function updateItemUsesBody(
   // -- Resolve target item on actor.
   const target = actor.items?.get?.(input.itemId);
   if (!target || !target.id) {
-    return fail(
-      `No item found on actor ${actor.id ?? input.actorId} for itemId: ${input.itemId}`,
-      {
-        actorId: input.actorId,
-        itemId: input.itemId,
-        reason: 'ITEM_NOT_FOUND_ON_ACTOR',
-      },
-    );
+    return fail(`No item found on actor ${actor.id ?? input.actorId} for itemId: ${input.itemId}`, {
+      actorId: input.actorId,
+      itemId: input.itemId,
+      reason: 'ITEM_NOT_FOUND_ON_ACTOR',
+    });
   }
 
   const targetType: string = typeof target.type === 'string' ? target.type : '';
@@ -193,11 +187,7 @@ export async function updateItemUsesBody(
   const sys = (target.system as AnyRecord | undefined) ?? {};
   const uses = sys.uses as AnyRecord | undefined;
   const usesMaxRaw = uses?.max;
-  if (
-    !uses ||
-    typeof usesMaxRaw !== 'number' ||
-    !Number.isFinite(usesMaxRaw)
-  ) {
+  if (!uses || typeof usesMaxRaw !== 'number' || !Number.isFinite(usesMaxRaw)) {
     return fail(
       `Item '${identifiedName(target)}' (type=${targetType}) has no \`system.uses\` ` +
         `tracker — there is no charges field to set. Items with \`system.uses\` are ` +

@@ -108,38 +108,50 @@ try {
   // --------------------------------------------------------------------
   // Snapshot: capture conditions/effects/vitals on Valeros + Goblin.
   // --------------------------------------------------------------------
-  const startSnapshot = await page.evaluate((actorIds) => {
-    const out = {};
-    for (const id of actorIds) {
-      const actor = globalThis.game.actors?.get(id);
-      if (!actor) {
-        out[id] = { error: `actor ${id} not found` };
-        continue;
+  const startSnapshot = await page.evaluate(
+    (actorIds) => {
+      const out = {};
+      for (const id of actorIds) {
+        const actor = globalThis.game.actors?.get(id);
+        if (!actor) {
+          out[id] = { error: `actor ${id} not found` };
+          continue;
+        }
+        out[id] = {
+          name: actor.name,
+          type: actor.type,
+          conditions: actor.itemTypes.condition.map((c) => ({
+            id: c.id,
+            slug: c.system.slug,
+            value: c.system.value.value,
+            grantedById: c.flags?.pf2e?.grantedBy?.id ?? null,
+            payload: c.toObject(),
+          })),
+          effects: actor.itemTypes.effect.map((e) => ({
+            id: e.id,
+            name: e.name,
+            payload: e.toObject(),
+          })),
+          vitals: {
+            dying: {
+              value: actor.system.attributes.dying.value,
+              max: actor.system.attributes.dying.max,
+            },
+            wounded: {
+              value: actor.system.attributes.wounded.value,
+              max: actor.system.attributes.wounded.max,
+            },
+            doomed: {
+              value: actor.system.attributes.doomed.value,
+              max: actor.system.attributes.doomed.max,
+            },
+          },
+        };
       }
-      out[id] = {
-        name: actor.name,
-        type: actor.type,
-        conditions: actor.itemTypes.condition.map((c) => ({
-          id: c.id,
-          slug: c.system.slug,
-          value: c.system.value.value,
-          grantedById: c.flags?.pf2e?.grantedBy?.id ?? null,
-          payload: c.toObject(),
-        })),
-        effects: actor.itemTypes.effect.map((e) => ({
-          id: e.id,
-          name: e.name,
-          payload: e.toObject(),
-        })),
-        vitals: {
-          dying: { value: actor.system.attributes.dying.value, max: actor.system.attributes.dying.max },
-          wounded: { value: actor.system.attributes.wounded.value, max: actor.system.attributes.wounded.max },
-          doomed: { value: actor.system.attributes.doomed.value, max: actor.system.attributes.doomed.max },
-        },
-      };
-    }
-    return out;
-  }, [VALEROS_ID, GOBLIN_ID]);
+      return out;
+    },
+    [VALEROS_ID, GOBLIN_ID],
+  );
   log.info(
     {
       valeros: {
@@ -289,9 +301,13 @@ try {
     log.info({ probe: 5, res }, 'probe 5: decrement prone → silent equivalence');
     assert(res.ok === true, 'probe 5: ok', { res });
     if (res.ok) {
-      assert(res.data.operation === 'removed', 'probe 5: operation=removed (decrement on non-valued)', {
-        op: res.data.operation,
-      });
+      assert(
+        res.data.operation === 'removed',
+        'probe 5: operation=removed (decrement on non-valued)',
+        {
+          op: res.data.operation,
+        },
+      );
     }
   }
 
@@ -389,11 +405,7 @@ try {
       const dyingAttr = await page.evaluate((id) => {
         return globalThis.game.actors?.get(id)?.system.attributes.dying.value ?? null;
       }, VALEROS_ID);
-      assert(
-        dyingAttr === 1,
-        'probe 7: system.attributes.dying.value === 1',
-        { dyingAttr },
-      );
+      assert(dyingAttr === 1, 'probe 7: system.attributes.dying.value === 1', { dyingAttr });
     }
   }
 
@@ -430,11 +442,9 @@ try {
         previousValue: res.data.condition.previousValue,
       });
       const cascadeSlugs = (res.data.cascadeDeleted ?? []).map((c) => c.slug).sort();
-      assert(
-        cascadeSlugs.includes('unconscious'),
-        'probe 8: cascadeDeleted includes unconscious',
-        { cascadeSlugs },
-      );
+      assert(cascadeSlugs.includes('unconscious'), 'probe 8: cascadeDeleted includes unconscious', {
+        cascadeSlugs,
+      });
       assert(
         cascadeSlugs.includes('blinded'),
         'probe 8: cascadeDeleted includes blinded (transitive)',
@@ -454,16 +464,10 @@ try {
           conditionSlugs: actor.itemTypes.condition.map((c) => c.system.slug).sort(),
         };
       }, VALEROS_ID);
-      assert(
-        postState.dying === 0,
-        'probe 8: system.attributes.dying.value === 0',
-        { postState },
-      );
-      assert(
-        !postState.conditionSlugs.includes('unconscious'),
-        'probe 8: unconscious gone',
-        { postState },
-      );
+      assert(postState.dying === 0, 'probe 8: system.attributes.dying.value === 0', { postState });
+      assert(!postState.conditionSlugs.includes('unconscious'), 'probe 8: unconscious gone', {
+        postState,
+      });
       log.info(
         { probe: 8, postWounded: postState.wounded, preWounded: preCheck.wounded },
         'probe 8: informational — wounded post-remove (PF2e recovery side-effect)',
@@ -554,11 +558,9 @@ try {
     const res = await callRemove({ actorId: 'deadbeef', slug: 'frightened' });
     log.info({ probe: 12, res }, 'probe 12: bogus actorId');
     assert(res.isError === true, 'probe 12: error', { res });
-    assert(
-      res.error?.details?.reason === 'ACTOR_NOT_FOUND',
-      'probe 12: reason=ACTOR_NOT_FOUND',
-      { reason: res.error?.details?.reason },
-    );
+    assert(res.error?.details?.reason === 'ACTOR_NOT_FOUND', 'probe 12: reason=ACTOR_NOT_FOUND', {
+      reason: res.error?.details?.reason,
+    });
   }
 
   // --------------------------------------------------------------------

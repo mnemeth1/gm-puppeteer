@@ -11,9 +11,7 @@ const AssignActorOwnershipInput = z
     actorId: z
       .string()
       .min(1)
-      .describe(
-        'World actor id (as returned by list_world_actors). Pass the bare id, not a UUID.',
-      ),
+      .describe('World actor id (as returned by list_world_actors). Pass the bare id, not a UUID.'),
     userId: z
       .string()
       .min(1)

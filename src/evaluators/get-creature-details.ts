@@ -530,7 +530,12 @@ export async function getCreatureDetailsBody(
   const fallbackDesc = get(get(sys, 'description'), 'value');
   const descRaw =
     typeof publicNotes === 'string' && publicNotes.length > 0 ? publicNotes : fallbackDesc;
-  applyDescFormat(out as unknown as Record<string, unknown>, 'description', 'descriptionText', descRaw);
+  applyDescFormat(
+    out as unknown as Record<string, unknown>,
+    'description',
+    'descriptionText',
+    descRaw,
+  );
 
   // ---- shared sub-projections (used by npc + hazard + familiar) ---------
 
@@ -592,8 +597,12 @@ export async function getCreatureDetailsBody(
 
   const projectIwr = (): IWRBlock => {
     const attrRaw = obj(get(sys, 'attributes')) ?? {};
-    const immunitiesRaw = Array.isArray(attrRaw.immunities) ? (attrRaw.immunities as unknown[]) : [];
-    const weaknessesRaw = Array.isArray(attrRaw.weaknesses) ? (attrRaw.weaknesses as unknown[]) : [];
+    const immunitiesRaw = Array.isArray(attrRaw.immunities)
+      ? (attrRaw.immunities as unknown[])
+      : [];
+    const weaknessesRaw = Array.isArray(attrRaw.weaknesses)
+      ? (attrRaw.weaknesses as unknown[])
+      : [];
     const resistancesRaw = Array.isArray(attrRaw.resistances)
       ? (attrRaw.resistances as unknown[])
       : [];
@@ -693,8 +702,7 @@ export async function getCreatureDetailsBody(
     const itemSys = (item.system as AnyRecord | undefined) ?? {};
     const actionTypeV = str(get(obj(itemSys.actionType), 'value'));
     const actionCountRaw = get(obj(itemSys.actions), 'value');
-    const actionCount: number | null =
-      typeof actionCountRaw === 'number' ? actionCountRaw : null;
+    const actionCount: number | null = typeof actionCountRaw === 'number' ? actionCountRaw : null;
     const entry: ActionEntry = {
       id: str(item.id),
       slug: str(itemSys.slug),

@@ -39,17 +39,14 @@ try {
     for (const pack of Array.from(game.packs ?? [])) {
       if (pack.documentName !== 'Actor') continue;
       const index = await pack.getIndex();
-      const hit = index.contents.find((e) =>
-        (e.name ?? '').toLowerCase().includes('valeros'),
-      );
+      const hit = index.contents.find((e) => (e.name ?? '').toLowerCase().includes('valeros'));
       out.packs.push({
         collection: pack.collection,
         size: index.contents.length,
         sampleNames: index.contents.slice(0, 3).map((e) => e.name),
       });
       if (hit) {
-        out.valerosUuid =
-          hit.uuid ?? `Compendium.${pack.collection}.Actor.${hit._id}`;
+        out.valerosUuid = hit.uuid ?? `Compendium.${pack.collection}.Actor.${hit._id}`;
         break;
       }
     }
@@ -80,9 +77,7 @@ try {
       objKeys: Object.keys(obj).slice(0, 20),
       objIdPresent: '_id' in obj,
       objHasPrototypeToken: !!obj.prototypeToken,
-      prototypeTokenKeys: obj.prototypeToken
-        ? Object.keys(obj.prototypeToken).slice(0, 20)
-        : null,
+      prototypeTokenKeys: obj.prototypeToken ? Object.keys(obj.prototypeToken).slice(0, 20) : null,
       prototypeTokenName: obj.prototypeToken?.name,
       prototypeTokenActorLink: obj.prototypeToken?.actorLink,
       itemCount: Array.isArray(obj.items) ? obj.items.length : -1,
@@ -180,16 +175,13 @@ try {
       out.missingPackError = e?.message ?? String(e);
     }
     // An Item UUID — we need to detect "wrong doc type" cleanly.
-    const itemPack = Array.from(globalThis.game.packs ?? []).find(
-      (p) => p.documentName === 'Item',
-    );
+    const itemPack = Array.from(globalThis.game.packs ?? []).find((p) => p.documentName === 'Item');
     let itemUuid = null;
     if (itemPack) {
       const idx = await itemPack.getIndex();
       const firstItem = idx.contents[0];
       if (firstItem) {
-        itemUuid =
-          firstItem.uuid ?? `Compendium.${itemPack.collection}.Item.${firstItem._id}`;
+        itemUuid = firstItem.uuid ?? `Compendium.${itemPack.collection}.Item.${firstItem._id}`;
       }
     }
     if (itemUuid) {
@@ -204,21 +196,24 @@ try {
   log.info({ fromUuidErrors }, 'fromUuid error / wrong-type behavior');
 
   // --- Cleanup: delete anything we created. ---
-  const cleanup = await page.evaluate(async (names) => {
-    const removed = [];
-    for (const name of names) {
-      const docs = globalThis.game.actors?.contents?.filter((a) => a.name === name) ?? [];
-      for (const doc of docs) {
-        try {
-          await doc.delete();
-          removed.push(doc.id);
-        } catch (e) {
-          removed.push(`failed:${doc.id}:${e?.message ?? e}`);
+  const cleanup = await page.evaluate(
+    async (names) => {
+      const removed = [];
+      for (const name of names) {
+        const docs = globalThis.game.actors?.contents?.filter((a) => a.name === name) ?? [];
+        for (const doc of docs) {
+          try {
+            await doc.delete();
+            removed.push(doc.id);
+          } catch (e) {
+            removed.push(`failed:${doc.id}:${e?.message ?? e}`);
+          }
         }
       }
-    }
-    return { removed };
-  }, [TEST_NAME, '__gm_puppeteer_probe_actor_folder__']);
+      return { removed };
+    },
+    [TEST_NAME, '__gm_puppeteer_probe_actor_folder__'],
+  );
   log.info({ cleanup }, 'cleanup');
 
   process.exitCode = 0;

@@ -115,8 +115,7 @@ try {
       snapshot: snap(t),
     }));
 
-    const linkedPC =
-      projection.find((t) => t.actorLink && t.actorType === 'character') ?? null;
+    const linkedPC = projection.find((t) => t.actorLink && t.actorType === 'character') ?? null;
     const npc =
       projection.find((t) => !t.actorLink) ??
       projection.find((t) => t.actorType !== 'character') ??
@@ -194,7 +193,9 @@ try {
     return { original, target, updateErr, immediate, later };
   }, npcId);
   log.info({ q1 }, 'Q1: disposition write on NPC token');
-  assert(q1.updateErr === null, 'Q1: disposition update did not throw', { updateErr: q1.updateErr });
+  assert(q1.updateErr === null, 'Q1: disposition update did not throw', {
+    updateErr: q1.updateErr,
+  });
 
   if (linkedPCId !== null) {
     const q1Linked = await page.evaluate(async (tokenId) => {
@@ -377,11 +378,7 @@ try {
     return {
       errMsg,
       returnedKind:
-        returned === undefined
-          ? 'undefined'
-          : returned === null
-            ? 'null'
-            : typeof returned,
+        returned === undefined ? 'undefined' : returned === null ? 'null' : typeof returned,
     };
   }, npcId);
   log.info({ q5 }, 'Q5: empty token.update({}) behavior');
@@ -527,24 +524,18 @@ try {
     });
 
     // Q8c: sight subobject update. Same faithful-reporting invariant as Q8a.
-    const sightPre = await page.evaluate(
-      (id) => {
-        const t = globalThis.game.scenes.active.tokens.get(id);
-        return { enabled: t.sight?.enabled === true, range: t.sight?.range ?? 0 };
-      },
-      npcId,
-    );
+    const sightPre = await page.evaluate((id) => {
+      const t = globalThis.game.scenes.active.tokens.get(id);
+      return { enabled: t.sight?.enabled === true, range: t.sight?.range ?? 0 };
+    }, npcId);
     const requestedSight = { enabled: !sightPre.enabled, range: 30 };
     const r8c = JSON.parse(
       (await updateTool.handler({ tokenId: npcId, sight: requestedSight }, toolCtx))[0].text,
     );
-    const sightPost = await page.evaluate(
-      (id) => {
-        const t = globalThis.game.scenes.active.tokens.get(id);
-        return { enabled: t.sight?.enabled === true, range: t.sight?.range ?? 0 };
-      },
-      npcId,
-    );
+    const sightPost = await page.evaluate((id) => {
+      const t = globalThis.game.scenes.active.tokens.get(id);
+      return { enabled: t.sight?.enabled === true, range: t.sight?.range ?? 0 };
+    }, npcId);
     log.info(
       { r8c, sightPre, sightPost, requested: requestedSight },
       'Q8c: sight subobject update',
@@ -555,8 +546,7 @@ try {
       { changed: r8c.changed },
     );
     assert(
-      r8c.before.sight?.enabled === sightPre.enabled &&
-        r8c.before.sight?.range === sightPre.range,
+      r8c.before.sight?.enabled === sightPre.enabled && r8c.before.sight?.range === sightPre.range,
       'Q8c: tool reports correct pre-handler sight',
       { toolBefore: r8c.before.sight, live: sightPre },
     );
@@ -730,18 +720,13 @@ try {
     // derives it for linked PCs. Report mismatches but don't fail the probe
     // on that field for linked tokens — Q1 captured the divergence
     // intentionally.
-    const fieldsToCheck = [
-      'name',
-      'hidden',
-      'displayName',
-      'displayBars',
-    ];
+    const fieldsToCheck = ['name', 'hidden', 'displayName', 'displayBars'];
     for (const f of fieldsToCheck) {
-      assert(
-        read[f] === snap[f],
-        `final invariant: ${f} restored on token ${tokenId}`,
-        { field: f, read: read[f], snap: snap[f] },
-      );
+      assert(read[f] === snap[f], `final invariant: ${f} restored on token ${tokenId}`, {
+        field: f,
+        read: read[f],
+        snap: snap[f],
+      });
     }
     for (const f of ['enabled', 'range', 'angle', 'visionMode']) {
       assert(

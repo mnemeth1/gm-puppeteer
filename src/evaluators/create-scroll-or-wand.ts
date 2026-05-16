@@ -151,10 +151,7 @@ export async function createScrollOrWandBody(
     PF2E?: FoundryConfigPF2e;
   }
 
-  const fail = (
-    message: string,
-    details: Record<string, unknown>,
-  ): CreateScrollOrWandErr => ({
+  const fail = (message: string, details: Record<string, unknown>): CreateScrollOrWandErr => ({
     ok: false,
     error: { code: 'INVALID_INPUT', message, details },
   });
@@ -196,8 +193,7 @@ export async function createScrollOrWandBody(
       {},
     );
   }
-  const kindConfig =
-    input.kind === 'scroll' ? spellcastingItems.scroll : spellcastingItems.wand;
+  const kindConfig = input.kind === 'scroll' ? spellcastingItems.scroll : spellcastingItems.wand;
   if (!kindConfig?.compendiumUuids) {
     return fail(
       `CONFIG.PF2E.spellcastingItems.${input.kind}.compendiumUuids is missing — the PF2e ` +
@@ -256,13 +252,10 @@ export async function createScrollOrWandBody(
   //    document layer would accept the create.
   const spellSys = (spell.system as AnyRecord | undefined) ?? {};
   const spellTraits = (spellSys.traits as AnyRecord | undefined) ?? {};
-  const traitsValue = Array.isArray(spellTraits.value)
-    ? (spellTraits.value as string[])
-    : [];
+  const traitsValue = Array.isArray(spellTraits.value) ? (spellTraits.value as string[]) : [];
   const isCantrip = traitsValue.includes('cantrip');
   const isFocus = traitsValue.includes('focus');
-  const isRitual =
-    spellSys.category === 'ritual' || spell.type === ('ritual' as unknown as string);
+  const isRitual = spellSys.category === 'ritual' || spell.type === ('ritual' as unknown as string);
   if (isCantrip) {
     return fail(
       `Spell "${spell.name ?? '?'}" is a cantrip; cantrips cannot be scribed into scrolls or wands in PF2e.`,
@@ -305,8 +298,7 @@ export async function createScrollOrWandBody(
         containerId: input.containerId,
       });
     }
-    const containerType =
-      typeof containerItem.type === 'string' ? containerItem.type : '';
+    const containerType = typeof containerItem.type === 'string' ? containerItem.type : '';
     if (containerType !== 'backpack') {
       return fail(
         `Item with containerId ${input.containerId} is type ${containerType}, not a container.`,
@@ -330,8 +322,7 @@ export async function createScrollOrWandBody(
   // Inject the spell at the chosen rank.
   const spellPayload = spell.toObject();
   const spellPayloadSys = (spellPayload.system as AnyRecord | undefined) ?? {};
-  const spellPayloadLocation =
-    (spellPayloadSys.location as AnyRecord | undefined) ?? {};
+  const spellPayloadLocation = (spellPayloadSys.location as AnyRecord | undefined) ?? {};
   spellPayload.system = {
     ...spellPayloadSys,
     location: {

@@ -89,7 +89,10 @@ export async function assignActorOwnershipBody(
 
   const game = (globalThis as unknown as { game?: FoundryGameForAssign }).game;
   if (!game) {
-    return { ok: false, error: { code: 'INVALID_INPUT', message: 'Foundry game object is not ready.' } };
+    return {
+      ok: false,
+      error: { code: 'INVALID_INPUT', message: 'Foundry game object is not ready.' },
+    };
   }
 
   const actor = game.actors?.get(input.actorId) ?? null;

@@ -8,10 +8,7 @@ import { jsonText, type ToolDefinition } from './types.js';
 
 const CreateJournalPageInput = z
   .object({
-    entryId: z
-      .string()
-      .min(1)
-      .describe('Id of the parent journal entry the new page is added to.'),
+    entryId: z.string().min(1).describe('Id of the parent journal entry the new page is added to.'),
     name: z
       .string()
       .min(1)
@@ -45,7 +42,9 @@ const CreateJournalPageInput = z
       .min(1)
       .max(6)
       .optional()
-      .describe('Heading level (1-6) for the page title in the entry table of contents. Default 1.'),
+      .describe(
+        'Heading level (1-6) for the page title in the entry table of contents. Default 1.',
+      ),
   })
   .strict();
 
@@ -59,8 +58,8 @@ export const createJournalPageTool: ToolDefinition<typeof CreateJournalPageInput
     'Returns the new pageId and its assigned sort. Page sort auto-appends after existing ' +
     'pages unless you pass an explicit sort. v1 creates TEXT pages only — image/pdf/video ' +
     'pages are out of scope (use foundry_eval if genuinely needed). To add to an existing ' +
-    "page rather than create a new one, use update_journal_page with mode append/prepend. " +
-    'New pages inherit the parent entry\'s ownership; override per-page via ' +
+    'page rather than create a new one, use update_journal_page with mode append/prepend. ' +
+    "New pages inherit the parent entry's ownership; override per-page via " +
     'assign_journal_ownership with a pageId.',
   inputSchema: CreateJournalPageInput,
   async handler(input, ctx) {

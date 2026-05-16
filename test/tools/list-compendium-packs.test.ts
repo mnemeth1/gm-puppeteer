@@ -61,18 +61,12 @@ describe('list_compendium_packs', () => {
   });
 
   it('rejects empty-string filter values', () => {
-    expect(
-      listCompendiumPacksTool.inputSchema.safeParse({ documentType: '' }).success,
-    ).toBe(false);
-    expect(
-      listCompendiumPacksTool.inputSchema.safeParse({ system: '' }).success,
-    ).toBe(false);
+    expect(listCompendiumPacksTool.inputSchema.safeParse({ documentType: '' }).success).toBe(false);
+    expect(listCompendiumPacksTool.inputSchema.safeParse({ system: '' }).success).toBe(false);
   });
 
   it('rejects unknown fields (strict)', () => {
-    expect(
-      listCompendiumPacksTool.inputSchema.safeParse({ extraField: 1 }).success,
-    ).toBe(false);
+    expect(listCompendiumPacksTool.inputSchema.safeParse({ extraField: 1 }).success).toBe(false);
   });
 
   it('accepts an empty input object', () => {

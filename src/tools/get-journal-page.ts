@@ -1,9 +1,6 @@
 import { z } from 'zod';
 import { ToolError } from '../errors.js';
-import {
-  getJournalPageBody,
-  type GetJournalPageResult,
-} from '../evaluators/get-journal-page.js';
+import { getJournalPageBody, type GetJournalPageResult } from '../evaluators/get-journal-page.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
 const GetJournalPageInput = z
@@ -27,7 +24,7 @@ const GetJournalPageInput = z
 export const getJournalPageTool: ToolDefinition<typeof GetJournalPageInput> = {
   name: 'get_journal_page',
   description:
-    "Read-only full-detail view of a single JournalEntryPage. The third step in the " +
+    'Read-only full-detail view of a single JournalEntryPage. The third step in the ' +
     'journal navigation hierarchy: list_journals → get_journal_entry → get_journal_page. ' +
     'Returns the page metadata (id, name, type, sort, title) plus the type-specific ' +
     'content slot: text pages return `{format, markdown, content}` (markdown is the source ' +

@@ -180,13 +180,12 @@ try {
     if (!sample) return { error: 'no packs' };
     const result = {
       collectionClassName: sample.constructor?.name ?? null,
-      hasIndexFieldsInstance:
-        sample.indexFields !== undefined && sample.indexFields !== null,
+      hasIndexFieldsInstance: sample.indexFields !== undefined && sample.indexFields !== null,
       indexFieldsType: sample.indexFields ? sample.indexFields.constructor?.name : null,
       indexFieldsContents:
         sample.indexFields instanceof Set
           ? Array.from(sample.indexFields)
-          : sample.indexFields ?? null,
+          : (sample.indexFields ?? null),
       ctorIndexFields:
         sample.constructor && 'INDEX_FIELDS' in sample.constructor
           ? sample.constructor.INDEX_FIELDS
@@ -254,9 +253,7 @@ try {
         if (!pack) return { error: `pack ${collection} not loaded` };
         const idx = await pack.getIndex();
         const target =
-          (typeFilter
-            ? idx.contents.find((e) => e.type === typeFilter)
-            : idx.contents[0]) ?? null;
+          (typeFilter ? idx.contents.find((e) => e.type === typeFilter) : idx.contents[0]) ?? null;
         if (!target) return { error: `no entry matched filter ${typeFilter}` };
         const doc = await pack.getDocument(target._id);
         const sys = doc?.system ?? {};
@@ -266,19 +263,13 @@ try {
           name: doc?.name ?? null,
           hasSystemDescriptionValue: typeof sys.description?.value === 'string',
           systemDescriptionValueLen:
-            typeof sys.description?.value === 'string'
-              ? sys.description.value.length
-              : null,
+            typeof sys.description?.value === 'string' ? sys.description.value.length : null,
           hasDetailsPublicNotes: typeof sys.details?.publicNotes === 'string',
           detailsPublicNotesLen:
-            typeof sys.details?.publicNotes === 'string'
-              ? sys.details.publicNotes.length
-              : null,
+            typeof sys.details?.publicNotes === 'string' ? sys.details.publicNotes.length : null,
           hasDetailsAppearance: typeof sys.details?.appearance === 'string',
           detailsAppearanceLen:
-            typeof sys.details?.appearance === 'string'
-              ? sys.details.appearance.length
-              : null,
+            typeof sys.details?.appearance === 'string' ? sys.details.appearance.length : null,
           systemKeys: Object.keys(sys).slice(0, 20),
           detailsKeys: Object.keys(sys.details ?? {}).slice(0, 20),
         };

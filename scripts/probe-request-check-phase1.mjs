@@ -108,8 +108,7 @@ try {
         report.createdMessage = {
           id: msg?.id ?? null,
           storedHasAnchor: typeof msg?.content === 'string' && /<a\b/.test(msg.content),
-          storedContentSample:
-            typeof msg?.content === 'string' ? msg.content.slice(0, 240) : null,
+          storedContentSample: typeof msg?.content === 'string' ? msg.content.slice(0, 240) : null,
         };
       } catch (e) {
         report.createError = e?.message ?? String(e);

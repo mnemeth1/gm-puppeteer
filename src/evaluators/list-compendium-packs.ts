@@ -88,8 +88,7 @@ export function listCompendiumPacksBody(
   const game = (globalThis as unknown as { game?: FoundryGameForPacks }).game;
   const all = game?.packs ? Array.from(game.packs) : [];
 
-  const wantDocumentType =
-    typeof input?.documentType === 'string' ? input.documentType : null;
+  const wantDocumentType = typeof input?.documentType === 'string' ? input.documentType : null;
   const wantSystem = typeof input?.system === 'string' ? input.system : null;
 
   const summaries: CompendiumPackSummary[] = [];
@@ -104,13 +103,11 @@ export function listCompendiumPacksBody(
       typeof pack.metadata?.label === 'string' && pack.metadata.label.length > 0
         ? pack.metadata.label
         : null;
-    const title =
-      typeof pack.title === 'string' && pack.title.length > 0 ? pack.title : null;
+    const title = typeof pack.title === 'string' && pack.title.length > 0 ? pack.title : null;
     const label = metaLabel ?? title ?? id;
 
     const packageName =
-      typeof pack.metadata?.packageName === 'string' &&
-      pack.metadata.packageName.length > 0
+      typeof pack.metadata?.packageName === 'string' && pack.metadata.packageName.length > 0
         ? pack.metadata.packageName
         : null;
     const prefix = id.includes('.') ? id.slice(0, id.indexOf('.')) : id;
@@ -122,9 +119,7 @@ export function listCompendiumPacksBody(
     summaries.push({ id, label, system, documentType });
   }
 
-  summaries.sort((a, b) =>
-    a.label.localeCompare(b.label, undefined, { sensitivity: 'base' }),
-  );
+  summaries.sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' }));
 
   return { packs: summaries };
 }

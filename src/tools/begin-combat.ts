@@ -10,8 +10,7 @@ const BeginCombatInput = z
       .min(1)
       .optional()
       .describe(
-        'Scene id whose combat encounter to begin; defaults to the ' +
-          'world-active scene.',
+        'Scene id whose combat encounter to begin; defaults to the ' + 'world-active scene.',
       ),
   })
   .strict();
@@ -19,13 +18,13 @@ const BeginCombatInput = z
 export const beginCombatTool: ToolDefinition<typeof BeginCombatInput> = {
   name: 'begin_combat',
   description:
-    'Begin a scene\'s combat encounter — advance it from the round-0 staging ' +
+    "Begin a scene's combat encounter — advance it from the round-0 staging " +
     'state to round 1, turn 0. Resolves the scene (defaults to the active ' +
     'scene, or uses sceneId) and its Combat (no encounter → error; run ' +
     'start_combat first). Returns combatId, round, turn, started, and ' +
     '`alreadyStarted`. Idempotent: if the encounter is already underway it ' +
     'is returned untouched with `alreadyStarted: true`. This does NOT roll ' +
-    'initiative — that is the human GM\'s job and should be done before ' +
+    "initiative — that is the human GM's job and should be done before " +
     'begin_combat so the turn order is meaningful. It also does not advance ' +
     'turns or rounds; that stays manual.',
   inputSchema: BeginCombatInput,

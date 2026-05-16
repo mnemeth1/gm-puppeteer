@@ -9,17 +9,14 @@ const EndCombatInput = z
       .string()
       .min(1)
       .optional()
-      .describe(
-        'Scene id whose combat encounter to end; defaults to the ' +
-          'world-active scene.',
-      ),
+      .describe('Scene id whose combat encounter to end; defaults to the ' + 'world-active scene.'),
   })
   .strict();
 
 export const endCombatTool: ToolDefinition<typeof EndCombatInput> = {
   name: 'end_combat',
   description:
-    'End a scene\'s combat encounter — delete the Combat document, Foundry\'s ' +
+    "End a scene's combat encounter — delete the Combat document, Foundry's " +
     '"End Combat". Resolves the scene (defaults to the active scene, or uses ' +
     'sceneId) and its Combat, snapshots combatId and combatantCount, then ' +
     'deletes the encounter and all its combatants. Returns combatId, ' +

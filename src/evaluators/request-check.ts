@@ -71,9 +71,7 @@ export interface RequestCheckErr {
 
 export type RequestCheckResult = RequestCheckOk | RequestCheckErr;
 
-export async function requestCheckBody(
-  input: RequestCheckInput,
-): Promise<RequestCheckResult> {
+export async function requestCheckBody(input: RequestCheckInput): Promise<RequestCheckResult> {
   interface ActorDocLike {
     id?: string;
     name?: string;
@@ -98,30 +96,21 @@ export async function requestCheckBody(
     messages?: MessagesCollectionLike;
   }
   interface TextEditorLike {
-    enrichHTML(
-      content: string,
-      options?: Record<string, unknown>,
-    ): Promise<string>;
+    enrichHTML(content: string, options?: Record<string, unknown>): Promise<string>;
   }
   interface ChatMessageStaticLike {
     implementation: {
-      create(
-        data: Record<string, unknown>,
-      ): Promise<{ id?: string } | undefined>;
+      create(data: Record<string, unknown>): Promise<{ id?: string } | undefined>;
     };
     getSpeaker(opts?: { actor?: unknown }): Record<string, unknown>;
   }
 
-  const fail = (
-    message: string,
-    details: Record<string, unknown>,
-  ): RequestCheckErr => ({
+  const fail = (message: string, details: Record<string, unknown>): RequestCheckErr => ({
     ok: false,
     error: { code: 'INVALID_INPUT', message, details },
   });
 
-  const errText = (e: unknown): string =>
-    e instanceof Error ? e.message : String(e);
+  const errText = (e: unknown): string => (e instanceof Error ? e.message : String(e));
 
   const SAVE_SLUGS = new Set(['fortitude', 'reflex', 'will']);
 
@@ -131,15 +120,13 @@ export async function requestCheckBody(
       foundry?: { applications?: { ux?: { TextEditor?: { implementation?: TextEditorLike } } } };
     }
   ).foundry?.applications?.ux?.TextEditor?.implementation;
-  const ChatMessageCls = (
-    globalThis as unknown as { ChatMessage?: ChatMessageStaticLike }
-  ).ChatMessage;
+  const ChatMessageCls = (globalThis as unknown as { ChatMessage?: ChatMessageStaticLike })
+    .ChatMessage;
 
   if (!game || !TextEditor || !ChatMessageCls) {
-    return fail(
-      'Foundry globals (game / TextEditor / ChatMessage) are unavailable.',
-      { reason: 'FOUNDRY_NOT_READY' },
-    );
+    return fail('Foundry globals (game / TextEditor / ChatMessage) are unavailable.', {
+      reason: 'FOUNDRY_NOT_READY',
+    });
   }
 
   // -- Resolve actor; must be a player character.
@@ -182,8 +169,7 @@ export async function requestCheckBody(
   // -- Enrich to an inline-check button.
   let enriched: string;
   try {
-    const rollData =
-      typeof actor.getRollData === 'function' ? actor.getRollData() : {};
+    const rollData = typeof actor.getRollData === 'function' ? actor.getRollData() : {};
     enriched = await TextEditor.enrichHTML(checkExpression, { rollData });
   } catch (e: unknown) {
     return fail(`Failed to enrich '${checkExpression}': ${errText(e)}`, {
@@ -192,10 +178,7 @@ export async function requestCheckBody(
       reason: 'ENRICH_FAILED',
     });
   }
-  if (
-    typeof enriched !== 'string' ||
-    !/<a[^>]*class="[^"]*inline-check/.test(enriched)
-  ) {
+  if (typeof enriched !== 'string' || !/<a[^>]*class="[^"]*inline-check/.test(enriched)) {
     return fail(
       `Enriching '${checkExpression}' did not produce a clickable check button. ` +
         `The checkType or traits may be unrecognized by PF2e.`,

@@ -26,9 +26,7 @@ const PlaceTokenAtScreenPixelInput = z
       ),
     screenY: z
       .number()
-      .describe(
-        'Page-pixel Y coordinate. See `screenX` for conversion semantics.',
-      ),
+      .describe('Page-pixel Y coordinate. See `screenX` for conversion semantics.'),
     sceneId: z
       .string()
       .min(1)

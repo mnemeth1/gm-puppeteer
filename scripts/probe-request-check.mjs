@@ -136,19 +136,14 @@ try {
         'probe 1: content has data-pf2-check=perception',
         { content: msg?.content },
       );
-      assert(
-        /data-pf2-dc="20"/.test(msg?.content ?? ''),
-        'probe 1: content has data-pf2-dc=20',
-        { content: msg?.content },
-      );
-      assert(
-        msg?.speakerActor === setup.pc.id,
-        'probe 1: message speaker is the target PC',
-        { speakerActor: msg?.speakerActor },
-      );
+      assert(/data-pf2-dc="20"/.test(msg?.content ?? ''), 'probe 1: content has data-pf2-dc=20', {
+        content: msg?.content,
+      });
+      assert(msg?.speakerActor === setup.pc.id, 'probe 1: message speaker is the target PC', {
+        speakerActor: msg?.speakerActor,
+      });
       const whisperCoversOwners =
-        Array.isArray(msg?.whisper) &&
-        setup.pc.ownerIds.every((id) => msg.whisper.includes(id));
+        Array.isArray(msg?.whisper) && setup.pc.ownerIds.every((id) => msg.whisper.includes(id));
       assert(whisperCoversOwners, 'probe 1: whisper covers all actor owners', {
         whisper: msg?.whisper,
         ownerIds: setup.pc.ownerIds,
@@ -243,11 +238,9 @@ try {
     log.info({ probe: 6, res }, 'probe 6: NPC actor rejection');
     assert(res.isError === true, 'probe 6: error returned', { res });
     if (res.isError) {
-      assert(
-        res.error?.details?.reason === 'ACTOR_NOT_A_PC',
-        'probe 6: reason=ACTOR_NOT_A_PC',
-        { reason: res.error?.details?.reason },
-      );
+      assert(res.error?.details?.reason === 'ACTOR_NOT_A_PC', 'probe 6: reason=ACTOR_NOT_A_PC', {
+        reason: res.error?.details?.reason,
+      });
     }
   }
 
@@ -259,32 +252,33 @@ try {
     log.info({ probe: 7, res }, 'probe 7: bogus actorId');
     assert(res.isError === true, 'probe 7: error returned', { res });
     if (res.isError) {
-      assert(
-        res.error?.details?.reason === 'ACTOR_NOT_FOUND',
-        'probe 7: reason=ACTOR_NOT_FOUND',
-        { reason: res.error?.details?.reason },
-      );
+      assert(res.error?.details?.reason === 'ACTOR_NOT_FOUND', 'probe 7: reason=ACTOR_NOT_FOUND', {
+        reason: res.error?.details?.reason,
+      });
     }
   }
 
   // --------------------------------------------------------------------
   // Teardown — delete every ChatMessage created during the probe.
   // --------------------------------------------------------------------
-  const teardown = await page.evaluate(async (baseline) => {
-    const game = globalThis.game;
-    const baseSet = new Set(baseline);
-    const created = game.messages?.contents.filter((m) => !baseSet.has(m.id)).map((m) => m.id) ?? [];
-    if (created.length > 0) {
-      await globalThis.ChatMessage.deleteDocuments(created);
-    }
-    return { deleted: created.length, finalCount: game.messages?.size ?? 0 };
-  }, [...baselineIds]);
-  log.info({ teardown }, 'teardown complete');
-  assert(
-    teardown.finalCount === baselineIds.size,
-    'teardown: message count restored to baseline',
-    { finalCount: teardown.finalCount, baseline: baselineIds.size },
+  const teardown = await page.evaluate(
+    async (baseline) => {
+      const game = globalThis.game;
+      const baseSet = new Set(baseline);
+      const created =
+        game.messages?.contents.filter((m) => !baseSet.has(m.id)).map((m) => m.id) ?? [];
+      if (created.length > 0) {
+        await globalThis.ChatMessage.deleteDocuments(created);
+      }
+      return { deleted: created.length, finalCount: game.messages?.size ?? 0 };
+    },
+    [...baselineIds],
   );
+  log.info({ teardown }, 'teardown complete');
+  assert(teardown.finalCount === baselineIds.size, 'teardown: message count restored to baseline', {
+    finalCount: teardown.finalCount,
+    baseline: baselineIds.size,
+  });
 
   log.info({ failureCount: failures.length, failures }, 'PROBE SUMMARY');
   if (failures.length > 0) process.exitCode = 1;

@@ -204,10 +204,7 @@ export async function applyConditionBody(
     pf2e?: { ConditionManager?: ConditionManagerLike };
   }
 
-  const fail = (
-    message: string,
-    details: Record<string, unknown>,
-  ): ApplyConditionErr => ({
+  const fail = (message: string, details: Record<string, unknown>): ApplyConditionErr => ({
     ok: false,
     error: { code: 'INVALID_INPUT', message, details },
   });
@@ -241,10 +238,9 @@ export async function applyConditionBody(
   // -- Resolve ConditionManager and validate slug.
   const CM = game?.pf2e?.ConditionManager;
   if (!CM) {
-    return fail(
-      `game.pf2e.ConditionManager is unavailable — the PF2e system may not be loaded.`,
-      { reason: 'CONDITION_MANAGER_UNAVAILABLE' },
-    );
+    return fail(`game.pf2e.ConditionManager is unavailable — the PF2e system may not be loaded.`, {
+      reason: 'CONDITION_MANAGER_UNAVAILABLE',
+    });
   }
 
   const slugList: string[] = Array.isArray(CM.conditionsSlugs) ? CM.conditionsSlugs : [];
@@ -312,16 +308,14 @@ export async function applyConditionBody(
       currentValue = typeof vital.value === 'number' ? (vital.value as number) : 0;
       effectiveMax = typeof vital.max === 'number' ? (vital.max as number) : NON_VITAL_VALUED_CAP;
     } else {
-      const src = existingItem?._source?.system?.value as
-        | { value?: number | null }
-        | undefined;
+      const src = existingItem?._source?.system?.value as { value?: number | null } | undefined;
       currentValue = typeof src?.value === 'number' ? src.value : 0;
       effectiveMax = NON_VITAL_VALUED_CAP;
     }
   }
 
   // -- Determine requested value with default-1 rule.
-  const requestedValue: number | null = isValued ? input.value ?? 1 : null;
+  const requestedValue: number | null = isValued ? (input.value ?? 1) : null;
 
   // -- Non-valued path.
   if (!isValued) {
@@ -342,10 +336,10 @@ export async function applyConditionBody(
     // Apply.
     const created = await actor.increaseCondition(input.slug);
     if (!created || !created.id) {
-      return fail(
-        `increaseCondition returned no document for slug: '${input.slug}'.`,
-        { slug: input.slug, reason: 'INCREASE_CONDITION_RETURNED_NULL' },
-      );
+      return fail(`increaseCondition returned no document for slug: '${input.slug}'.`, {
+        slug: input.slug,
+        reason: 'INCREASE_CONDITION_RETURNED_NULL',
+      });
     }
     return buildAppliedResponse({
       actor,
@@ -399,10 +393,10 @@ export async function applyConditionBody(
     max: safeMax,
   });
   if (!applied || !applied.id) {
-    return fail(
-      `increaseCondition returned no document for slug: '${input.slug}'.`,
-      { slug: input.slug, reason: 'INCREASE_CONDITION_RETURNED_NULL' },
-    );
+    return fail(`increaseCondition returned no document for slug: '${input.slug}'.`, {
+      slug: input.slug,
+      reason: 'INCREASE_CONDITION_RETURNED_NULL',
+    });
   }
 
   // Re-read post-apply for accurate value (vitals route through attribute
@@ -411,12 +405,12 @@ export async function applyConditionBody(
   if (VITALS_SLUGS.has(input.slug)) {
     const attrs = (actor.system?.attributes as AnyRecord | undefined) ?? {};
     const vital = (attrs[input.slug] as AnyRecord | undefined) ?? {};
-    valueApplied = typeof vital.value === 'number' ? (vital.value as number) : valueAppliedPredicted;
+    valueApplied =
+      typeof vital.value === 'number' ? (vital.value as number) : valueAppliedPredicted;
   } else {
     const reread = actor.getCondition(input.slug);
     const v = reread?._source?.system?.value as { value?: number | null } | undefined;
-    valueApplied =
-      typeof v?.value === 'number' ? (v.value as number) : valueAppliedPredicted;
+    valueApplied = typeof v?.value === 'number' ? (v.value as number) : valueAppliedPredicted;
   }
 
   return buildAppliedResponse({
@@ -466,8 +460,7 @@ export async function applyConditionBody(
           granted.add(c.id);
           cascadeGranted.push({
             id: c.id,
-            slug:
-              typeof c.system?.slug === 'string' ? (c.system.slug as string) : args.slug,
+            slug: typeof c.system?.slug === 'string' ? (c.system.slug as string) : args.slug,
             name: typeof c.name === 'string' ? c.name : '',
             grantedBy: parentId,
           });

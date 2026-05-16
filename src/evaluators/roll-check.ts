@@ -45,11 +45,7 @@ export interface RollCheckInput {
   visibility: 'public' | 'gm' | 'blind';
 }
 
-export type CheckOutcome =
-  | 'criticalSuccess'
-  | 'success'
-  | 'failure'
-  | 'criticalFailure';
+export type CheckOutcome = 'criticalSuccess' | 'success' | 'failure' | 'criticalFailure';
 
 export interface RollCheckOk {
   ok: true;
@@ -114,24 +110,15 @@ export async function rollCheckBody(input: RollCheckInput): Promise<RollCheckRes
     messages?: MessagesCollectionLike;
   }
 
-  const fail = (
-    message: string,
-    details: Record<string, unknown>,
-  ): RollCheckErr => ({
+  const fail = (message: string, details: Record<string, unknown>): RollCheckErr => ({
     ok: false,
     error: { code: 'INVALID_INPUT', message, details },
   });
 
-  const errText = (e: unknown): string =>
-    e instanceof Error ? e.message : String(e);
+  const errText = (e: unknown): string => (e instanceof Error ? e.message : String(e));
 
   const SAVE_SLUGS = new Set(['fortitude', 'reflex', 'will']);
-  const OUTCOMES: CheckOutcome[] = [
-    'criticalFailure',
-    'failure',
-    'success',
-    'criticalSuccess',
-  ];
+  const OUTCOMES: CheckOutcome[] = ['criticalFailure', 'failure', 'success', 'criticalSuccess'];
 
   const game = (globalThis as unknown as { game?: FoundryGameLike }).game;
   if (!game) {
@@ -182,8 +169,7 @@ export async function rollCheckBody(input: RollCheckInput): Promise<RollCheckRes
     );
   }
 
-  const statisticSlug =
-    typeof statistic.slug === 'string' ? statistic.slug : input.checkType;
+  const statisticSlug = typeof statistic.slug === 'string' ? statistic.slug : input.checkType;
   const modifier =
     typeof statistic.check?.mod === 'number'
       ? statistic.check.mod
@@ -248,9 +234,7 @@ export async function rollCheckBody(input: RollCheckInput): Promise<RollCheckRes
         ? roll.degreeOfSuccess
         : null;
   const outcome: CheckOutcome | null =
-    degreeRaw != null && degreeRaw >= 0 && degreeRaw <= 3
-      ? (OUTCOMES[degreeRaw] ?? null)
-      : null;
+    degreeRaw != null && degreeRaw >= 0 && degreeRaw <= 3 ? (OUTCOMES[degreeRaw] ?? null) : null;
 
   return {
     ok: true,

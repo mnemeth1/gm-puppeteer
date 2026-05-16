@@ -109,7 +109,8 @@ try {
     });
     if (!renamed.ok) fail('rename not ok', renamed);
     else {
-      if (!renamed.changedFields.includes('name')) fail('rename changedFields missing name', renamed);
+      if (!renamed.changedFields.includes('name'))
+        fail('rename changedFields missing name', renamed);
       if (renamed.entry.name !== `${PROBE_PREFIX}create_bare_renamed`) {
         fail('rename did not apply', renamed);
       }
@@ -184,8 +185,7 @@ try {
         await e.delete();
       }
       for (const f of (globalThis.game.folders?.contents ?? []).filter(
-        (x) =>
-          typeof x.name === 'string' && x.name.startsWith(prefix) && x.type === 'JournalEntry',
+        (x) => typeof x.name === 'string' && x.name.startsWith(prefix) && x.type === 'JournalEntry',
       )) {
         await f.delete();
       }

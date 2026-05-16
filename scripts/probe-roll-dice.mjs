@@ -130,18 +130,14 @@ try {
     log.info({ probe: 2, res }, 'probe 2: single die');
     assert(res.ok === true, 'probe 2: ok', { res });
     if (res.ok) {
-      assert(
-        res.data.total >= 1 && res.data.total <= 30,
-        'probe 2: total in [1,30]',
-        { total: res.data.total },
-      );
+      assert(res.data.total >= 1 && res.data.total <= 30, 'probe 2: total in [1,30]', {
+        total: res.data.total,
+      });
       assert(res.data.terms.length === 1, 'probe 2: one dice term', { terms: res.data.terms });
       assert(res.data.terms[0]?.faces === 30, 'probe 2: faces=30', { terms: res.data.terms });
-      assert(
-        res.data.terms[0]?.results.length === 1,
-        'probe 2: one die result',
-        { terms: res.data.terms },
-      );
+      assert(res.data.terms[0]?.results.length === 1, 'probe 2: one die result', {
+        terms: res.data.terms,
+      });
     }
   }
 
@@ -153,17 +149,13 @@ try {
     log.info({ probe: 3, res }, 'probe 3: multi-die + modifier');
     assert(res.ok === true, 'probe 3: ok', { res });
     if (res.ok) {
-      assert(
-        res.data.total >= 5 && res.data.total <= 15,
-        'probe 3: total in [5,15]',
-        { total: res.data.total },
-      );
+      assert(res.data.total >= 5 && res.data.total <= 15, 'probe 3: total in [5,15]', {
+        total: res.data.total,
+      });
       assert(res.data.terms[0]?.faces === 6, 'probe 3: faces=6', { terms: res.data.terms });
-      assert(
-        res.data.terms[0]?.results.length === 2,
-        'probe 3: two d6 results',
-        { terms: res.data.terms },
-      );
+      assert(res.data.terms[0]?.results.length === 2, 'probe 3: two d6 results', {
+        terms: res.data.terms,
+      });
     }
   }
 
@@ -177,11 +169,9 @@ try {
     if (res.ok) {
       assert(res.data.visibility === 'gm', 'probe 4: visibility=gm', { v: res.data.visibility });
       const msg = await getMessage(res.data.chatMessageId);
-      assert(
-        Array.isArray(msg?.whisper) && msg.whisper.length > 0,
-        'probe 4: whisper non-empty',
-        { whisper: msg?.whisper },
-      );
+      assert(Array.isArray(msg?.whisper) && msg.whisper.length > 0, 'probe 4: whisper non-empty', {
+        whisper: msg?.whisper,
+      });
       const allGm =
         Array.isArray(msg?.whisper) && msg.whisper.every((id) => setup.gmUserIds.includes(id));
       assert(allGm, 'probe 4: all whisper recipients are GMs', {
@@ -202,11 +192,9 @@ try {
     if (res.ok) {
       const msg = await getMessage(res.data.chatMessageId);
       assert(msg?.blind === true, 'probe 5: message blind=true', { msg });
-      assert(
-        Array.isArray(msg?.whisper) && msg.whisper.length > 0,
-        'probe 5: whisper non-empty',
-        { whisper: msg?.whisper },
-      );
+      assert(Array.isArray(msg?.whisper) && msg.whisper.length > 0, 'probe 5: whisper non-empty', {
+        whisper: msg?.whisper,
+      });
     }
   }
 
@@ -229,11 +217,9 @@ try {
         { speaker: res.data.speaker, expected: setup.npc.name },
       );
       const msg = await getMessage(res.data.chatMessageId);
-      assert(
-        msg?.speaker.actor === setup.npc.id,
-        'probe 6: message speaker.actor is the NPC',
-        { msg },
-      );
+      assert(msg?.speaker.actor === setup.npc.id, 'probe 6: message speaker.actor is the NPC', {
+        msg,
+      });
     }
   }
 
@@ -245,11 +231,9 @@ try {
     log.info({ probe: 7, res }, 'probe 7: invalid formula');
     assert(res.isError === true, 'probe 7: error returned', { res });
     if (res.isError) {
-      assert(
-        res.error?.details?.reason === 'FORMULA_INVALID',
-        'probe 7: reason=FORMULA_INVALID',
-        { reason: res.error?.details?.reason },
-      );
+      assert(res.error?.details?.reason === 'FORMULA_INVALID', 'probe 7: reason=FORMULA_INVALID', {
+        reason: res.error?.details?.reason,
+      });
     }
   }
 
@@ -272,21 +256,24 @@ try {
   // --------------------------------------------------------------------
   // Teardown — delete every ChatMessage created during the probe.
   // --------------------------------------------------------------------
-  const teardown = await page.evaluate(async (baseline) => {
-    const game = globalThis.game;
-    const baseSet = new Set(baseline);
-    const created = game.messages?.contents.filter((m) => !baseSet.has(m.id)).map((m) => m.id) ?? [];
-    if (created.length > 0) {
-      await globalThis.ChatMessage.deleteDocuments(created);
-    }
-    return { deleted: created.length, finalCount: game.messages?.size ?? 0 };
-  }, [...baselineIds]);
-  log.info({ teardown }, 'teardown complete');
-  assert(
-    teardown.finalCount === baselineIds.size,
-    'teardown: message count restored to baseline',
-    { finalCount: teardown.finalCount, baseline: baselineIds.size },
+  const teardown = await page.evaluate(
+    async (baseline) => {
+      const game = globalThis.game;
+      const baseSet = new Set(baseline);
+      const created =
+        game.messages?.contents.filter((m) => !baseSet.has(m.id)).map((m) => m.id) ?? [];
+      if (created.length > 0) {
+        await globalThis.ChatMessage.deleteDocuments(created);
+      }
+      return { deleted: created.length, finalCount: game.messages?.size ?? 0 };
+    },
+    [...baselineIds],
   );
+  log.info({ teardown }, 'teardown complete');
+  assert(teardown.finalCount === baselineIds.size, 'teardown: message count restored to baseline', {
+    finalCount: teardown.finalCount,
+    baseline: baselineIds.size,
+  });
 
   log.info({ failureCount: failures.length, failures }, 'PROBE SUMMARY');
   if (failures.length > 0) process.exitCode = 1;

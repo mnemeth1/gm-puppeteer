@@ -22,7 +22,7 @@ const DeleteJournalEntryInput = z
 export const deleteJournalEntryTool: ToolDefinition<typeof DeleteJournalEntryInput> = {
   name: 'delete_journal_entry',
   description:
-    "Delete a JournalEntry and all its embedded pages. Cascading: every page on the entry " +
+    'Delete a JournalEntry and all its embedded pages. Cascading: every page on the entry ' +
     'is removed automatically by Foundry — no separate page-delete is needed. Returns the ' +
     'deleted entry id, name, and page count for audit. This is a destructive operation; ' +
     'pages cannot be restored after the parent entry is deleted. Prefer delete_journal_page ' +

@@ -96,9 +96,7 @@ export interface GetAvailableConditionsErr {
   };
 }
 
-export type GetAvailableConditionsResult =
-  | GetAvailableConditionsOk
-  | GetAvailableConditionsErr;
+export type GetAvailableConditionsResult = GetAvailableConditionsOk | GetAvailableConditionsErr;
 
 export function getAvailableConditionsBody(): GetAvailableConditionsResult {
   // Inlined: module-scope identifiers do NOT survive page.evaluate
@@ -128,8 +126,7 @@ export function getAvailableConditionsBody(): GetAvailableConditionsResult {
       ok: false,
       error: {
         code: 'INVALID_INPUT',
-        message:
-          'game.pf2e.ConditionManager is unavailable — the PF2e system may not be loaded.',
+        message: 'game.pf2e.ConditionManager is unavailable — the PF2e system may not be loaded.',
         details: { reason: 'CONDITION_MANAGER_UNAVAILABLE' },
       },
     };

@@ -61,7 +61,7 @@ export const getCreatureDetailsTool: ToolDefinition<typeof GetCreatureDetailsInp
     'PF2e sourcebook citation), description, traits, and a per-type projection block. For NPCs: ' +
     'AC, HP, saves, perception+senses, ability mods, speeds, languages, curated skills, strikes ' +
     '(with damage rolls, attack bonus, traits, melee/ranged discrimination), unified actions ' +
-    "array (passive/reaction/free/active abilities), spellcasting entries with slot tables, and " +
+    'array (passive/reaction/free/active abilities), spellcasting entries with slot tables, and ' +
     'IWR. For hazards: hardness, HP/broken-threshold, Stealth DC, disable/routine/reset prose, ' +
     'simple-vs-complex flag, saves, attacks, actions, IWR. For familiars: slim sheet with master ' +
     'pointer, HP/AC (inherited at runtime), perception, speeds, reach, actions. NOT for PC ' +
@@ -81,10 +81,7 @@ export const getCreatureDetailsTool: ToolDefinition<typeof GetCreatureDetailsInp
       includeRules: input.includeRules ?? false,
       includeRawSystem: input.includeRawSystem ?? false,
     };
-    const result = (await page.evaluate(
-      getCreatureDetailsBody,
-      args,
-    )) as GetCreatureDetailsResult;
+    const result = (await page.evaluate(getCreatureDetailsBody, args)) as GetCreatureDetailsResult;
     if (!result.ok) {
       throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
     }

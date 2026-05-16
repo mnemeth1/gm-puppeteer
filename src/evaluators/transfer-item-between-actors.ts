@@ -298,9 +298,7 @@ export async function transferItemBetweenActorsBody(
   };
 
   const identificationStatusOf = (item: ItemDocLike): 'identified' | 'unidentified' => {
-    const ident = (item.system as AnyRecord | undefined)?.identification as
-      | AnyRecord
-      | undefined;
+    const ident = (item.system as AnyRecord | undefined)?.identification as AnyRecord | undefined;
     return ident?.status === 'unidentified' ? 'unidentified' : 'identified';
   };
 
@@ -394,8 +392,7 @@ export async function transferItemBetweenActorsBody(
   // -- Resolve / validate destination container.
   let destinationContainer: ItemDocLike | null = null;
   if (input.destinationContainerId !== null) {
-    destinationContainer =
-      destinationActor.items?.get?.(input.destinationContainerId) ?? null;
+    destinationContainer = destinationActor.items?.get?.(input.destinationContainerId) ?? null;
     if (!destinationContainer) {
       return fail(
         `No item found on destination actor ${destinationActor.id ?? input.destinationActorId} ` +
@@ -691,12 +688,7 @@ export async function transferItemBetweenActorsBody(
     }
 
     // No merge: create on dest with quantity=N, then decrement source.
-    const payload = buildPayload(
-      rootNode,
-      true,
-      quantity,
-      input.destinationContainerId,
-    );
+    const payload = buildPayload(rootNode, true, quantity, input.destinationContainerId);
     const createdArr = await destinationActor.createEmbeddedDocuments('Item', [payload]);
     const created = createdArr?.[0];
     if (!created || typeof created.id !== 'string' || created.id.length === 0) {
@@ -815,9 +807,8 @@ export async function transferItemBetweenActorsBody(
   // create runs, can wire `system.containerId` into the payload
   // directly, and don't need a post-create remap. Three Foundry
   // operations become two (create + delete).
-  const foundryUtils = (
-    globalThis as unknown as { foundry?: { utils?: FoundryUtilsLike } }
-  ).foundry?.utils;
+  const foundryUtils = (globalThis as unknown as { foundry?: { utils?: FoundryUtilsLike } }).foundry
+    ?.utils;
   const randomID = foundryUtils?.randomID;
   if (typeof randomID !== 'function') {
     return fail(
@@ -841,9 +832,7 @@ export async function transferItemBetweenActorsBody(
       resolvedContainerId = input.destinationContainerId;
     } else {
       const originalParent = node.originalContainerId;
-      resolvedContainerId = originalParent
-        ? oldToNew.get(originalParent) ?? null
-        : null;
+      resolvedContainerId = originalParent ? (oldToNew.get(originalParent) ?? null) : null;
     }
     const data: AnyRecord = { ...node.payload };
     data._id = newId;
@@ -890,10 +879,10 @@ export async function transferItemBetweenActorsBody(
   // post-update state (containerId reflects the remap).
   const rootNewId = oldToNew.get(targetId);
   if (!rootNewId) {
-    return fail(
-      `Internal: root oldId ${targetId} missing from oldToNew map post-create.`,
-      { itemId: targetId, reason: 'CREATE_FAILED' },
-    );
+    return fail(`Internal: root oldId ${targetId} missing from oldToNew map post-create.`, {
+      itemId: targetId,
+      reason: 'CREATE_FAILED',
+    });
   }
   const rootCreated = destinationActor.items?.get?.(rootNewId);
   const root: TransferCreatedItem = {
@@ -913,7 +902,7 @@ export async function transferItemBetweenActorsBody(
     if (!newId) continue;
     const liveItem = destinationActor.items?.get?.(newId);
     const parentNewId = node.originalContainerId
-      ? oldToNew.get(node.originalContainerId) ?? ''
+      ? (oldToNew.get(node.originalContainerId) ?? '')
       : '';
     descendants.push({
       oldId: node.oldId,

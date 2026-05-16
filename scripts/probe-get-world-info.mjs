@@ -77,8 +77,7 @@ try {
         worldFields[k] = describe(world[k]);
       }
     }
-    const worldAllKeys =
-      world && typeof world === 'object' ? Object.keys(world).sort() : [];
+    const worldAllKeys = world && typeof world === 'object' ? Object.keys(world).sort() : [];
 
     const system = game?.system ?? null;
     const systemFields = {};
@@ -87,8 +86,7 @@ try {
         systemFields[k] = describe(system[k]);
       }
     }
-    const systemAllKeys =
-      system && typeof system === 'object' ? Object.keys(system).sort() : [];
+    const systemAllKeys = system && typeof system === 'object' ? Object.keys(system).sort() : [];
 
     const versionCandidates = {
       'game.version': describe(game?.version),
@@ -124,10 +122,7 @@ try {
         ? {
             length: world.description.length,
             hasTags: /<[a-z][^>]*>/i.test(world.description),
-            firstChars:
-              world.description.length > 0
-                ? world.description.slice(0, 80)
-                : '(empty)',
+            firstChars: world.description.length > 0 ? world.description.slice(0, 80) : '(empty)',
           }
         : null;
 

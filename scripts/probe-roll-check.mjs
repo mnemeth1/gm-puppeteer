@@ -110,11 +110,9 @@ try {
     assert(res.ok === true, 'probe 1: ok', { res });
     if (res.ok) {
       assert(typeof res.data.total === 'number', 'probe 1: total numeric', { d: res.data });
-      assert(
-        res.data.dieResult >= 1 && res.data.dieResult <= 20,
-        'probe 1: dieResult in [1,20]',
-        { dieResult: res.data.dieResult },
-      );
+      assert(res.data.dieResult >= 1 && res.data.dieResult <= 20, 'probe 1: dieResult in [1,20]', {
+        dieResult: res.data.dieResult,
+      });
       assert(OUTCOMES.includes(res.data.outcome), 'probe 1: outcome is a degree of success', {
         outcome: res.data.outcome,
       });
@@ -174,11 +172,9 @@ try {
     assert(res.ok === true, 'probe 4: ok', { res });
     if (res.ok) {
       const msg = await getMessage(res.data.chatMessageId);
-      assert(
-        Array.isArray(msg?.whisper) && msg.whisper.length > 0,
-        'probe 4: whisper non-empty',
-        { whisper: msg?.whisper },
-      );
+      assert(Array.isArray(msg?.whisper) && msg.whisper.length > 0, 'probe 4: whisper non-empty', {
+        whisper: msg?.whisper,
+      });
       const allGm =
         Array.isArray(msg?.whisper) && msg.whisper.every((id) => setup.gmUserIds.includes(id));
       assert(allGm, 'probe 4: all whisper recipients are GMs', {
@@ -196,11 +192,9 @@ try {
     log.info({ probe: 5, res }, 'probe 5: PC actor rejection');
     assert(res.isError === true, 'probe 5: error returned', { res });
     if (res.isError) {
-      assert(
-        res.error?.details?.reason === 'ACTOR_IS_PC',
-        'probe 5: reason=ACTOR_IS_PC',
-        { reason: res.error?.details?.reason },
-      );
+      assert(res.error?.details?.reason === 'ACTOR_IS_PC', 'probe 5: reason=ACTOR_IS_PC', {
+        reason: res.error?.details?.reason,
+      });
     }
   }
 
@@ -212,32 +206,33 @@ try {
     log.info({ probe: 6, res }, 'probe 6: bogus actorId');
     assert(res.isError === true, 'probe 6: error returned', { res });
     if (res.isError) {
-      assert(
-        res.error?.details?.reason === 'ACTOR_NOT_FOUND',
-        'probe 6: reason=ACTOR_NOT_FOUND',
-        { reason: res.error?.details?.reason },
-      );
+      assert(res.error?.details?.reason === 'ACTOR_NOT_FOUND', 'probe 6: reason=ACTOR_NOT_FOUND', {
+        reason: res.error?.details?.reason,
+      });
     }
   }
 
   // --------------------------------------------------------------------
   // Teardown — delete every ChatMessage created during the probe.
   // --------------------------------------------------------------------
-  const teardown = await page.evaluate(async (baseline) => {
-    const game = globalThis.game;
-    const baseSet = new Set(baseline);
-    const created = game.messages?.contents.filter((m) => !baseSet.has(m.id)).map((m) => m.id) ?? [];
-    if (created.length > 0) {
-      await globalThis.ChatMessage.deleteDocuments(created);
-    }
-    return { deleted: created.length, finalCount: game.messages?.size ?? 0 };
-  }, [...baselineIds]);
-  log.info({ teardown }, 'teardown complete');
-  assert(
-    teardown.finalCount === baselineIds.size,
-    'teardown: message count restored to baseline',
-    { finalCount: teardown.finalCount, baseline: baselineIds.size },
+  const teardown = await page.evaluate(
+    async (baseline) => {
+      const game = globalThis.game;
+      const baseSet = new Set(baseline);
+      const created =
+        game.messages?.contents.filter((m) => !baseSet.has(m.id)).map((m) => m.id) ?? [];
+      if (created.length > 0) {
+        await globalThis.ChatMessage.deleteDocuments(created);
+      }
+      return { deleted: created.length, finalCount: game.messages?.size ?? 0 };
+    },
+    [...baselineIds],
   );
+  log.info({ teardown }, 'teardown complete');
+  assert(teardown.finalCount === baselineIds.size, 'teardown: message count restored to baseline', {
+    finalCount: teardown.finalCount,
+    baseline: baselineIds.size,
+  });
 
   log.info({ failureCount: failures.length, failures }, 'PROBE SUMMARY');
   if (failures.length > 0) process.exitCode = 1;

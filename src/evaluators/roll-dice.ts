@@ -111,22 +111,17 @@ export async function rollDiceBody(input: RollDiceInput): Promise<RollDiceResult
     messages?: MessagesCollectionLike;
   }
 
-  const fail = (
-    message: string,
-    details: Record<string, unknown>,
-  ): RollDiceErr => ({
+  const fail = (message: string, details: Record<string, unknown>): RollDiceErr => ({
     ok: false,
     error: { code: 'INVALID_INPUT', message, details },
   });
 
-  const errText = (e: unknown): string =>
-    e instanceof Error ? e.message : String(e);
+  const errText = (e: unknown): string => (e instanceof Error ? e.message : String(e));
 
   const game = (globalThis as unknown as { game?: FoundryGameLike }).game;
   const RollCtor = (globalThis as unknown as { Roll?: RollConstructorLike }).Roll;
-  const ChatMessageCls = (
-    globalThis as unknown as { ChatMessage?: ChatMessageStaticLike }
-  ).ChatMessage;
+  const ChatMessageCls = (globalThis as unknown as { ChatMessage?: ChatMessageStaticLike })
+    .ChatMessage;
 
   if (!game || !RollCtor || !ChatMessageCls) {
     return fail('Foundry globals (game / Roll / ChatMessage) are unavailable.', {
@@ -162,10 +157,10 @@ export async function rollDiceBody(input: RollDiceInput): Promise<RollDiceResult
     });
   }
   if (typeof roll.total !== 'number' || !Number.isFinite(roll.total)) {
-    return fail(
-      `Dice formula '${input.formula}' did not evaluate to a finite number.`,
-      { formula: input.formula, reason: 'FORMULA_INVALID' },
-    );
+    return fail(`Dice formula '${input.formula}' did not evaluate to a finite number.`, {
+      formula: input.formula,
+      reason: 'FORMULA_INVALID',
+    });
   }
 
   // -- Map visibility to the core Roll.toMessage rollMode.
@@ -212,9 +207,7 @@ export async function rollDiceBody(input: RollDiceInput): Promise<RollDiceResult
   for (const d of dice) {
     const faces = typeof d.faces === 'number' ? d.faces : 0;
     const results = Array.isArray(d.results)
-      ? d.results
-          .map((r) => r.result)
-          .filter((n): n is number => typeof n === 'number')
+      ? d.results.map((r) => r.result).filter((n): n is number => typeof n === 'number')
       : [];
     terms.push({ faces, results });
   }

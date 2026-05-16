@@ -9,11 +9,7 @@ import { jsonText, type ToolDefinition } from './types.js';
 const UpdateJournalEntryInput = z
   .object({
     entryId: z.string().min(1).describe('Id of the journal entry to update.'),
-    name: z
-      .string()
-      .min(1)
-      .optional()
-      .describe('New display name. Omit to leave unchanged.'),
+    name: z.string().min(1).optional().describe('New display name. Omit to leave unchanged.'),
     folderId: z
       .string()
       .min(1)
@@ -34,7 +30,7 @@ export const updateJournalEntryTool: ToolDefinition<typeof UpdateJournalEntryInp
     'snapshot plus a `changedFields` array for audit. Pass folderId: null to move the entry ' +
     'to the journal directory root. Ownership changes do NOT go through this tool — call ' +
     'assign_journal_ownership / remove_journal_ownership instead. Page content does NOT ' +
-    "go through this tool — use update_journal_page. NOT for compendium entries.",
+    'go through this tool — use update_journal_page. NOT for compendium entries.',
   inputSchema: UpdateJournalEntryInput,
   async handler(input, ctx) {
     const { page } = await ctx.browser.ensureStarted();

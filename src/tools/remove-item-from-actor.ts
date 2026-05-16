@@ -41,14 +41,14 @@ const RemoveItemFromActorInput = z
     mode: z
       .enum(['delete', 'decrement'])
       .describe(
-        "`delete`: remove the item entry entirely. For containers (`backpack`), PF2e ejects the " +
+        '`delete`: remove the item entry entirely. For containers (`backpack`), PF2e ejects the ' +
           'contents to the actor top-level rather than destroying them — those promoted items are ' +
           'surfaced in `ejectedToTopLevel`. PF2e GrantItem children (e.g. items granted by a ' +
           'parent feat) cascade-delete automatically and are surfaced in `cascadeDeleted`. ' +
           "`decrement`: reduce the item's quantity by `quantity`. If the resulting quantity is 0 " +
           'and `deleteIfZero` is true (default), the item is deleted (operation becomes ' +
           '`decrementedAndDeleted`); otherwise the entry persists at qty 0. `quantity` and ' +
-          "`deleteIfZero` are only valid when `mode` is `decrement`.",
+          '`deleteIfZero` are only valid when `mode` is `decrement`.',
       ),
     quantity: z
       .number()
@@ -96,12 +96,12 @@ export const removeItemFromActorTool: ToolDefinition<typeof RemoveItemFromActorI
   description:
     "Remove an item from a world actor's inventory, OR decrement its quantity. Companion to " +
     'add_item_to_actor. Two modes: "delete" removes the item entry entirely; "decrement" ' +
-    'reduces a physical item\'s `system.quantity` by N (default 1) and by default also deletes ' +
+    "reduces a physical item's `system.quantity` by N (default 1) and by default also deletes " +
     'the entry when quantity reaches 0. ' +
     'Returns one of three operations: ' +
     '{operation: "deleted", deletedItem, ejectedToTopLevel, cascadeDeleted} — the item was ' +
     'removed; {operation: "decremented", item} — quantity reduced but the entry survives ' +
-    "(qtyAfter > 0, or qtyAfter === 0 with deleteIfZero:false); {operation: " +
+    '(qtyAfter > 0, or qtyAfter === 0 with deleteIfZero:false); {operation: ' +
     '"decrementedAndDeleted", deletedItem, ejectedToTopLevel, cascadeDeleted} — quantity hit 0 ' +
     'and the entry was removed. ' +
     'Container semantics: deleting a backpack (or decrementing one to 0) does NOT destroy its ' +

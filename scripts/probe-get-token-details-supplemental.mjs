@@ -59,9 +59,10 @@ try {
             /* probe: ignore getter throw */
           }
           try {
-            hex = typeof tint?.toString === 'function' && typeof tint?.valueOf === 'function'
-              ? tint.valueOf()
-              : null;
+            hex =
+              typeof tint?.toString === 'function' && typeof tint?.valueOf === 'function'
+                ? tint.valueOf()
+                : null;
           } catch {
             /* probe: ignore getter throw */
           }
@@ -71,7 +72,11 @@ try {
             typeof: typeof tint,
             constructor: tint?.constructor?.name ?? null,
             jsonStringify: (() => {
-              try { return JSON.stringify(tint); } catch { return '<unserializable>'; }
+              try {
+                return JSON.stringify(tint);
+              } catch {
+                return '<unserializable>';
+              }
             })(),
             css,
             toString: toStr,
@@ -121,7 +126,11 @@ try {
             name: t.name,
             keys: Object.keys(t.sight ?? {}).sort(),
             json: (() => {
-              try { return JSON.parse(JSON.stringify(t.sight)); } catch { return null; }
+              try {
+                return JSON.parse(JSON.stringify(t.sight));
+              } catch {
+                return null;
+              }
             })(),
           };
         }
@@ -133,7 +142,11 @@ try {
             name: t.name,
             keys: Object.keys(t.light ?? {}).sort(),
             json: (() => {
-              try { return JSON.parse(JSON.stringify(t.light)); } catch { return null; }
+              try {
+                return JSON.parse(JSON.stringify(t.light));
+              } catch {
+                return null;
+              }
             })(),
           };
         }
@@ -145,7 +158,11 @@ try {
             keys: Object.keys(t.texture ?? {}).sort(),
             // attempt json; tint may break it
             json: (() => {
-              try { return JSON.parse(JSON.stringify(t.texture)); } catch { return '<unserializable>'; }
+              try {
+                return JSON.parse(JSON.stringify(t.texture));
+              } catch {
+                return '<unserializable>';
+              }
             })(),
           };
         }

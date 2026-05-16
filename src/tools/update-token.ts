@@ -93,8 +93,7 @@ const UpdateTokenInput = z
       v.hidden !== undefined ||
       v.displayName !== undefined ||
       v.displayBars !== undefined ||
-      (v.sight !== undefined &&
-        (v.sight.enabled !== undefined || v.sight.range !== undefined)),
+      (v.sight !== undefined && (v.sight.enabled !== undefined || v.sight.range !== undefined)),
     {
       message:
         'Provide at least one updatable field: name, disposition, hidden, displayName, ' +

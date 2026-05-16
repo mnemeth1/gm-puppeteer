@@ -1,9 +1,6 @@
 import { z } from 'zod';
 import { ToolError } from '../errors.js';
-import {
-  applyConditionBody,
-  type ApplyConditionResult,
-} from '../evaluators/apply-condition.js';
+import { applyConditionBody, type ApplyConditionResult } from '../evaluators/apply-condition.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
 /**

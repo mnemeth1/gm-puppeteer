@@ -107,7 +107,11 @@ try {
     }
     return out;
   });
-  record('Q4', 'pack inventory (collection, documentName, packageType, system, locked, total, types)', packInventory);
+  record(
+    'Q4',
+    'pack inventory (collection, documentName, packageType, system, locked, total, types)',
+    packInventory,
+  );
 
   // Pick a mid-size Actor pack with majority-npc content for the doc-cache
   // and index-cache timing tests. Prefer 100-300 entries to keep probe fast.
@@ -117,8 +121,7 @@ try {
   const midSizeBestiary =
     actorPacks
       .filter((p) => p.total >= 100 && p.total <= 300)
-      .sort((a, b) => a.total - b.total)[0] ??
-    actorPacks.sort((a, b) => a.total - b.total)[0];
+      .sort((a, b) => a.total - b.total)[0] ?? actorPacks.sort((a, b) => a.total - b.total)[0];
 
   if (!midSizeBestiary) {
     fail('Q4', 'no Actor pack with npc entries found — Q1/Q2 cannot run', { actorPacks });
@@ -176,8 +179,7 @@ try {
       // so we capture this for context, not as proof of a cold cache.
       const preState = {
         contentsLength: pack.contents?.length ?? null,
-        documentsSize:
-          typeof pack.documents?.size === 'number' ? pack.documents.size : null,
+        documentsSize: typeof pack.documents?.size === 'number' ? pack.documents.size : null,
         indexSize: pack.index?.size ?? null,
       };
 
@@ -208,15 +210,12 @@ try {
 
       const postState = {
         contentsLength: pack.contents?.length ?? null,
-        documentsSize:
-          typeof pack.documents?.size === 'number' ? pack.documents.size : null,
+        documentsSize: typeof pack.documents?.size === 'number' ? pack.documents.size : null,
         indexSize: pack.index?.size ?? null,
       };
 
-      const firstMsAvg =
-        results.reduce((s, r) => s + r.firstMs, 0) / results.length;
-      const secondMsAvg =
-        results.reduce((s, r) => s + r.secondMs, 0) / results.length;
+      const firstMsAvg = results.reduce((s, r) => s + r.firstMs, 0) / results.length;
+      const secondMsAvg = results.reduce((s, r) => s + r.secondMs, 0) / results.length;
       const allIdentical = results.every((r) => r.identityAEqualsB === true);
       const allFastOnSecond = results.every((r) => r.secondMs < 5);
 
@@ -283,8 +282,7 @@ try {
             keys: Object.keys(e),
             systemKeys: e.system ? Object.keys(e.system) : null,
             hasLevel:
-              e.system?.details?.level?.value !== undefined ||
-              e.system?.level?.value !== undefined,
+              e.system?.details?.level?.value !== undefined || e.system?.level?.value !== undefined,
             hasTraitsValue: Array.isArray(e.system?.traits?.value),
             hasRarity: typeof e.system?.traits?.rarity === 'string',
             hasPublication:

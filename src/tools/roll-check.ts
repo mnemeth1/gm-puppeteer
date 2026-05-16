@@ -69,7 +69,7 @@ export const rollCheckTool: ToolDefinition<typeof RollCheckInput> = {
   name: 'roll_check',
   description:
     "Roll a non-PC actor's real statistic check and post the result to Foundry's chat " +
-    'log. This runs the actor\'s actual stat-block modifier through the PF2e check ' +
+    "log. This runs the actor's actual stat-block modifier through the PF2e check " +
     'pipeline — "Redcap, roll Stealth", "the Goblin rolls a Will save vs DC 18". Supply a ' +
     'DC to get a degree of success. Restrict visibility with "gm" or "blind" for a secret ' +
     'check. Returns {actor:{id, name, type}, checkType, statisticSlug, modifier, dc, ' +

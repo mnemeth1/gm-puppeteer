@@ -63,9 +63,7 @@ try {
       // full serialized Roll (terms / instances / options).
       let rollsParsed = null;
       try {
-        rollsParsed = (src.rolls ?? []).map((r) =>
-          typeof r === 'string' ? JSON.parse(r) : r,
-        );
+        rollsParsed = (src.rolls ?? []).map((r) => (typeof r === 'string' ? JSON.parse(r) : r));
       } catch (e) {
         rollsParsed = [{ parseError: String(e) }];
       }
@@ -94,10 +92,8 @@ try {
         whisper: src.whisper ?? null,
         blind: src.blind ?? null,
         visible: safeGetter(() => m.visible ?? null),
-        contentSample:
-          typeof src.content === 'string' ? src.content.slice(0, 400) : src.content,
-        flavorSample:
-          typeof src.flavor === 'string' ? src.flavor.slice(0, 200) : src.flavor,
+        contentSample: typeof src.content === 'string' ? src.content.slice(0, 400) : src.content,
+        flavorSample: typeof src.flavor === 'string' ? src.flavor.slice(0, 200) : src.flavor,
         rollsLive,
         rollsParsed,
         flagKeys: src.flags ? Object.keys(src.flags) : [],
@@ -137,15 +133,11 @@ try {
     // -- Generate a check card if none exists: an NPC perception roll.
     let check = existingCheck;
     if (!check) {
-      const npc = game.actors?.contents.find(
-        (a) => a.type === 'npc' && a.perception?.roll,
-      );
+      const npc = game.actors?.contents.find((a) => a.type === 'npc' && a.perception?.roll);
       if (npc) {
         try {
           await npc.perception.roll({ skipDialog: true, createMessage: true, dc: 18 });
-          const created = (game.messages?.contents ?? []).filter(
-            (m) => !baselineIds.has(m.id),
-          );
+          const created = (game.messages?.contents ?? []).filter((m) => !baselineIds.has(m.id));
           check = created[created.length - 1] ?? null;
           if (check) report.generated.push(check.id);
         } catch (e) {
@@ -169,9 +161,7 @@ try {
       if (strike) {
         try {
           await strike.damage({ event: new MouseEvent('click', { shiftKey: true }) });
-          const created = (game.messages?.contents ?? []).filter(
-            (m) => !baselineIds.has(m.id),
-          );
+          const created = (game.messages?.contents ?? []).filter((m) => !baselineIds.has(m.id));
           damage = created[created.length - 1] ?? null;
           if (damage && !report.generated.includes(damage.id)) {
             report.generated.push(damage.id);
@@ -210,8 +200,7 @@ try {
     report.cleanup = {
       deleted: created.length,
       restored:
-        finalIds.size === baselineIds.size &&
-        [...baselineIds].every((id) => finalIds.has(id)),
+        finalIds.size === baselineIds.size && [...baselineIds].every((id) => finalIds.has(id)),
     };
 
     return report;

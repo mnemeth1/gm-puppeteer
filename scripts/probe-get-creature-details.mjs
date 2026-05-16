@@ -52,9 +52,10 @@ async function call(input) {
     return { isError: true, validation: parsed.error.issues };
   }
   const blocks = await tool.handler(parsed.data, { browser: session, log }).catch((err) => ({
-    __throw: err instanceof Error
-      ? { code: err.code, message: err.message, details: err.details }
-      : { message: String(err) },
+    __throw:
+      err instanceof Error
+        ? { code: err.code, message: err.message, details: err.details }
+        : { message: String(err) },
   }));
   if (blocks?.__throw) return { isError: true, error: blocks.__throw };
   const block = blocks?.[0];
@@ -84,18 +85,21 @@ try {
     };
 
     // Pre-load each pack's index so type field is populated.
-    const npc = await findInPack(
-      'pf2e.pathfinder-monster-core',
-      (e) => e.type === 'npc' && (e.name ?? '').toLowerCase() === 'goblin warrior',
-    ) ?? await findInPack('pf2e.pathfinder-monster-core', (e) => e.type === 'npc');
+    const npc =
+      (await findInPack(
+        'pf2e.pathfinder-monster-core',
+        (e) => e.type === 'npc' && (e.name ?? '').toLowerCase() === 'goblin warrior',
+      )) ?? (await findInPack('pf2e.pathfinder-monster-core', (e) => e.type === 'npc'));
 
-    const casterNpc = await findInPack(
-      'pf2e.pathfinder-monster-core',
-      (e) => e.type === 'npc' && (e.name ?? '').toLowerCase() === 'lich',
-    ) ?? await findInPack(
-      'pf2e.pathfinder-monster-core',
-      (e) => e.type === 'npc' && /lich|sorcer|wizard|druid|cleric|priest/i.test(e.name ?? ''),
-    );
+    const casterNpc =
+      (await findInPack(
+        'pf2e.pathfinder-monster-core',
+        (e) => e.type === 'npc' && (e.name ?? '').toLowerCase() === 'lich',
+      )) ??
+      (await findInPack(
+        'pf2e.pathfinder-monster-core',
+        (e) => e.type === 'npc' && /lich|sorcer|wizard|druid|cleric|priest/i.test(e.name ?? ''),
+      ));
 
     // For hazards, getDocument is required to discriminate complex vs
     // simple (the index doesn't carry isComplex).
@@ -129,10 +133,7 @@ try {
       }
     }
 
-    const familiar = await findInPack(
-      'pf2e.iconics',
-      (e) => e.type === 'familiar',
-    );
+    const familiar = await findInPack('pf2e.iconics', (e) => e.type === 'familiar');
 
     // PC actor uuid (Valeros).
     const valeros = globalThis.game.actors?.get('tLhy0qgJyw31QaEy');
@@ -348,15 +349,21 @@ try {
     const textRes = await call({ uuid: targets.npc.uuid, descriptionFormat: 'text' });
     const bothRes = await call({ uuid: targets.npc.uuid, descriptionFormat: 'both' });
     assert(
-      htmlRes.ok && htmlRes.data.description !== undefined && htmlRes.data.descriptionText === undefined,
+      htmlRes.ok &&
+        htmlRes.data.description !== undefined &&
+        htmlRes.data.descriptionText === undefined,
       "descriptionFormat='html': only description present",
     );
     assert(
-      textRes.ok && textRes.data.descriptionText !== undefined && textRes.data.description === undefined,
+      textRes.ok &&
+        textRes.data.descriptionText !== undefined &&
+        textRes.data.description === undefined,
       "descriptionFormat='text': only descriptionText present",
     );
     assert(
-      bothRes.ok && bothRes.data.description !== undefined && bothRes.data.descriptionText !== undefined,
+      bothRes.ok &&
+        bothRes.data.description !== undefined &&
+        bothRes.data.descriptionText !== undefined,
       "descriptionFormat='both': both fields present",
     );
   }
@@ -369,13 +376,16 @@ try {
     const rulesRes = await call({ uuid: targets.npc.uuid, includeRules: true });
     const rawRes = await call({ uuid: targets.npc.uuid, includeRawSystem: true });
     assert(baseRes.ok && baseRes.data.rules === undefined, 'opt-in: rules absent by default');
-    assert(baseRes.ok && baseRes.data.rawSystem === undefined, 'opt-in: rawSystem absent by default');
-    assert(rulesRes.ok && Array.isArray(rulesRes.data.rules), 'opt-in: includeRules → rules array');
-    assert(rawRes.ok && rawRes.data.rawSystem !== undefined, 'opt-in: includeRawSystem → rawSystem present');
     assert(
-      rawRes.ok && typeof rawRes.data.rawSystem === 'object',
-      'opt-in: rawSystem is object',
+      baseRes.ok && baseRes.data.rawSystem === undefined,
+      'opt-in: rawSystem absent by default',
     );
+    assert(rulesRes.ok && Array.isArray(rulesRes.data.rules), 'opt-in: includeRules → rules array');
+    assert(
+      rawRes.ok && rawRes.data.rawSystem !== undefined,
+      'opt-in: includeRawSystem → rawSystem present',
+    );
+    assert(rawRes.ok && typeof rawRes.data.rawSystem === 'object', 'opt-in: rawSystem is object');
   }
 
   // ======================================================================

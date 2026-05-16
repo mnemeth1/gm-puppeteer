@@ -1,9 +1,6 @@
 import { z } from 'zod';
 import { ToolError } from '../errors.js';
-import {
-  updateItemUsesBody,
-  type UpdateItemUsesResult,
-} from '../evaluators/update-item-uses.js';
+import { updateItemUsesBody, type UpdateItemUsesResult } from '../evaluators/update-item-uses.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
 /**
@@ -62,7 +59,7 @@ const UpdateItemUsesInput = z
 export const updateItemUsesTool: ToolDefinition<typeof UpdateItemUsesInput> = {
   name: 'update_item_uses',
   description:
-    "Set the absolute `system.uses.value` of a charges-tracking physical item on a world actor. " +
+    'Set the absolute `system.uses.value` of a charges-tracking physical item on a world actor. ' +
     'Sibling to use_item (which decrements with side effects: chat card, autoDestroy) and to ' +
     'update_item_quantity (which sets `system.quantity`). Useful for refreshing daily wand ' +
     'charges, hand-tuning probe state, or reverting an accidental use_item call. ' +
@@ -92,10 +89,7 @@ export const updateItemUsesTool: ToolDefinition<typeof UpdateItemUsesInput> = {
       itemId: input.itemId,
       value: input.value,
     };
-    const result = (await page.evaluate(
-      updateItemUsesBody,
-      args,
-    )) as UpdateItemUsesResult;
+    const result = (await page.evaluate(updateItemUsesBody, args)) as UpdateItemUsesResult;
     if (!result.ok) {
       throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
     }

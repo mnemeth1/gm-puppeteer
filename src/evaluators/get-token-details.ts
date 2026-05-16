@@ -328,7 +328,8 @@ export function getTokenDetailsBody(input: GetTokenDetailsInput): GetTokenDetail
     scenes?: FoundryScenesLike;
   }
 
-  const num = (v: unknown, fallback = 0): number => (typeof v === 'number' && Number.isFinite(v) ? v : fallback);
+  const num = (v: unknown, fallback = 0): number =>
+    typeof v === 'number' && Number.isFinite(v) ? v : fallback;
   const bool = (v: unknown): boolean => v === true;
   const str = (v: unknown, fallback = ''): string => (typeof v === 'string' ? v : fallback);
   const strOrNull = (v: unknown): string | null => (typeof v === 'string' ? v : null);

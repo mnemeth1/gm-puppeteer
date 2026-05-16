@@ -52,7 +52,10 @@ async function call(input) {
     return { isError: true, validation: parsed.error.issues };
   }
   const blocks = await tool.handler(parsed.data, { browser: session, log }).catch((err) => ({
-    __throw: err instanceof Error ? { code: err.code, message: err.message, details: err.details } : { message: String(err) },
+    __throw:
+      err instanceof Error
+        ? { code: err.code, message: err.message, details: err.details }
+        : { message: String(err) },
   }));
   if (blocks?.__throw) return { isError: true, error: blocks.__throw };
   const block = blocks?.[0];
@@ -217,7 +220,9 @@ try {
       // shield runes can be {reinforcing: number} or null.
       assert(
         runes === null ||
-          (runes && typeof runes === 'object' && ('reinforcing' in runes || Object.keys(runes).length === 0)),
+          (runes &&
+            typeof runes === 'object' &&
+            ('reinforcing' in runes || Object.keys(runes).length === 0)),
         'shield runes shape',
         { runes },
       );
@@ -225,11 +230,9 @@ try {
     // v1.1: empty publication objects (system-default lore items, etc.)
     // are normalized to null. Farming Lore is the in-sandbox witness.
     if (type === 'lore' && data.name === 'Farming Lore') {
-      assert(
-        data.publication === null,
-        'Farming Lore publication normalized to null',
-        { publication: data.publication },
-      );
+      assert(data.publication === null, 'Farming Lore publication normalized to null', {
+        publication: data.publication,
+      });
     }
   }
 
@@ -361,11 +364,7 @@ try {
       'includeRawSystem:true populates rawSystem',
       { rawSystem: !!withRaw.data?.rawSystem },
     );
-    assert(
-      both.data?.rules === undefined,
-      'rules omitted by default',
-      { rules: both.data?.rules },
-    );
+    assert(both.data?.rules === undefined, 'rules omitted by default', { rules: both.data?.rules });
     // rawSystem may still be present if the type has no projection — that's expected.
     if (KNOWN_PROJECTIONS_HAS(both.data?.type)) {
       assert(

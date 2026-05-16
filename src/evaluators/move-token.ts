@@ -119,8 +119,7 @@ export async function moveTokenBody(input: MoveTokenInput): Promise<MoveTokenRes
         ok: false,
         error: {
           code: 'NO_ACTIVE_SCENE',
-          message:
-            'No active scene, and no sceneId provided. Activate a scene or pass sceneId.',
+          message: 'No active scene, and no sceneId provided. Activate a scene or pass sceneId.',
         },
       };
     }

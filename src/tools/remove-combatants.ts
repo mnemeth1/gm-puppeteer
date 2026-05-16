@@ -22,8 +22,7 @@ const RemoveCombatantsInput = z
       .min(1)
       .optional()
       .describe(
-        'Scene id whose combat encounter to remove from; defaults to the ' +
-          'world-active scene.',
+        'Scene id whose combat encounter to remove from; defaults to the ' + 'world-active scene.',
       ),
   })
   .strict();
@@ -31,7 +30,7 @@ const RemoveCombatantsInput = z
 export const removeCombatantsTool: ToolDefinition<typeof RemoveCombatantsInput> = {
   name: 'remove_combatants',
   description:
-    'Remove one or more combatants from a scene\'s combat encounter by ' +
+    "Remove one or more combatants from a scene's combat encounter by " +
     'combatant id. Resolves the scene (defaults to the active scene, or uses ' +
     'sceneId) and its Combat (no encounter → error). Each requested id is ' +
     'looked up first: hits are snapshotted (tokenId, name) and deleted in a ' +

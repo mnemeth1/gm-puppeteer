@@ -344,19 +344,11 @@ export type GetActorStateResult = GetActorStateOk | GetActorStateErr;
  * tool layer can name them in user-facing error messages. */
 export const SUPPORTED_ACTOR_TYPES = ['character', 'npc', 'familiar'] as const;
 
-export async function getActorStateBody(
-  input: GetActorStateInput,
-): Promise<GetActorStateResult> {
+export async function getActorStateBody(input: GetActorStateInput): Promise<GetActorStateResult> {
   // Inlined: module-scope identifiers do NOT survive page.evaluate
   // serialization — only the function source is shipped to the browser.
   const SUPPORTED = new Set(['character', 'npc', 'familiar']);
-  const PROFICIENCY_LABELS = [
-    'untrained',
-    'trained',
-    'expert',
-    'master',
-    'legendary',
-  ] as const;
+  const PROFICIENCY_LABELS = ['untrained', 'trained', 'expert', 'master', 'legendary'] as const;
   type ProficiencyLabel = (typeof PROFICIENCY_LABELS)[number];
 
   type AnyRecord = Record<string, unknown> & { [k: string]: unknown };
@@ -445,8 +437,7 @@ export async function getActorStateBody(
   const num = (v: unknown, fallback = 0): number =>
     typeof v === 'number' && Number.isFinite(v) ? v : fallback;
 
-  const str = (v: unknown, fallback = ''): string =>
-    typeof v === 'string' ? v : fallback;
+  const str = (v: unknown, fallback = ''): string => (typeof v === 'string' ? v : fallback);
 
   const obj = (v: unknown): Record<string, unknown> | null =>
     v && typeof v === 'object' ? (v as Record<string, unknown>) : null;

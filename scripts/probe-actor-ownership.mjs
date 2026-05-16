@@ -226,7 +226,9 @@ try {
       check(
         'T3.d',
         'previousLevel + operation are internally consistent',
-        (baselineHumanGmLevel === null && r.value.previousLevel === null && r.value.operation === 'created') ||
+        (baselineHumanGmLevel === null &&
+          r.value.previousLevel === null &&
+          r.value.operation === 'created') ||
           (baselineHumanGmLevel !== null &&
             r.value.previousLevel === baselineHumanGmLevel &&
             r.value.operation === 'updated'),
@@ -482,12 +484,7 @@ try {
       ctx,
     );
     check('T13', 'remove not-present rejected', r.ok === false, r);
-    check(
-      'T13.a',
-      'error reason=NOT_PRESENT',
-      r.err?.details?.reason === 'NOT_PRESENT',
-      r.err,
-    );
+    check('T13.a', 'error reason=NOT_PRESENT', r.err?.details?.reason === 'NOT_PRESENT', r.err);
   }
 
   // --------------------------------------------------------------------
@@ -536,10 +533,7 @@ try {
   // --------------------------------------------------------------------
   // Final report.
   // --------------------------------------------------------------------
-  log.info(
-    { findingCount: findings.length, errorCount: errors.length, errors },
-    'PROBE SUMMARY',
-  );
+  log.info({ findingCount: findings.length, errorCount: errors.length, errors }, 'PROBE SUMMARY');
   if (errors.length > 0) process.exitCode = 1;
 } catch (err) {
   log.error(

@@ -91,9 +91,7 @@ try {
   const scrub = await page.evaluate(async (prefix) => {
     const s = globalThis.game.scenes?.active;
     if (!s) return { error: 'no active scene' };
-    const targets = (s.tokens?.contents ?? []).filter((t) =>
-      (t.name ?? '').startsWith(prefix),
-    );
+    const targets = (s.tokens?.contents ?? []).filter((t) => (t.name ?? '').startsWith(prefix));
     const ids = targets.map((t) => t.id);
     if (ids.length === 0) return { removed: [] };
     try {
@@ -142,7 +140,12 @@ try {
     process.exit(2);
   }
   log.info(
-    { sceneId: env.sceneId, sceneName: env.sceneName, actor: placeable, tokenCount: env.tokenCount },
+    {
+      sceneId: env.sceneId,
+      sceneName: env.sceneName,
+      actor: placeable,
+      tokenCount: env.tokenCount,
+    },
     'env: active scene + chosen actor',
   );
 
@@ -335,12 +338,12 @@ try {
     const res = await call({ tokenIds: ['anything'], sceneId: 'bogus-scene-id' });
     log.info({ probe: 4, res }, 'T4: bogus sceneId');
     assert(res.isError === true, 'T4: error', { res });
-    assert(res.error?.code === 'INVALID_INPUT', 'T4: code=INVALID_INPUT', { code: res.error?.code });
-    assert(
-      res.error?.details?.sceneId === 'bogus-scene-id',
-      'T4: error details echo the sceneId',
-      { d: res.error?.details },
-    );
+    assert(res.error?.code === 'INVALID_INPUT', 'T4: code=INVALID_INPUT', {
+      code: res.error?.code,
+    });
+    assert(res.error?.details?.sceneId === 'bogus-scene-id', 'T4: error details echo the sceneId', {
+      d: res.error?.details,
+    });
   }
 
   // --------------------------------------------------------------------
@@ -348,9 +351,7 @@ try {
   // scene.tokens.size unchanged across the call.
   // --------------------------------------------------------------------
   {
-    const sizeBefore = await page.evaluate(
-      () => globalThis.game.scenes.active.tokens?.size ?? 0,
-    );
+    const sizeBefore = await page.evaluate(() => globalThis.game.scenes.active.tokens?.size ?? 0);
     const res = await call({ tokenIds: ['bogus1', 'bogus2', 'bogus3'] });
     log.info({ probe: 5, res, sizeBefore }, 'T5: all-bogus batch');
     assert(res.ok === true, 'T5: ok (no Foundry call needed)', { res });
@@ -360,9 +361,7 @@ try {
         nf: res.data.notFound,
       });
     }
-    const sizeAfter = await page.evaluate(
-      () => globalThis.game.scenes.active.tokens?.size ?? 0,
-    );
+    const sizeAfter = await page.evaluate(() => globalThis.game.scenes.active.tokens?.size ?? 0);
     assert(sizeBefore === sizeAfter, 'T5: scene.tokens.size unchanged', { sizeBefore, sizeAfter });
   }
 
@@ -388,9 +387,7 @@ try {
       const snapIds = new Set(snapshot.tokens.map((t) => t.id));
 
       // 1. Delete orphans introduced after the snapshot (probeD).
-      const orphans = (s.tokens?.contents ?? [])
-        .filter((t) => !snapIds.has(t.id))
-        .map((t) => t.id);
+      const orphans = (s.tokens?.contents ?? []).filter((t) => !snapIds.has(t.id)).map((t) => t.id);
       const orphansDeleted = [];
       const orphanFailures = [];
       if (orphans.length > 0) {
@@ -443,14 +440,7 @@ try {
 
       // 4. Build signature multisets.
       const sigOfToken = (t) =>
-        [
-          t.name ?? '',
-          t.actorId ?? '',
-          t.x ?? 0,
-          t.y ?? 0,
-          t.width ?? 1,
-          t.height ?? 1,
-        ].join('|');
+        [t.name ?? '', t.actorId ?? '', t.x ?? 0, t.y ?? 0, t.width ?? 1, t.height ?? 1].join('|');
       const sigOfSnap = (s) => [s.name, s.actorId ?? '', s.x, s.y, s.width, s.height].join('|');
 
       const finalSig = new Map();
@@ -514,11 +504,10 @@ try {
     'T6: final token count equals pre-setup state',
     { final: teardown.finalTokenCount, expected: expectedFinalCount },
   );
-  assert(
-    teardown.signaturesMatch === true,
-    'T6: name+actorId+x+y+w+h multiset matches pre-setup',
-    { missing: teardown.missingSigs, extra: teardown.extraSigs },
-  );
+  assert(teardown.signaturesMatch === true, 'T6: name+actorId+x+y+w+h multiset matches pre-setup', {
+    missing: teardown.missingSigs,
+    extra: teardown.extraSigs,
+  });
 
   if (failures.length > 0) {
     log.error({ failures, failureCount: failures.length }, 'PROBE FAILED');

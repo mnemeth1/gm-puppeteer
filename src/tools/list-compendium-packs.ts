@@ -16,14 +16,14 @@ export const listCompendiumPacksTool: ToolDefinition<typeof ListCompendiumPacksI
   name: 'list_compendium_packs',
   description:
     'Read-only enumeration of every compendium pack visible to the current ' +
-    "Foundry world (system packs, module packs, and world packs). One row " +
+    'Foundry world (system packs, module packs, and world packs). One row ' +
     'per pack with id (the collection id, e.g. "pf2e.pathfinder-bestiary"), ' +
     'label, system (the source package — system id for system-shipped packs, ' +
     'module id for module packs, world id for world packs), and documentType ' +
     '("Actor" | "Item" | "JournalEntry" | "RollTable" | "Macro" | "Scene" | ' +
     'other Foundry document types), sorted by label. Optional filters: ' +
     'documentType (exact match) and system (exact match), composed with AND. ' +
-    'Use this to discover the pack ids to pass into search_compendium\'s ' +
+    "Use this to discover the pack ids to pass into search_compendium's " +
     'pack / packs filter when the universe of available packs is unknown. ' +
     'NOT for searching pack contents — use search_compendium for that. NOT ' +
     'for PF2e rules text (actions, spells, feats, conditions, traits) — fetch ' +

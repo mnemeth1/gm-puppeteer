@@ -78,8 +78,7 @@ try {
   record('Q0', 'Actor-type pack inventory', packDiscovery);
 
   // Pick concrete targets from the discovery results.
-  const findPackByTypes = (predicate) =>
-    packDiscovery.find((p) => predicate(p.typesSeen ?? {}));
+  const findPackByTypes = (predicate) => packDiscovery.find((p) => predicate(p.typesSeen ?? {}));
   const bestiaryPack = findPackByTypes((t) => (t.npc ?? 0) > 50);
   const hazardPack = findPackByTypes((t) => (t.hazard ?? 0) > 0);
   const familiarPack = findPackByTypes((t) => (t.familiar ?? 0) > 0);
@@ -115,7 +114,7 @@ try {
       const targets = [];
       for (const want of wantNames) {
         const hit = idx.contents.find(
-          (e) => (e.type === 'npc') && (e.name ?? '').toLowerCase() === want,
+          (e) => e.type === 'npc' && (e.name ?? '').toLowerCase() === want,
         );
         if (hit) targets.push(hit);
       }
@@ -306,14 +305,25 @@ try {
           allSystemKeys: Object.keys(sys),
           hardness: sys.attributes?.hardness ?? null,
           hardnessShape:
-            typeof sys.attributes?.hardness === 'object' ? Object.keys(sys.attributes.hardness) : null,
+            typeof sys.attributes?.hardness === 'object'
+              ? Object.keys(sys.attributes.hardness)
+              : null,
           hp: sys.attributes?.hp ?? null,
           stealth: sys.attributes?.stealth ?? null,
           stealthDC: sys.attributes?.stealth?.dc ?? null,
           stealthValue: sys.attributes?.stealth?.value ?? null,
-          disable: typeof sys.details?.disable === 'string' ? sys.details.disable.slice(0, 120) : sys.details?.disable ?? null,
-          routine: typeof sys.details?.routine === 'string' ? sys.details.routine.slice(0, 120) : sys.details?.routine ?? null,
-          reset: typeof sys.details?.reset === 'string' ? sys.details.reset.slice(0, 120) : sys.details?.reset ?? null,
+          disable:
+            typeof sys.details?.disable === 'string'
+              ? sys.details.disable.slice(0, 120)
+              : (sys.details?.disable ?? null),
+          routine:
+            typeof sys.details?.routine === 'string'
+              ? sys.details.routine.slice(0, 120)
+              : (sys.details?.routine ?? null),
+          reset:
+            typeof sys.details?.reset === 'string'
+              ? sys.details.reset.slice(0, 120)
+              : (sys.details?.reset ?? null),
           saves: sys.saves ?? null,
           actionsCount: Array.isArray(sys.actions) ? sys.actions.length : null,
           itemTypeCounts: doc.items.contents.reduce((m, i) => {
@@ -386,7 +396,10 @@ try {
         if (!pack) return { error: `pack ${collection} not loaded` };
         const idx = await pack.getIndex();
         const all = idx.contents.filter((e) => e.type === 'familiar');
-        return { count: all.length, sample: all.slice(0, 3).map((e) => ({ name: e.name, uuid: e.uuid })) };
+        return {
+          count: all.length,
+          sample: all.slice(0, 3).map((e) => ({ name: e.name, uuid: e.uuid })),
+        };
       }, bestiaryPack.collection);
       record('Q3_fallback', 'familiars in bestiary?', fallback);
     }

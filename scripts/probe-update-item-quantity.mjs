@@ -389,13 +389,12 @@ try {
     assert(res.error?.code === 'INVALID_INPUT', 'probe 6: INVALID_INPUT', {
       code: res.error?.code,
     });
+    assert(res.error?.details?.reason === 'QUANTITY_ZERO', 'probe 6: reason=QUANTITY_ZERO', {
+      d: res.error?.details,
+    });
     assert(
-      res.error?.details?.reason === 'QUANTITY_ZERO',
-      'probe 6: reason=QUANTITY_ZERO',
-      { d: res.error?.details },
-    );
-    assert(
-      typeof res.error?.message === 'string' && res.error.message.includes('remove_item_from_actor'),
+      typeof res.error?.message === 'string' &&
+        res.error.message.includes('remove_item_from_actor'),
       'probe 6: message points at remove_item_from_actor',
       { msg: res.error?.message },
     );

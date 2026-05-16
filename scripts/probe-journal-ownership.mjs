@@ -91,7 +91,8 @@ try {
         fail('fresh entry should not yet list the scratch user', r);
       }
       if (r.pages.length !== 1) fail('expected 1 page', r);
-      else if (r.pages[0].default !== 'INHERIT') fail('fresh page default expected INHERIT', r.pages[0]);
+      else if (r.pages[0].default !== 'INHERIT')
+        fail('fresh page default expected INHERIT', r.pages[0]);
     }
   }
 

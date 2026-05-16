@@ -21,7 +21,7 @@ export const deleteJournalPageTool: ToolDefinition<typeof DeleteJournalPageInput
   description:
     'Delete a single page from a JournalEntry. The parent entry is left intact, even if ' +
     'this was its last page (zero-page entries are valid). Returns the deleted page id, ' +
-    'name, and the entry\'s remaining page count. This is destructive — page content ' +
+    "name, and the entry's remaining page count. This is destructive — page content " +
     'cannot be recovered. To delete an entire entry and every page on it, use ' +
     'delete_journal_entry instead.',
   inputSchema: DeleteJournalPageInput,

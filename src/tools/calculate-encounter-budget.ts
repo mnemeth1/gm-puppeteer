@@ -97,7 +97,7 @@ const CalculateEncounterBudgetInput = z
       .min(1)
       .max(25)
       .describe(
-        'The party\'s level (1-25, PF2e standard range). The encounter budget table is keyed off ' +
+        "The party's level (1-25, PF2e standard range). The encounter budget table is keyed off " +
           'this; per-creature XP costs are computed at PL+offset for each offset in [-4,+4]. The ' +
           'tool does not validate that the party is actually at this level; trust the caller.',
       ),
@@ -157,7 +157,9 @@ function formatOffset(offset: number): string {
   return offset > 0 ? `PL+${offset}` : `PL${offset}`;
 }
 
-function computeBudget(input: z.infer<typeof CalculateEncounterBudgetInput>): CalculateEncounterBudgetResult {
+function computeBudget(
+  input: z.infer<typeof CalculateEncounterBudgetInput>,
+): CalculateEncounterBudgetResult {
   const { partyLevel, partySize, difficulty } = input;
   const partySizeAdjustment = (partySize - 4) * PARTY_SIZE_DELTA;
   const totalXp = BASE_BUDGETS[difficulty] + partySizeAdjustment;
@@ -185,7 +187,9 @@ function computeBudget(input: z.infer<typeof CalculateEncounterBudgetInput>): Ca
   const survivingOffsets = new Set(creatureCosts.map((c) => c.relativeLevel));
   const suggestedMixes: SuggestedMix[] = [];
   for (const template of MIX_TEMPLATES) {
-    const allOffsetsAllowed = template.creatures.every((c) => survivingOffsets.has(c.relativeLevel));
+    const allOffsetsAllowed = template.creatures.every((c) =>
+      survivingOffsets.has(c.relativeLevel),
+    );
     if (!allOffsetsAllowed) continue;
     const mixXp = template.creatures.reduce(
       (sum, c) => sum + CREATURE_XP_BY_OFFSET[c.relativeLevel]! * c.count,
@@ -223,7 +227,7 @@ export const calculateEncounterBudgetTool: ToolDefinition<typeof CalculateEncoun
     'Pure math — does not touch Foundry. ' +
     'Entries whose absoluteLevel would fall below -1 are omitted (PF2e creature floor). ' +
     'suggestedMixes is a SKELETON, not a roster — the LLM still has to pick actual creatures ' +
-    'that fit the GM\'s scene and theme. An empty suggestedMixes array means no template hit ' +
+    "that fit the GM's scene and theme. An empty suggestedMixes array means no template hit " +
     'the budget exactly; the caller can compose from the creatureCosts table directly. ' +
     'Not for: choosing specific creatures (use search_compendium + the upcoming ' +
     'get_creature_details), rolling random encounters (that is the roll-tables cluster — ' +
