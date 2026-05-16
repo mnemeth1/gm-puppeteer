@@ -1,3 +1,4 @@
+import { resolve } from 'node:path';
 import { z } from 'zod';
 
 const ConfigSchema = z.object({
@@ -10,6 +11,9 @@ const ConfigSchema = z.object({
   warmCompendiumOnStart: z.boolean(),
   warmPhase2Packs: z.array(z.string()),
   allowEval: z.boolean(),
+  forgeMode: z.boolean(),
+  forgeProfileDir: z.string().min(1),
+  forgeManualLoginTimeoutMs: z.number().int().positive(),
 });
 
 export type Config = z.infer<typeof ConfigSchema>;
@@ -46,6 +50,11 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     warmCompendiumOnStart: parseBool(env.WARM_COMPENDIUM_ON_START, true),
     warmPhase2Packs: parseCsv(env.WARM_PHASE2_PACKS, ['pf2e.pathfinder-monster-core']),
     allowEval: parseBool(env.ALLOW_EVAL, false),
+    forgeMode: parseBool(env.FORGE_MODE, false),
+    // Resolved to an absolute path: the MCP server's cwd is set by the
+    // launching client and is not guaranteed to be the project directory.
+    forgeProfileDir: resolve(env.FORGE_PROFILE_DIR ?? '.puppeteer-profile'),
+    forgeManualLoginTimeoutMs: parseInt32(env.FORGE_MANUAL_LOGIN_TIMEOUT_MS, 300_000),
   });
 
   if (!parsed.success) {

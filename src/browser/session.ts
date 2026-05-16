@@ -1,5 +1,6 @@
 import type { Browser, Page } from 'puppeteer';
 import puppeteer from 'puppeteer';
+import { existsSync, readdirSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { Config } from '../config.js';
@@ -37,19 +38,30 @@ const CHROME_LAUNCH_ARGS = [
 const DEBUG_DIR = 'debug-output';
 
 /**
- * Owns the headless Chromium browser and its single Foundry page.
+ * Owns the Chromium browser and its single Foundry page.
  *
  * Startup is lazy and one-shot: the MCP server can register and advertise
  * tools before a browser launch, and the first tool call that needs the
  * page triggers `ensureStarted()`. Concurrent first-callers all await the
  * same in-flight launch promise so we never double-launch.
  *
- * Login flow:
+ * Two launch paths, selected by `config.forgeMode`:
+ *
+ * LAN mode (`forgeMode === false`, default) — `launchLocal()`:
  *   1. Launch Chromium + open page at FOUNDRY_URL.
  *   2. Detect which Foundry screen we landed on (setup / join / in-game).
  *   3. On the join screen, select FOUNDRY_GM_USERNAME, fill password,
  *      click Join, wait for `game.ready === true`.
  *   4. Verify the logged-in user is the configured GM and isGM=true.
+ *
+ * Forge mode (`forgeMode === true`) — `launchForge()`:
+ *   A Forge-hosted world sits behind a Forge account login (OAuth / 2FA /
+ *   CAPTCHA) that cannot be scripted. The session is persisted in a
+ *   Chromium profile directory (`config.forgeProfileDir`):
+ *   1. If a saved profile exists, try a headless restore from it.
+ *   2. If there is no live session, open a visible window so a human can
+ *      complete the Forge login once; the profile is saved on close.
+ *   3. Relaunch headless from the now-saved profile for the working session.
  *
  * On any login failure, screenshots and a DOM dump are written to
  * `debug-output/` to aid diagnosis without re-running.
@@ -82,25 +94,24 @@ export class BrowserSession {
   }
 
   private async launchAndLogin(): Promise<void> {
-    this.log.info(
-      { url: this.config.foundryUrl, headless: this.config.foundryHeadless },
-      'launching chromium',
-    );
-    const browser = await puppeteer.launch({
-      headless: this.config.foundryHeadless,
-      defaultViewport: VIEWPORT,
-      args: [...CHROME_LAUNCH_ARGS],
-    });
+    if (this.config.forgeMode) {
+      await this.launchForge();
+    } else {
+      await this.launchLocal();
+    }
+  }
+
+  /**
+   * LAN-mode startup: launch Chromium, navigate, and script the Foundry
+   * join form. This is the original flow and is unchanged in behavior.
+   */
+  private async launchLocal(): Promise<void> {
+    const browser = await this.launchBrowser({ headless: this.config.foundryHeadless });
     let page: Page | undefined;
     try {
       page = await browser.newPage();
       this.attachPageListeners(page);
-
-      this.log.info({ url: this.config.foundryUrl }, 'navigating to foundry');
-      await page.goto(this.config.foundryUrl, {
-        waitUntil: 'networkidle2',
-        timeout: this.config.loginTimeoutMs,
-      });
+      await this.navigate(page);
 
       const screen = await this.detectScreen(page);
       this.log.info({ screen, pathname: new URL(page.url()).pathname }, 'screen detected');
@@ -127,12 +138,7 @@ export class BrowserSession {
           this.log.info('already in-game; verifying user identity');
           const verify = await this.runVerify(page);
           this.assertVerifyMatches(verify);
-          await this.dismissHwAccelWarning(page);
-          this.browser = browser;
-          this.page = page;
-          this.verify = verify;
-          this.logVerified(verify);
-          this.maybeStartCompendiumWarm(page);
+          await this.finishStartup(browser, page, verify);
           return;
         }
 
@@ -141,12 +147,7 @@ export class BrowserSession {
           await this.waitForGameReady(page);
           const verify = await this.runVerify(page);
           this.assertVerifyMatches(verify);
-          await this.dismissHwAccelWarning(page);
-          this.browser = browser;
-          this.page = page;
-          this.verify = verify;
-          this.logVerified(verify);
-          this.maybeStartCompendiumWarm(page);
+          await this.finishStartup(browser, page, verify);
           return;
         }
       }
@@ -160,6 +161,199 @@ export class BrowserSession {
     }
   }
 
+  /**
+   * Forge-mode startup. Tries to restore a persisted session headlessly;
+   * if none is live, opens a visible window for a one-time human login,
+   * then relaunches headless from the now-saved profile.
+   */
+  private async launchForge(): Promise<void> {
+    const profileDir = this.config.forgeProfileDir;
+
+    if (this.profileDirHasSession(profileDir)) {
+      this.log.info({ profileDir }, 'forge: saved profile found, attempting headless restore');
+      if (await this.tryRestoreSession(profileDir)) return;
+      this.log.warn('forge: saved session is not live; falling back to visible login');
+    } else {
+      this.log.info({ profileDir }, 'forge: no saved profile; visible login required');
+    }
+
+    await this.runVisibleLogin(profileDir);
+
+    // The session is now persisted in the profile; relaunch headless for
+    // the actual working session. Honors "visible only for initial login"
+    // and immediately self-verifies that persistence worked.
+    this.log.info('forge: visible login complete, relaunching headless from saved profile');
+    if (!(await this.tryRestoreSession(profileDir))) {
+      throw new ToolError(
+        'FOUNDRY_NOT_READY',
+        'Visible login succeeded but the headless restore from the saved profile failed. ' +
+          'The Chromium profile may not be persisting correctly — check that FORGE_PROFILE_DIR is writable.',
+        { profileDir },
+      );
+    }
+  }
+
+  /**
+   * Launch headless using the persisted Chromium profile and check whether
+   * a live GM session is available.
+   *
+   * Returns `true` only when the session is fully verified. Returns `false`
+   * when there is no live session (so the caller can fall back to a visible
+   * login). A verify mismatch (wrong user / not a GM) is a configuration
+   * error, not an expired session, so it is rethrown rather than swallowed.
+   */
+  private async tryRestoreSession(profileDir: string): Promise<boolean> {
+    const browser = await this.launchBrowser({
+      headless: this.config.foundryHeadless,
+      profileDir,
+    });
+    let page: Page | undefined;
+    try {
+      page = await browser.newPage();
+      this.attachPageListeners(page);
+      await this.navigate(page);
+
+      const screen = await this.waitForStableScreen(page);
+      this.log.info({ screen, url: page.url() }, 'forge: restore screen detected');
+
+      if (screen === 'in-game') {
+        const verify = await this.runVerify(page);
+        this.assertVerifyMatches(verify);
+        await this.finishStartup(browser, page, verify);
+        return true;
+      }
+
+      if (screen === 'join') {
+        // The Forge account session is still valid but the Foundry world
+        // session lapsed — re-submit the join form headlessly with the
+        // stored GM credentials.
+        this.log.info('forge: at join screen, re-submitting join form headlessly');
+        await this.submitJoinForm(page);
+        await this.waitForGameReady(page);
+        const verify = await this.runVerify(page);
+        this.assertVerifyMatches(verify);
+        await this.finishStartup(browser, page, verify);
+        return true;
+      }
+
+      // 'setup' or 'unknown' (e.g. the Forge account login page) — a human
+      // must complete the login in a visible window. Capture a debug
+      // artifact so the actual page state is inspectable afterwards.
+      this.log.info({ screen, url: page.url() }, 'forge: no live session at this screen');
+      await this.dumpDebug(page, 'forge-restore-no-session');
+      await browser.close().catch(() => undefined);
+      return false;
+    } catch (err) {
+      await browser.close().catch(() => undefined);
+      if (this.isVerifyMismatch(err)) throw err;
+      this.log.warn(
+        { err: err instanceof Error ? err.message : String(err) },
+        'forge: headless restore failed; falling back to visible login',
+      );
+      return false;
+    }
+  }
+
+  /**
+   * Open a visible Chromium window so a human can complete the Forge
+   * account login. Blocks until `game.ready` becomes true (up to
+   * `forgeManualLoginTimeoutMs`), then closes the window — Chromium
+   * flushes the session into the profile directory on close.
+   */
+  private async runVisibleLogin(profileDir: string): Promise<void> {
+    this.log.warn(
+      { url: this.config.foundryUrl, timeoutMs: this.config.forgeManualLoginTimeoutMs },
+      'forge: opening a visible browser window — complete the Forge login manually; ' +
+        'the server continues automatically once the world is ready',
+    );
+
+    let browser: Browser;
+    try {
+      browser = await this.launchBrowser({ headless: false, profileDir });
+    } catch (err) {
+      throw new ToolError(
+        'BROWSER_NOT_READY',
+        'Forge mode needs a visible browser for the first-time login, but Chromium could not ' +
+          'open a window (no display available?). Perform the initial login on a machine with a ' +
+          'desktop, then copy the FORGE_PROFILE_DIR directory to this host.',
+        { profileDir, underlyingError: err instanceof Error ? err.message : String(err) },
+      );
+    }
+
+    let page: Page | undefined;
+    try {
+      page = await browser.newPage();
+      this.attachPageListeners(page);
+      await this.navigate(page);
+      await this.waitForGameReady(page, this.config.forgeManualLoginTimeoutMs);
+    } finally {
+      // Always close the visible window: the working session is the
+      // headless relaunch from the now-saved profile.
+      await browser.close().catch(() => undefined);
+    }
+  }
+
+  /** True when the profile directory exists and has been populated before. */
+  private profileDirHasSession(profileDir: string): boolean {
+    try {
+      return existsSync(profileDir) && readdirSync(profileDir).length > 0;
+    } catch {
+      return false;
+    }
+  }
+
+  /** A verify mismatch is a config error (wrong user / not a GM), tagged by `details.verify`. */
+  private isVerifyMismatch(err: unknown): boolean {
+    return (
+      err instanceof ToolError &&
+      err.code === 'FOUNDRY_NOT_READY' &&
+      err.details !== undefined &&
+      'verify' in err.details
+    );
+  }
+
+  private async launchBrowser(opts: {
+    headless: boolean;
+    profileDir?: string;
+  }): Promise<Browser> {
+    this.log.info(
+      { headless: opts.headless, profileDir: opts.profileDir ?? null },
+      'launching chromium',
+    );
+    return puppeteer.launch({
+      headless: opts.headless,
+      defaultViewport: VIEWPORT,
+      args: [...CHROME_LAUNCH_ARGS],
+      ...(opts.profileDir ? { userDataDir: opts.profileDir } : {}),
+    });
+  }
+
+  private async navigate(page: Page): Promise<void> {
+    this.log.info({ url: this.config.foundryUrl }, 'navigating to foundry');
+    await page.goto(this.config.foundryUrl, {
+      waitUntil: 'networkidle2',
+      timeout: this.config.loginTimeoutMs,
+    });
+  }
+
+  /**
+   * Final shared startup steps once a verified GM session exists: dismiss
+   * the hardware-acceleration banner, publish the browser/page/verify
+   * handles, and kick off background compendium warming.
+   */
+  private async finishStartup(
+    browser: Browser,
+    page: Page,
+    verify: LoginVerifyResult,
+  ): Promise<void> {
+    await this.dismissHwAccelWarning(page);
+    this.browser = browser;
+    this.page = page;
+    this.verify = verify;
+    this.logVerified(verify);
+    this.maybeStartCompendiumWarm(page);
+  }
+
   private async detectScreen(page: Page): Promise<Screen> {
     return page.evaluate(() => {
       const path = location.pathname;
@@ -170,6 +364,24 @@ export class BrowserSession {
       if (path.startsWith('/join') || document.body.classList.contains('join')) return 'join';
       return 'unknown';
     });
+  }
+
+  /**
+   * Foundry served through Forge can sit in a transient booting /
+   * redirecting state for several seconds after `networkidle2` resolves:
+   * `game` is not yet defined and the path has not settled to /join or
+   * the live game. A single `detectScreen` sample races that boot and
+   * reads 'unknown'. Poll until the screen resolves to a terminal value
+   * (in-game / join / setup) or the login timeout elapses.
+   */
+  private async waitForStableScreen(page: Page): Promise<Screen> {
+    const deadline = Date.now() + this.config.loginTimeoutMs;
+    let screen = await this.detectScreen(page);
+    while (screen === 'unknown' && Date.now() < deadline) {
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      screen = await this.detectScreen(page);
+    }
+    return screen;
   }
 
   private async submitJoinForm(page: Page): Promise<void> {
@@ -220,18 +432,22 @@ export class BrowserSession {
     await page.click(SELECTOR_JOIN_SUBMIT);
   }
 
-  private async waitForGameReady(page: Page): Promise<void> {
-    this.log.info({ timeoutMs: this.config.loginTimeoutMs }, 'waiting for game.ready');
+  private async waitForGameReady(
+    page: Page,
+    timeoutMs: number = this.config.loginTimeoutMs,
+  ): Promise<void> {
+    this.log.info({ timeoutMs }, 'waiting for game.ready');
     try {
       await page.waitForFunction(
         () => (globalThis as { game?: { ready?: boolean } }).game?.ready === true,
-        { timeout: this.config.loginTimeoutMs, polling: 250 },
+        { timeout: timeoutMs, polling: 250 },
       );
     } catch (err) {
       await this.dumpDebug(page, 'game-not-ready');
       throw new ToolError(
         'FOUNDRY_NOT_READY',
-        'game.ready did not become true within the login timeout. The join form may have been rejected, or the world failed to initialize.',
+        'game.ready did not become true within the login timeout. The login may not have ' +
+          'completed, or the world failed to initialize.',
         { underlyingError: (err as Error).message },
       );
     }

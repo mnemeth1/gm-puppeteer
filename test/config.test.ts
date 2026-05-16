@@ -1,3 +1,4 @@
+import { isAbsolute } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadConfig } from '../src/config.js';
 
@@ -11,6 +12,35 @@ describe('loadConfig', () => {
     expect(cfg.loginTimeoutMs).toBe(60_000);
     expect(cfg.logLevel).toBe('info');
     expect(cfg.allowEval).toBe(false);
+    expect(cfg.forgeMode).toBe(false);
+    expect(cfg.forgeManualLoginTimeoutMs).toBe(300_000);
+    expect(isAbsolute(cfg.forgeProfileDir)).toBe(true);
+    expect(cfg.forgeProfileDir.endsWith('.puppeteer-profile')).toBe(true);
+  });
+
+  it('parses FORGE_MODE as boolean, defaulting to false', () => {
+    expect(loadConfig({}).forgeMode).toBe(false);
+    expect(loadConfig({ FORGE_MODE: 'true' }).forgeMode).toBe(true);
+    expect(loadConfig({ FORGE_MODE: '1' }).forgeMode).toBe(true);
+    expect(loadConfig({ FORGE_MODE: 'yes' }).forgeMode).toBe(true);
+    expect(loadConfig({ FORGE_MODE: 'false' }).forgeMode).toBe(false);
+  });
+
+  it('resolves FORGE_PROFILE_DIR to an absolute path', () => {
+    const cfg = loadConfig({ FORGE_PROFILE_DIR: '/srv/forge/session' });
+    expect(cfg.forgeProfileDir).toBe('/srv/forge/session');
+    // A relative path is resolved against cwd.
+    expect(isAbsolute(loadConfig({ FORGE_PROFILE_DIR: 'my-profile' }).forgeProfileDir)).toBe(true);
+  });
+
+  it('parses FORGE_MANUAL_LOGIN_TIMEOUT_MS as an integer', () => {
+    expect(loadConfig({ FORGE_MANUAL_LOGIN_TIMEOUT_MS: '120000' }).forgeManualLoginTimeoutMs).toBe(
+      120_000,
+    );
+    // Invalid values fall back to default rather than throwing.
+    expect(loadConfig({ FORGE_MANUAL_LOGIN_TIMEOUT_MS: 'nope' }).forgeManualLoginTimeoutMs).toBe(
+      300_000,
+    );
   });
 
   it('parses ALLOW_EVAL as boolean, defaulting to false', () => {

@@ -12,7 +12,9 @@ coverage/
 .idea/
 *.swp
 
-# puppeteer user data dirs (if we end up persisting one)
+# puppeteer user data dirs — the default FORGE_PROFILE_DIR for Forge mode.
+# Holds a live Foundry/Forge session; never commit it. A custom
+# FORGE_PROFILE_DIR must be added here (or kept outside the repo) too.
 .puppeteer-profile/
 
 # Debug artifacts (screenshots, DOM dumps, etc.)
@@ -20,3 +22,6 @@ debug-output/
 
 # Local Claude Code MCP project-scope config (dev convenience)
 .mcp.json
+
+# Local dev smoke-test harness for the browser login flow
+scripts/smoke-login.mjs

@@ -149,6 +149,9 @@ default except where noted; `.env.example` carries the full, commented list.
 | `WARM_COMPENDIUM_ON_START` | `true` | Pre-warm Foundry's compendium index cache at startup (background; first tool call is not blocked). |
 | `WARM_PHASE2_PACKS` | `pf2e.pathfinder-monster-core` | Comma-separated packs to fully warm for instant description search. Empty string disables phase 2. |
 | `ALLOW_EVAL` | `false` | Register the `foundry_eval` tool — see below. |
+| `FORGE_MODE` | `false` | Enable the Forge-hosted session flow — see [Forge-hosted Foundry](#forge-hosted-foundry). |
+| `FORGE_PROFILE_DIR` | `.puppeteer-profile` | Chromium profile directory the Forge session is persisted in. Absolute path recommended. |
+| `FORGE_MANUAL_LOGIN_TIMEOUT_MS` | `300000` | How long to wait for a human to finish the visible Forge login. |
 
 ### `ALLOW_EVAL` and the `foundry_eval` tool
 
@@ -165,6 +168,52 @@ client; every other tool is unaffected.
 
 Set `ALLOW_EVAL=true` for your own development environment. Leave it off for
 any shared or published deployment.
+
+## Forge-hosted Foundry
+
+By default GM-Puppeteer targets a **local/LAN Foundry** instance: it launches
+headless Chromium and scripts Foundry's join form directly. Nothing in this
+section applies — leave `FORGE_MODE` unset.
+
+A **Forge-hosted** world (`forge-vtt.com`) sits behind a Forge account login —
+OAuth, 2FA, or CAPTCHA — that cannot be scripted reliably. Set `FORGE_MODE=true`
+to switch to a persisted-session flow:
+
+1. **First run** — with no saved session, a **visible** Chromium window opens.
+   Complete the Forge login by hand. When the world reaches `game.ready`, the
+   window closes and the browser profile (cookies + localStorage) is saved to
+   `FORGE_PROFILE_DIR`. The server then relaunches **headless** from that saved
+   profile for the working session.
+2. **Later runs** — the saved session is restored headlessly; no window opens.
+   If only the Foundry world session lapsed (Forge account still valid), the
+   join form is re-submitted headlessly using `FOUNDRY_GM_USERNAME` /
+   `FOUNDRY_GM_PASSWORD`.
+3. **Expired session** — if the saved session is no longer live, the visible
+   login from step 1 repeats.
+
+The LAN flow is completely unchanged when `FORGE_MODE` is `false` or unset.
+
+**Notes and caveats:**
+
+- **A display is required for the first login.** `headless: false` cannot open
+  a window on a server with no desktop. Do the initial login on a machine with
+  a GUI (the project's WSL2 + WSLg dev box works), then copy the
+  `FORGE_PROFILE_DIR` directory to the headless host.
+- **`FORGE_PROFILE_DIR` holds a live session** — effectively a credential. Keep
+  it gitignored (the default `.puppeteer-profile/` already is), restrict its
+  file permissions, and never commit or copy it over an untrusted channel.
+- Use an **absolute path** for `FORGE_PROFILE_DIR`; a relative path resolves
+  against the server's working directory, which the MCP client controls.
+- **One server instance per profile directory** — Chromium locks the profile,
+  so two instances cannot share one `FORGE_PROFILE_DIR`.
+- In Forge mode, `FOUNDRY_HEADLESS` controls only the restored/working session;
+  the first-time login is always visible.
+- `FORGE_MANUAL_LOGIN_TIMEOUT_MS` (default 5 min) bounds how long the server
+  waits for the human login — raise it if 2FA takes longer.
+- A Forge-hosted world boots more slowly than a LAN one (typically 20-40 s).
+  The headless restore polls for the world to finish loading, bounded by
+  `FOUNDRY_LOGIN_TIMEOUT_MS` (default 60 s) — raise that if a heavy world
+  needs longer.
 
 ## Connecting an MCP client
 
