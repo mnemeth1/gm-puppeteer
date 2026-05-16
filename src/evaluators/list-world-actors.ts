@@ -31,6 +31,14 @@
  *    `.id`) or `null` (unfoldered). Probed world had only unfoldered
  *    actors; defensive `folder?.id ?? null` covers both cases.
  *
+ *  - **Active-scene presence.** `onActiveScene` is `true` iff the actor
+ *    has at least one token on the *world-active* scene
+ *    (`game.scenes.active` — the campaign-state pointer, NOT
+ *    `canvas.scene`, which is the headless GM's local view). This is the
+ *    disambiguator when several actors share a name: the one in play is
+ *    the one with a token on the active scene. When no scene is active,
+ *    the top-level `activeScene` is `null` and every row is `false`.
+ *
  *  - **Sort.** Output is sorted by `name` using a case-insensitive locale
  *    compare for stable ordering across calls.
  *
@@ -46,9 +54,13 @@ export interface WorldActorSummary {
   type: string;
   level: number | null;
   folderId: string | null;
+  /** True iff the actor has ≥1 token on the world-active scene. */
+  onActiveScene: boolean;
 }
 
 export interface ListWorldActorsResult {
+  /** The world-active scene the `onActiveScene` flags are computed against; null when none is active. */
+  activeScene: { id: string; name: string } | null;
   actors: WorldActorSummary[];
 }
 
@@ -73,12 +85,38 @@ export function listWorldActorsBody(): ListWorldActorsResult {
   interface FoundryActorsCollection {
     contents?: FoundryActorLike[];
   }
+  interface FoundryTokenLike {
+    actorId?: string | null;
+  }
+  interface FoundryTokensCollection {
+    contents?: FoundryTokenLike[];
+  }
+  interface FoundrySceneLike {
+    id?: string;
+    name?: string;
+    tokens?: FoundryTokensCollection;
+  }
+  interface FoundryScenesCollection {
+    active?: FoundrySceneLike | null;
+  }
   interface FoundryGameForActors {
     actors?: FoundryActorsCollection;
+    scenes?: FoundryScenesCollection;
   }
 
   const game = (globalThis as unknown as { game?: FoundryGameForActors }).game;
   const all = game?.actors?.contents ?? [];
+
+  // -- World-active scene: the campaign-state pointer, NOT canvas.scene.
+  const active = game?.scenes?.active ?? null;
+  const activeScene =
+    active && typeof active.id === 'string'
+      ? { id: active.id, name: typeof active.name === 'string' ? active.name : '' }
+      : null;
+  const activeSceneActorIds = new Set<string>();
+  for (const t of active?.tokens?.contents ?? []) {
+    if (t && typeof t.actorId === 'string') activeSceneActorIds.add(t.actorId);
+  }
 
   const summaries: WorldActorSummary[] = [];
   for (const a of all) {
@@ -92,10 +130,11 @@ export function listWorldActorsBody(): ListWorldActorsResult {
       type: typeof a.type === 'string' ? a.type : '',
       level,
       folderId: a.folder?.id ?? null,
+      onActiveScene: activeSceneActorIds.has(a.id),
     });
   }
 
   summaries.sort((x, y) => x.name.localeCompare(y.name, undefined, { sensitivity: 'base' }));
 
-  return { actors: summaries };
+  return { activeScene, actors: summaries };
 }

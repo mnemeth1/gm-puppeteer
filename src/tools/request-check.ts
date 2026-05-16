@@ -18,7 +18,9 @@ const RequestCheckInput = z
       .describe(
         'World actor id of the player character to ask for a roll (as returned by ' +
           'list_world_actors). Must be a character actor — NPCs are rejected with ' +
-          'ACTOR_NOT_A_PC (use roll_check for NPC checks).',
+          'ACTOR_NOT_A_PC (use roll_check for NPC checks). When several PCs share the ' +
+          "target's name, pick the one with onActiveScene: true in list_world_actors — " +
+          'that is the character currently in play.',
       ),
     checkType: z
       .enum([
@@ -84,10 +86,11 @@ const RequestCheckInput = z
 export const requestCheckTool: ToolDefinition<typeof RequestCheckInput> = {
   name: 'request_check',
   description:
-    'Ask a player to roll a check for their own character. Posts a PF2e @Check inline ' +
-    'button to Foundry\'s chat — "Valeros, roll Perception" — whispered to the actor\'s ' +
-    'owner(s) and GMs. The player clicks the button to roll, keeping agency over their ' +
-    'own dice; this tool rolls nothing itself. The message speaker is set to the target ' +
+    'Ask a player to roll a check for their own character. Posts an explicit sentence ' +
+    'with a clickable PF2e @Check button to Foundry\'s chat — e.g. "Valeros, roll a ' +
+    '[Perception] check." or "Valeros, roll a [Will] saving throw." — whispered to the ' +
+    "actor's owner(s) and GMs. The player clicks the button to roll, keeping agency over " +
+    'their own dice; this tool rolls nothing itself. The message speaker is set to the target ' +
     'PC so the button resolves the roll to that character. Supports an optional DC, the ' +
     'basic-save flag (saves only), trait slugs, and whether the DC is visible to the ' +
     'player (default: GM-only). Returns {actor:{id, name}, checkType, dc, basic, ' +

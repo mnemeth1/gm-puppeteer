@@ -50,7 +50,7 @@ loaded, the rest are Foundry-core.
 
 ### Actors & inventory
 
-- **`list_world_actors`** — enumerate every actor in the world (id, uuid, name, type, level, folder).
+- **`list_world_actors`** — enumerate every actor in the world (id, uuid, name, type, level, folder, active-scene presence).
 - **`create_actor_from_compendium`** — import a compendium actor into the world.
 - **`get_actor_inventory`** — read-only list of an actor's physical inventory and currency.
 - **`get_item_details`** — read-only full-detail view of any Foundry Item by UUID.
@@ -74,7 +74,7 @@ loaded, the rest are Foundry-core.
 
 - **`roll_dice`** — evaluate a raw dice formula and post it to chat; optional NPC speaker, GM/blind visibility.
 - **`roll_check`** — roll a non-PC actor's real statistic check via the PF2e pipeline and post the result (PF2e).
-- **`request_check`** — post a whispered PF2e `@Check` inline button asking a player to roll for their PC (PF2e).
+- **`request_check`** — post a whispered full-sentence PF2e `@Check` prompt asking a player to roll for their PC (PF2e).
 
 ### Chat
 

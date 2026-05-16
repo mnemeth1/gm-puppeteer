@@ -10,6 +10,12 @@
  * resolves the roll to that character. For an NPC's real check use
  * `roll_check`; for raw dice use `roll_dice`.
  *
+ * The posted content is a full sentence, not a bare button — the
+ * enriched `@Check` anchor is wrapped as `<Name>, roll a/an <button>
+ * check.` (saves end "saving throw"; `flat` takes no suffix since the
+ * button already reads "Flat Check"). The article is picked from the
+ * checkType slug's first letter.
+ *
  * `@Check[...]` syntax (segments joined by `|`; order: type, dc,
  * basic, traits, showDC):
  *   - type      = the slug verbatim (perception / a skill / a save / flat).
@@ -186,6 +192,14 @@ export async function requestCheckBody(input: RequestCheckInput): Promise<Reques
     );
   }
 
+  // -- Wrap the button in an explicit sentence: "<Name>, roll a/an <button> <suffix>."
+  const suffix = isSave ? ' saving throw' : input.checkType === 'flat' ? '' : ' check';
+  const article = /^[aeiou]/.test(input.checkType) ? 'an' : 'a';
+  const escapeHtml = (s: string): string =>
+    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const actorName = escapeHtml(actor.name ?? 'The character');
+  const content = `${actorName}, roll ${article} ${enriched}${suffix}.`;
+
   // -- Resolve whisper recipients: owner players + GMs (GMs own all actors).
   const users = game.users?.contents ?? [];
   const recipients =
@@ -208,7 +222,7 @@ export async function requestCheckBody(input: RequestCheckInput): Promise<Reques
   let message: { id?: string } | undefined;
   try {
     message = await ChatMessageCls.implementation.create({
-      content: enriched,
+      content,
       speaker: ChatMessageCls.getSpeaker({ actor }),
       whisper: whisperIds,
     });

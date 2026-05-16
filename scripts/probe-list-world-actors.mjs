@@ -16,6 +16,10 @@
  *      Should be ("Actor.<id>"), but verify before narrowing the type.
  *   4. Folder shape — actor.folder is what (id only? {id, name}? null)?
  *      Decides whether v1 surfaces a folderId field at all.
+ *   5. Active-scene presence — game.scenes.active resolves to a scene with
+ *      a tokens.contents array whose tokens carry an actorId; the derived
+ *      onActiveScene flag is a boolean on every row, and exactly the
+ *      actors with a token on the active scene are flagged true.
  *
  *   npm run build && node scripts/probe-list-world-actors.mjs
  */
@@ -33,6 +37,19 @@ try {
   const enumeration = await page.evaluate(() => {
     const game = globalThis.game;
     const all = game?.actors?.contents ?? [];
+
+    // Q5: world-active scene token -> actor presence.
+    const active = game?.scenes?.active ?? null;
+    const activeScene =
+      active && typeof active.id === 'string'
+        ? { id: active.id, name: active.name ?? '' }
+        : null;
+    const activeSceneActorIds = new Set();
+    let activeSceneTokenCount = 0;
+    for (const t of active?.tokens?.contents ?? []) {
+      activeSceneTokenCount += 1;
+      if (t && typeof t.actorId === 'string') activeSceneActorIds.add(t.actorId);
+    }
 
     const typeCounts = {};
     const rows = [];
@@ -93,8 +110,12 @@ try {
         type: t,
         levelValue: typeof lvlValue === 'number' ? lvlValue : null,
         folderId: folder && typeof folder === 'object' ? (folder.id ?? null) : null,
+        onActiveScene: typeof a?.id === 'string' && activeSceneActorIds.has(a.id),
       });
     }
+
+    const flaggedRows = rows.filter((r) => r.onActiveScene);
+    const allFlagsBoolean = rows.every((r) => typeof r.onActiveScene === 'boolean');
 
     return {
       total: all.length,
@@ -104,6 +125,11 @@ try {
       folderShapes: Array.from(folderShapes).sort(),
       folderSamples,
       levelByType,
+      activeScene,
+      activeSceneTokenCount,
+      activeSceneActorIdCount: activeSceneActorIds.size,
+      allFlagsBoolean,
+      flaggedActorNames: flaggedRows.map((r) => r.name),
       rows,
     };
   });
@@ -132,6 +158,16 @@ try {
   log.info(
     { levelByType: enumeration.levelByType },
     'Q2: system.details.level.value presence by actor.type',
+  );
+  log.info(
+    {
+      activeScene: enumeration.activeScene,
+      activeSceneTokenCount: enumeration.activeSceneTokenCount,
+      activeSceneActorIdCount: enumeration.activeSceneActorIdCount,
+      allFlagsBoolean: enumeration.allFlagsBoolean,
+      flaggedActorNames: enumeration.flaggedActorNames,
+    },
+    'Q5: onActiveScene flag (expect allFlagsBoolean true)',
   );
   log.info({ rows: enumeration.rows }, 'projection preview (one row per actor)');
 
