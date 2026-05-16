@@ -5,15 +5,16 @@ self-hosted.**
 
 GM-Puppeteer is a powerful, module-free MCP server that lets your AI fully
 control Foundry VTT v14 as a Game Master. It can build balanced encounters,
-manage tokens, update journals, handle loot, apply conditions, create scrolls
-and wands, and run deep Pathfinder 2e workflows — all through natural language.
+manage tokens, run the combat tracker, update journals, handle loot, apply
+conditions, create scrolls and wands, and run deep Pathfinder 2e workflows —
+all through natural language.
 
 No modules required. Works on both local LAN and Forge-hosted worlds. Just give
 it a GM account and let the AI do the busywork while you focus on running the
 game.
 
 **Under the hood:** an MCP server that launches a headless (or visible)
-Chromium browser, logs into your Foundry world as a GM user, and exposes 53
+Chromium browser, logs into your Foundry world as a GM user, and exposes 59
 typed tools over the Model Context Protocol. All actions run through real
 Foundry APIs inside an authenticated GM session — giving it deep, reliable
 control without any custom modules or v13 limitations.
@@ -25,7 +26,7 @@ stat block handling.
 
 ## Tools
 
-53 typed tools. The catalog below is grouped by area; the final group
+59 typed tools. The catalog below is grouped by area; the final group
 requires the Pathfinder 2e system loaded, the rest are Foundry-core.
 
 ### Scenes & canvas
@@ -58,6 +59,15 @@ requires the Pathfinder 2e system loaded, the rest are Foundry-core.
 - **`update_item_uses`** — set the remaining charges/uses on an item (e.g. wand recharge).
 - **`move_item_to_container`** — relocate a physical item between containers (or to/from root).
 - **`transfer_item_between_actors`** — move a physical item (or container subtree) between actors.
+
+### Combat
+
+- **`start_combat`** — create (or return) the combat encounter for a scene; round 0.
+- **`begin_combat`** — advance a scene's encounter to round 1 after initiative is rolled.
+- **`end_combat`** — delete a scene's combat encounter (Foundry "End Combat"); idempotent.
+- **`add_combatants`** — add scene tokens to the combat as combatants; partial success.
+- **`remove_combatants`** — remove combatants from the combat by id; partial success.
+- **`get_combat_state`** — read round, turn, started flag, and the ordered combatant list.
 
 ### Journals
 

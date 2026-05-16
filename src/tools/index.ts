@@ -1,10 +1,12 @@
 import type { z } from 'zod';
 import type { Config } from '../config.js';
 import { activateSceneTool } from './activate-scene.js';
+import { addCombatantsTool } from './add-combatants.js';
 import { addItemToActorTool } from './add-item-to-actor.js';
 import { applyConditionTool } from './apply-condition.js';
 import { assignActorOwnershipTool } from './assign-actor-ownership.js';
 import { assignJournalOwnershipTool } from './assign-journal-ownership.js';
+import { beginCombatTool } from './begin-combat.js';
 import { calculateEncounterBudgetTool } from './calculate-encounter-budget.js';
 import { createActorFromCompendiumTool } from './create-actor-from-compendium.js';
 import { createJournalEntryTool } from './create-journal-entry.js';
@@ -13,11 +15,13 @@ import { createScrollOrWandTool } from './create-scroll-or-wand.js';
 import { deleteJournalEntryTool } from './delete-journal-entry.js';
 import { deleteJournalPageTool } from './delete-journal-page.js';
 import { deleteTokenTool } from './delete-token.js';
+import { endCombatTool } from './end-combat.js';
 import { foundryEvalTool } from './foundry-eval.js';
 import { foundryScreenshotTool } from './foundry-screenshot.js';
 import { getActorInventoryTool } from './get-actor-inventory.js';
 import { getActorStateTool } from './get-actor-state.js';
 import { getAvailableConditionsTool } from './get-available-conditions.js';
+import { getCombatStateTool } from './get-combat-state.js';
 import { getCreatureDetailsTool } from './get-creature-details.js';
 import { getCurrentSceneTool } from './get-current-scene.js';
 import { getItemDetailsTool } from './get-item-details.js';
@@ -38,12 +42,14 @@ import { moveTokenTool } from './move-token.js';
 import { placeTokenAtGridTool } from './place-token-at-grid.js';
 import { placeTokenAtScreenPixelTool } from './place-token-at-screen-pixel.js';
 import { removeActorOwnershipTool } from './remove-actor-ownership.js';
+import { removeCombatantsTool } from './remove-combatants.js';
 import { removeConditionTool } from './remove-condition.js';
 import { removeJournalOwnershipTool } from './remove-journal-ownership.js';
 import { removeItemFromActorTool } from './remove-item-from-actor.js';
 import { searchCompendiumTool } from './search-compendium.js';
 import { searchJournalsTool } from './search-journals.js';
 import { showJournalEntryTool } from './show-journal-entry.js';
+import { startCombatTool } from './start-combat.js';
 import { updateJournalEntryTool } from './update-journal-entry.js';
 import { updateJournalPageTool } from './update-journal-page.js';
 import { setConditionValueTool } from './set-condition-value.js';
@@ -57,10 +63,12 @@ import { viewSceneTool } from './view-scene.js';
 
 export const tools: ReadonlyArray<ToolDefinition<z.ZodTypeAny>> = [
   activateSceneTool,
+  addCombatantsTool,
   addItemToActorTool,
   applyConditionTool,
   assignActorOwnershipTool,
   assignJournalOwnershipTool,
+  beginCombatTool,
   calculateEncounterBudgetTool,
   createActorFromCompendiumTool,
   createJournalEntryTool,
@@ -69,11 +77,13 @@ export const tools: ReadonlyArray<ToolDefinition<z.ZodTypeAny>> = [
   deleteJournalEntryTool,
   deleteJournalPageTool,
   deleteTokenTool,
+  endCombatTool,
   foundryEvalTool,
   foundryScreenshotTool,
   getActorInventoryTool,
   getActorStateTool,
   getAvailableConditionsTool,
+  getCombatStateTool,
   getCreatureDetailsTool,
   getCurrentSceneTool,
   getItemDetailsTool,
@@ -94,6 +104,7 @@ export const tools: ReadonlyArray<ToolDefinition<z.ZodTypeAny>> = [
   placeTokenAtGridTool,
   placeTokenAtScreenPixelTool,
   removeActorOwnershipTool,
+  removeCombatantsTool,
   removeConditionTool,
   removeItemFromActorTool,
   removeJournalOwnershipTool,
@@ -101,6 +112,7 @@ export const tools: ReadonlyArray<ToolDefinition<z.ZodTypeAny>> = [
   searchJournalsTool,
   setConditionValueTool,
   showJournalEntryTool,
+  startCombatTool,
   transferItemBetweenActorsTool,
   updateItemQuantityTool,
   updateItemUsesTool,
