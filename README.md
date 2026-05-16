@@ -1,25 +1,27 @@
 # GM-Puppeteer
 
-**Hand your AI assistant the keys to your virtual tabletop.** GM-Puppeteer
-lets an AI dig through bestiaries, build balanced encounters, drop tokens on
-the map, sort out loot, and keep your campaign journals tidy — all the fiddly
-Foundry busywork — just by asking. Spend less time clicking, more time running
-the game.
+**Hand your AI assistant the keys to your virtual tabletop — on Forge or
+self-hosted.**
 
-Under the hood: an MCP server that drives a headless-Chromium Foundry VTT v14
-GM session, exposing typed tools over MCP/stdio to any connecting MCP client.
+GM-Puppeteer is a powerful, module-free MCP server that lets your AI fully
+control Foundry VTT v14 as a Game Master. It can build balanced encounters,
+manage tokens, update journals, handle loot, apply conditions, create scrolls
+and wands, and run deep Pathfinder 2e workflows — all through natural language.
 
-The scene, token, journal, ownership, and compendium tools are Foundry-core
-and **work on any game system**. A second layer — condition management,
-encounter budgeting, scroll/wand creation, creature stat blocks, and
-item-cascade handling — is **specialized for Pathfinder 2e** and requires the
-PF2e system loaded.
+No modules required. Works on both local LAN and Forge-hosted worlds. Just give
+it a GM account and let the AI do the busywork while you focus on running the
+game.
 
-The design is intentionally narrow: no custom Foundry module, no v13
-compatibility. It works against any Foundry instance the MCP server can
-reach over the network — the headless Chromium just needs to load the
-world's login page. All Foundry-side work runs through that Chromium tab,
-logged in as a GM user.
+**Under the hood:** an MCP server that launches a headless (or visible)
+Chromium browser, logs into your Foundry world as a GM user, and exposes 53
+typed tools over the Model Context Protocol. All actions run through real
+Foundry APIs inside an authenticated GM session — giving it deep, reliable
+control without any custom modules or v13 limitations.
+
+The core toolset (scenes, tokens, journals, ownership, compendiums) works on
+any game system. A specialized Pathfinder 2e layer adds powerful features like
+condition management, encounter budgeting, scroll/wand creation, and creature
+stat block handling.
 
 ## Tools
 
@@ -192,6 +194,12 @@ to switch to a persisted-session flow:
    login from step 1 repeats.
 
 The LAN flow is completely unchanged when `FORGE_MODE` is `false` or unset.
+
+**Set `FOUNDRY_URL` to the game URL — not the invitation link.** Use the real
+game address, `https://<your-slug>.forge-vtt.com/game`. Do **not** use Forge's
+one-shot player *invitation link* (`forge-vtt.com/invite/...`): it is a bootstrap
+redirect, and re-visiting it as the authenticated game owner lands on the Forge
+`/setup` screen instead of the world, which breaks the headless restore.
 
 **Notes and caveats:**
 
