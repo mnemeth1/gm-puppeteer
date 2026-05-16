@@ -1,0 +1,22 @@
+node_modules/
+dist/
+coverage/
+*.log
+.env
+.env.local
+.env.*.local
+
+# editor / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# puppeteer user data dirs (if we end up persisting one)
+.puppeteer-profile/
+
+# Debug artifacts (screenshots, DOM dumps, etc.)
+debug-output/
+
+# Local Claude Code MCP project-scope config (dev convenience)
+.mcp.json

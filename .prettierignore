@@ -1,0 +1,8 @@
+node_modules
+dist
+coverage
+package-lock.json
+
+# Hand-formatted markdown — prettier's reflow would munge the curated line breaks
+*.md
+docs/
