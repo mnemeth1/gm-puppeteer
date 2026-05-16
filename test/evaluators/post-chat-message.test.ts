@@ -94,7 +94,7 @@ function makeInput(over: Partial<PostChatMessageInput>): PostChatMessageInput {
 }
 
 const GM: UserLike = { id: 'gm1', name: 'AI-GM', isGM: true };
-const GM2: UserLike = { id: 'gm2', name: 'Michael-GM', isGM: true };
+const GM2: UserLike = { id: 'gm2', name: 'Human-GM', isGM: true };
 const PLAYER1: UserLike = { id: 'p1', name: 'Player1', isGM: false };
 const PLAYER2: UserLike = { id: 'p2', name: 'Player2', isGM: false };
 
@@ -160,7 +160,7 @@ describe('postChatMessageBody', () => {
       expect(result.whisperTargets).toEqual([]);
       expect(result.whisperedTo).toEqual([
         { userId: 'gm1', userName: 'AI-GM', viaActorId: null },
-        { userId: 'gm2', userName: 'Michael-GM', viaActorId: null },
+        { userId: 'gm2', userName: 'Human-GM', viaActorId: null },
       ]);
     }
     expect(createCalls[0]?.whisper).toEqual(['gm1', 'gm2']);
