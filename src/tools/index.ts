@@ -46,6 +46,9 @@ import { removeCombatantsTool } from './remove-combatants.js';
 import { removeConditionTool } from './remove-condition.js';
 import { removeJournalOwnershipTool } from './remove-journal-ownership.js';
 import { removeItemFromActorTool } from './remove-item-from-actor.js';
+import { requestCheckTool } from './request-check.js';
+import { rollCheckTool } from './roll-check.js';
+import { rollDiceTool } from './roll-dice.js';
 import { searchCompendiumTool } from './search-compendium.js';
 import { searchJournalsTool } from './search-journals.js';
 import { showJournalEntryTool } from './show-journal-entry.js';
@@ -108,6 +111,9 @@ export const tools: ReadonlyArray<ToolDefinition<z.ZodTypeAny>> = [
   removeConditionTool,
   removeItemFromActorTool,
   removeJournalOwnershipTool,
+  requestCheckTool,
+  rollCheckTool,
+  rollDiceTool,
   searchCompendiumTool,
   searchJournalsTool,
   setConditionValueTool,

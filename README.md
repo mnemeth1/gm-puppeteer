@@ -14,7 +14,7 @@ it a GM account and let the AI do the busywork while you focus on running the
 game.
 
 **Under the hood:** an MCP server that launches a headless (or visible)
-Chromium browser, logs into your Foundry world as a GM user, and exposes 59
+Chromium browser, logs into your Foundry world as a GM user, and exposes 62
 typed tools over the Model Context Protocol. All actions run through real
 Foundry APIs inside an authenticated GM session — giving it deep, reliable
 control without any custom modules or v13 limitations.
@@ -26,8 +26,9 @@ stat block handling.
 
 ## Tools
 
-59 typed tools. The catalog below is grouped by area; the final group
-requires the Pathfinder 2e system loaded, the rest are Foundry-core.
+62 typed tools. The catalog below is grouped by area; the final group —
+and `roll_check` / `request_check` — require the Pathfinder 2e system
+loaded, the rest are Foundry-core.
 
 ### Scenes & canvas
 
@@ -68,6 +69,12 @@ requires the Pathfinder 2e system loaded, the rest are Foundry-core.
 - **`add_combatants`** — add scene tokens to the combat as combatants; partial success.
 - **`remove_combatants`** — remove combatants from the combat by id; partial success.
 - **`get_combat_state`** — read round, turn, started flag, and the ordered combatant list.
+
+### Dice & checks
+
+- **`roll_dice`** — evaluate a raw dice formula and post it to chat; optional NPC speaker, GM/blind visibility.
+- **`roll_check`** — roll a non-PC actor's real statistic check via the PF2e pipeline and post the result (PF2e).
+- **`request_check`** — post a whispered PF2e `@Check` inline button asking a player to roll for their PC (PF2e).
 
 ### Journals
 
