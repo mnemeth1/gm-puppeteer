@@ -89,7 +89,6 @@ var
   TimeoutEdit:    TNewEdit;
   HeadlessCheck:  TNewCheckBox;
   WarmCheck:      TNewCheckBox;
-  Pf2eCheck:      TNewCheckBox;
 
   ClientDetected:   array[0..1] of Boolean;
   ClientConfigPath: array[0..1] of String;

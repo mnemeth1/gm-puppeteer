@@ -15,6 +15,8 @@ import { createScrollOrWandTool } from './create-scroll-or-wand.js';
 import { deleteJournalEntryTool } from './delete-journal-entry.js';
 import { deleteJournalPageTool } from './delete-journal-page.js';
 import { deleteTokenTool } from './delete-token.js';
+import { dnd5eSearchCompendiumTool } from './dnd5e-search-compendium.js';
+import { dnd5eSearchRulesTool } from './dnd5e-search-rules.js';
 import { endCombatTool } from './end-combat.js';
 import { foundryEvalTool } from './foundry-eval.js';
 import { foundryScreenshotTool } from './foundry-screenshot.js';
@@ -82,6 +84,8 @@ export const tools: ReadonlyArray<ToolDefinition<z.ZodTypeAny>> = [
   deleteJournalEntryTool,
   deleteJournalPageTool,
   deleteTokenTool,
+  dnd5eSearchCompendiumTool,
+  dnd5eSearchRulesTool,
   endCombatTool,
   foundryEvalTool,
   foundryScreenshotTool,

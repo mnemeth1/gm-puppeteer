@@ -10,6 +10,7 @@ const ConfigSchema = z.object({
   logLevel: z.enum(['trace', 'debug', 'info', 'warn', 'error']),
   warmCompendiumOnStart: z.boolean(),
   warmPhase2Packs: z.array(z.string()),
+  warmDocBudget: z.number().int().nonnegative(),
   allowEval: z.boolean(),
   forgeMode: z.boolean(),
   forgeProfileDir: z.string().min(1),
@@ -29,13 +30,22 @@ const parseInt32 = (raw: string | undefined, fallback: number): number => {
   return Number.isFinite(n) && n > 0 ? n : fallback;
 };
 
+// Like parseInt32 but accepts 0 (used where 0 is a meaningful value, e.g. a
+// warm budget of 0 means "warm nothing").
+const parseNonNegInt = (raw: string | undefined, fallback: number): number => {
+  if (raw === undefined) return fallback;
+  const n = Number.parseInt(raw, 10);
+  return Number.isFinite(n) && n >= 0 ? n : fallback;
+};
+
 const parseCsv = (raw: string | undefined, fallback: string[]): string[] => {
   if (raw === undefined) return fallback;
   const parts = raw
     .split(',')
     .map((s) => s.trim())
     .filter((s) => s.length > 0);
-  // Explicit empty string disables; an env var like "" or "   " returns [].
+  // An empty / whitespace-only env var returns [] — for WARM_PHASE2_PACKS
+  // that means "no explicit override, use auto pack selection".
   return parts;
 };
 
@@ -48,7 +58,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     loginTimeoutMs: parseInt32(env.FOUNDRY_LOGIN_TIMEOUT_MS, 60_000),
     logLevel: (env.LOG_LEVEL ?? 'info') as Config['logLevel'],
     warmCompendiumOnStart: parseBool(env.WARM_COMPENDIUM_ON_START, true),
-    warmPhase2Packs: parseCsv(env.WARM_PHASE2_PACKS, ['pf2e.pathfinder-monster-core']),
+    warmPhase2Packs: parseCsv(env.WARM_PHASE2_PACKS, []),
+    warmDocBudget: parseNonNegInt(env.WARM_DOC_BUDGET, 1500),
     allowEval: parseBool(env.ALLOW_EVAL, false),
     forgeMode: parseBool(env.FORGE_MODE, false),
     // Resolved to an absolute path: the MCP server's cwd is set by the

@@ -549,7 +549,10 @@ export class BrowserSession {
       this.log.debug('compendium warm disabled by config; skipping');
       return;
     }
-    startCompendiumWarm(page, this.log, this.config.warmPhase2Packs);
+    startCompendiumWarm(page, this.log, {
+      override: this.config.warmPhase2Packs,
+      budget: this.config.warmDocBudget,
+    });
   }
 
   private async dumpDebug(page: Page, label: string): Promise<void> {

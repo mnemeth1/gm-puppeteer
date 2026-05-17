@@ -42,9 +42,10 @@ walks you through.
 
 ## Tools
 
-64 typed tools. The catalog below is grouped by area; the final group —
-and `pf2e_roll_check` / `pf2e_request_check` — require the Pathfinder 2e system
-loaded, the rest are Foundry-core.
+66 typed tools. The catalog below is grouped by area; the two
+system-specific groups at the end — plus `pf2e_roll_check` /
+`pf2e_request_check` — are tuned for their game system (Pathfinder 2e or
+D&D 5e), the rest are Foundry-core.
 
 ### Scenes & canvas
 
@@ -145,6 +146,13 @@ Require the PF2e system loaded on the world.
 - **`pf2e_use_item`** — run the PF2e use pipeline for one consumable or equipment activation.
 - **`pf2e_calculate_encounter_budget`** — PF2e GMG XP budget, cost table, and mix skeletons for a party.
 
+### Dungeons & Dragons 5e–specific
+
+Tuned for the D&D 5e system; useful on a world with it loaded.
+
+- **`dnd5e_search_compendium`** — name/structured-filter search across D&D 5e compendium packs, on the system's native Compendium Browser engine.
+- **`dnd5e_search_rules`** — page-level full-text search across D&D 5e compendium rules-glossary journals.
+
 ## Prerequisites
 
 - **Node.js 24+** on the machine that runs the MCP server (the Foundry host).
@@ -209,8 +217,9 @@ default except where noted; `.env.example` carries the full, commented list.
 | `FOUNDRY_HEADLESS` | `true` | Run Chromium headless. Set `false` to watch the window while diagnosing login issues. |
 | `FOUNDRY_LOGIN_TIMEOUT_MS` | `60000` | How long to wait for `game.ready` after submitting the join form. |
 | `LOG_LEVEL` | `info` | `trace` / `debug` / `info` / `warn` / `error`. All logs go to stderr. |
-| `WARM_COMPENDIUM_ON_START` | `true` | Pre-warm Foundry's compendium index cache at startup (background; first tool call is not blocked). |
-| `WARM_PHASE2_PACKS` | `pf2e.pathfinder-monster-core` | Comma-separated packs to fully warm for instant description search. Empty string disables phase 2. |
+| `WARM_COMPENDIUM_ON_START` | `true` | Pre-load compendium documents into Foundry's cache at startup (background; first tool call is not blocked). Set `false` to disable the warm entirely. |
+| `WARM_DOC_BUDGET` | `1500` | Auto-mode document budget. The warm picks installed packs by type priority (JournalEntry → Actor → Item → RollTable), smallest first, until this many documents are warmed. `0` warms nothing. Raise it to warm more packs at the cost of a longer startup warm. |
+| `WARM_PHASE2_PACKS` | _(empty)_ | Comma-separated pack collection ids to warm explicitly. When set, this overrides auto selection and `WARM_DOC_BUDGET` is ignored. Empty (the default) uses auto selection. |
 | `ALLOW_EVAL` | `false` | Register the `foundry_eval` tool — see below. |
 | `FORGE_MODE` | `false` | Enable the Forge-hosted session flow — see [Forge-hosted Foundry](#forge-hosted-foundry). |
 | `FORGE_PROFILE_DIR` | `.puppeteer-profile` | Chromium profile directory the Forge session is persisted in. Absolute path recommended. |

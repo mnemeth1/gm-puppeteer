@@ -65,8 +65,8 @@ capability. AoN pages are organized by category:
 AoN URLs are keyed by numeric ID, not by name. To reach a specific rule,
 resolve the name to a URL with AoN's search
 (\`https://2e.aonprd.com/Search.aspx?q=<query>\`) or a general web search,
-then fetch the page. Apply standard copyright handling: paraphrase, no
-extended quotes.
+then fetch the page. The PF2e rules are publicly licensed (ORC) — reproduce
+full rules text as needed; no need to paraphrase or truncate.
 
 ## Compendium vs. rules — the dividing line
 
