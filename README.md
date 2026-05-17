@@ -175,6 +175,10 @@ Require the D&D 5e system loaded on the world.
 - **`dnd5e_get_available_conditions`** — enumerate every applyable D&D 5e status (condition, pseudo-condition, or plain status), with the valued flag, exhaustion cap, and a rules-reference UUID.
 - **`dnd5e_apply_condition`** — apply a D&D 5e status to a character or npc; take-max exhaustion level, rider conditions surfaced as a cascade.
 - **`dnd5e_remove_condition`** — remove a D&D 5e status from a character or npc, or decrement exhaustion by one level; rider conditions surfaced as a cascade.
+- **`dnd5e_add_item_to_actor`** — grant a physical compendium item (weapon, equipment, consumable, tool, loot, container) to a D&D 5e character or npc; handles quantity, container placement, identification, and stack-merging.
+- **`dnd5e_remove_item_from_actor`** — remove an item from a D&D 5e character or npc, or decrement its quantity; deleting a container ejects its direct contents to the inventory root.
+- **`dnd5e_update_item_quantity`** — set the absolute quantity of a physical item (weapon, equipment, consumable, tool, loot, container) on a D&D 5e character or npc.
+- **`dnd5e_update_item_uses`** — set the remaining charges of a uses-tracking item (wand, staff, charged magic item, or feat/spell with limited activations) on a D&D 5e character or npc.
 
 ## Prerequisites
 
