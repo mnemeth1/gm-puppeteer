@@ -1,5 +1,5 @@
 /**
- * page.evaluate body for create_scroll_or_wand. Generates a
+ * page.evaluate body for pf2e_create_scroll_or_wand. Generates a
  * spell-specific scroll or wand consumable on a world actor, mirroring
  * PF2e's drag-spell-onto-actor UI workflow.
  *
@@ -30,9 +30,9 @@
  *    `_stats.compendiumSource` (the rank-N scroll/wand template UUID),
  *    not the spell's UUID. Two scrolls of the same spell/rank would
  *    therefore both report the same compendiumSource — they will NOT
- *    auto-merge through add_item_to_actor's merge-by-source logic
+ *    auto-merge through pf2e_add_item_to_actor's merge-by-source logic
  *    (they should not; identical scrolls of different spells share the
- *    rank template). Each `create_scroll_or_wand` call yields one
+ *    rank template). Each `pf2e_create_scroll_or_wand` call yields one
  *    inventory entry with `quantity` copies inside.
  *
  *  - PF2e's document layer is permissive about embedded spell type:
@@ -242,7 +242,7 @@ export async function createScrollOrWandBody(
   }
   if (spell.type !== 'spell') {
     return fail(
-      `spellUuid points to a ${spell.type ?? 'unknown'}; create_scroll_or_wand requires a spell. For physical inventory items, use add_item_to_actor.`,
+      `spellUuid points to a ${spell.type ?? 'unknown'}; pf2e_create_scroll_or_wand requires a spell. For physical inventory items, use pf2e_add_item_to_actor.`,
       { spellUuid: input.spellUuid, type: spell.type ?? null },
     );
   }
@@ -335,7 +335,7 @@ export async function createScrollOrWandBody(
   newSys.quantity = input.quantity;
   newSys.containerId = input.containerId !== null ? input.containerId : null;
 
-  // Identification: default identified. Mirrors add_item_to_actor.
+  // Identification: default identified. Mirrors pf2e_add_item_to_actor.
   if (!input.identified) {
     const sourceIdent = (sysObj.identification as AnyRecord | undefined) ?? {};
     newSys.identification = { ...sourceIdent, status: 'unidentified' };
@@ -364,7 +364,7 @@ export async function createScrollOrWandBody(
   // -- Cascade detection: any items on the actor whose
   //    flags.pf2e.grantedBy.id points at our newly-created item.
   //    Scrolls/wands typically don't have GrantItem rules, but the
-  //    pattern is inherited from add_item_to_actor for consistency.
+  //    pattern is inherited from pf2e_add_item_to_actor for consistency.
   const cascadeGranted: CreateScrollOrWandCascadeEntry[] = [];
   for (const item of actor.items?.contents ?? []) {
     if (!item || !item.id || item.id === created.id) continue;

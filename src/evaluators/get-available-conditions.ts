@@ -1,17 +1,17 @@
 /**
- * page.evaluate body for get_available_conditions. Read-only enumeration
+ * page.evaluate body for pf2e_get_available_conditions. Read-only enumeration
  * of every PF2e condition the system exposes, surfacing the
  * valued/unvalued status and effective cap so a caller can pre-clamp
- * and pick the right downstream tool (`apply_condition` /
- * `set_condition_value` / `remove_condition`) on the first try without
+ * and pick the right downstream tool (`pf2e_apply_condition` /
+ * `pf2e_set_condition_value` / `pf2e_remove_condition`) on the first try without
  * trial-and-error.
  *
  * Semantics confirmed by scripts/probe-get-available-conditions.mjs
  * against Foundry v14.361 + PF2e 8.1.2:
  *
  *  - **Slug source.** `game.pf2e.ConditionManager.conditionsSlugs`
- *    (getter, 44 entries in PF2e 8.1.2). Same source apply_condition
- *    validates against. Same source remove_condition uses.
+ *    (getter, 44 entries in PF2e 8.1.2). Same source pf2e_apply_condition
+ *    validates against. Same source pf2e_remove_condition uses.
  *
  *  - **Template lookup.** `game.pf2e.ConditionManager.getCondition(slug)`
  *    returns a `ConditionPF2e` Item with top-level `name` and
@@ -39,7 +39,7 @@
  *    NON_VITAL_VALUED_CAP need to move together.
  *
  *  - **`persistentDamage` flag.** Surfaces the one slug
- *    apply_condition refuses outright (`persistent-damage` opens
+ *    pf2e_apply_condition refuses outright (`persistent-damage` opens
  *    PersistentDamageEditor, a UI dialog that blocks in headless).
  *    Template-level the slug has `isValued: false`, so callers
  *    grouping by `valued` alone wouldn't notice it; the explicit
@@ -50,7 +50,7 @@
  *    cap rather than the SRD's flat 4. Returning a flag plus
  *    null-cap (rather than guessing a constant) keeps the contract
  *    honest. Callers that want the real cap can hit
- *    `get_actor_state` once they have a target actor.
+ *    `pf2e_get_actor_state` once they have a target actor.
  *
  *  - **Sort.** Output sorted alphabetically by slug for stable
  *    enumeration across calls.

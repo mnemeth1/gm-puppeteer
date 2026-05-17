@@ -34,7 +34,7 @@
  *    `visible` to GM clients, so whispering to the GMs as well is not
  *    needed for the human GM to see it — but the resolved owner set
  *    includes the GMs anyway (they own the actor), and that is kept:
- *    it matches `request_check` and makes the whisper explicit.
+ *    it matches `pf2e_request_check` and makes the whisper explicit.
  *  - **Speaker.** `ChatMessage.getSpeaker({actor})` sets `speaker.actor`
  *    + `speaker.alias`; `ChatMessage.getSpeaker()` (no args) yields the
  *    GM user as speaker with `actor` null.

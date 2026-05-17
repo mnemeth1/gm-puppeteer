@@ -47,7 +47,7 @@ state** — the concrete objects in a running game.
 
 **PF2e rules text is out of scope.** This MCP does not return the
 canonical text of spells, feats, actions, conditions, traits,
-ancestries, classes, archetypes, or equipment rules. \`search_compendium\`
+ancestries, classes, archetypes, or equipment rules. \`pf2e_search_compendium\`
 returns Foundry's *parsed* documents — world content for gameplay, not a
 clean rules reference.
 
@@ -70,7 +70,7 @@ extended quotes.
 
 ## Compendium vs. rules — the dividing line
 
-Use \`search_compendium\` for things you place into or grant within the
+Use \`pf2e_search_compendium\` for things you place into or grant within the
 game: a goblin stat block to drop on a scene, a longsword to add to an
 actor, a roll table to consult. Use Archives of Nethys for the rules a
 player or GM reads to understand how something works. A creature's stat

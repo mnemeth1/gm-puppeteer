@@ -62,7 +62,7 @@ export const searchJournalsTool: ToolDefinition<typeof SearchJournalsInput> = {
     "and `entryId` filters scope the scan. Foundry's built-in journal search is NOT used " +
     '(it only matches entry names); this scans every entry and page server-side. ' +
     'Performance: ~0.1ms per 6 entries observed; expect well under a second on ' +
-    'thousand-entry worlds. NOT for compendium content (use search_compendium) and NOT ' +
+    'thousand-entry worlds. NOT for compendium content (use pf2e_search_compendium) and NOT ' +
     'for PF2e rules text (use https://2e.aonprd.com/ via web-fetch).',
   inputSchema: SearchJournalsInput,
   async handler(input, ctx) {

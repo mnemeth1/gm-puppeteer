@@ -1,5 +1,5 @@
 /**
- * page.evaluate body for remove_condition. Counterpart to apply_condition.
+ * page.evaluate body for pf2e_remove_condition. Counterpart to pf2e_apply_condition.
  * Decrements a condition's value or removes it entirely, by slug or by the
  * embedded condition item's id.
  *
@@ -22,7 +22,7 @@
  *       conditionsSlugs` to surface a clean `CONDITION_NOT_FOUND` instead
  *       of a downstream throw.
  *     - `conditionId`: the embedded item's id (matches the `id` returned
- *       by `get_actor_state`'s `ConditionEntry`). Used when slug is
+ *       by `pf2e_get_actor_state`'s `ConditionEntry`). Used when slug is
  *       ambiguous — primarily for the speculative multi-instance case.
  *    Tool-layer schema enforces exactly one is set. Both paths converge
  *    on the same `decreaseCondition(slug, …)` call after resolution.
@@ -38,7 +38,7 @@
  *    `mode: "remove"`, or `mode: "decrement"` and previousValue ≤ 1, or
  *    non-valued); `decremented` (valued, mode: "decrement", previousValue
  *    > 1 — condition still present with reduced value); `noop` (condition
- *    wasn't on the actor; not an error, mirrors apply_condition's no-op
+ *    wasn't on the actor; not an error, mirrors pf2e_apply_condition's no-op
  *    precedent).
  *
  *  - **Cascade visibility.** When a parent like Unconscious is removed,
@@ -48,7 +48,7 @@
  *    BEFORE the API call and surfaces it in `cascadeDeleted` on the
  *    `removed` operation. To keep the response truthful regardless of
  *    PF2e's hook reliability (same risk profile as
- *    `remove_item_from_actor`), the tool also force-deletes any
+ *    `pf2e_remove_item_from_actor`), the tool also force-deletes any
  *    cascade-tagged survivors after the API call.
  *
  *  - **Vitals are pure pass-through.** `decreaseCondition` routes the
@@ -59,9 +59,9 @@
  *    recovery-save flow, not in the raw condition-removal API. The tool
  *    therefore neither surfaces nor suppresses any wounded side effect;
  *    callers needing the post-call vitals state should issue a fresh
- *    `get_actor_state`. Same contract boundary as apply_condition.
+ *    `pf2e_get_actor_state`. Same contract boundary as pf2e_apply_condition.
  *
- *  - **`persistent-damage` is rejected.** Mirrors apply_condition.
+ *  - **`persistent-damage` is rejected.** Mirrors pf2e_apply_condition.
  *    Removing a persistent-damage instance via slug is ambiguous (an actor
  *    can carry multiple persistent-damage items of different damage types),
  *    and the PF2e UI routes through `PersistentDamageEditor` for these.
@@ -79,7 +79,7 @@
  *    is rare but not impossible.
  *
  *  - **Actor type support.** `character`, `npc`, `familiar` — same set as
- *    apply_condition / get_actor_state. Other types (party, loot, hazard,
+ *    pf2e_apply_condition / pf2e_get_actor_state. Other types (party, loot, hazard,
  *    vehicle, army) don't carry the condition machinery and are rejected
  *    with `ACTOR_TYPE_UNSUPPORTED`.
  *
@@ -154,7 +154,7 @@ export interface RemoveConditionErr {
 
 export type RemoveConditionResult = RemoveConditionOk | RemoveConditionErr;
 
-/** Actor types this tool will mutate. Mirrors apply_condition's set. */
+/** Actor types this tool will mutate. Mirrors pf2e_apply_condition's set. */
 export const SUPPORTED_ACTOR_TYPES = ['character', 'npc', 'familiar'] as const;
 
 export async function removeConditionBody(
@@ -219,7 +219,7 @@ export async function removeConditionBody(
   const actorType = typeof actor.type === 'string' ? actor.type : '';
   if (!SUPPORTED.has(actorType)) {
     return fail(
-      `Actor type '${actorType}' is not supported by remove_condition. ` +
+      `Actor type '${actorType}' is not supported by pf2e_remove_condition. ` +
         `Supported types: character, npc, familiar. ` +
         `(party/loot/hazard/vehicle/army actors do not carry the condition machinery.)`,
       {
@@ -259,7 +259,7 @@ export async function removeConditionBody(
     if (item.type !== 'condition') {
       return fail(
         `Item ${input.conditionId} on actor ${actor.id ?? input.actorId} is not a condition ` +
-          `(type='${typeof item.type === 'string' ? item.type : ''}'). remove_condition only ` +
+          `(type='${typeof item.type === 'string' ? item.type : ''}'). pf2e_remove_condition only ` +
           `operates on items of type 'condition'.`,
         {
           actorId: input.actorId,
@@ -282,7 +282,7 @@ export async function removeConditionBody(
     }
     if (itemSlug === PERSISTENT_DAMAGE_SLUG) {
       return fail(
-        `Item ${input.conditionId} is a persistent-damage condition. remove_condition does not ` +
+        `Item ${input.conditionId} is a persistent-damage condition. pf2e_remove_condition does not ` +
           `support persistent-damage in v1. Use foundry_eval with actor.deleteEmbeddedDocuments ` +
           `to remove a specific persistent-damage instance by id.`,
         {
@@ -316,7 +316,7 @@ export async function removeConditionBody(
 
     if (resolvedSlug === PERSISTENT_DAMAGE_SLUG) {
       return fail(
-        `Slug 'persistent-damage' is not supported by remove_condition in v1. ` +
+        `Slug 'persistent-damage' is not supported by pf2e_remove_condition in v1. ` +
           `Multiple persistent-damage instances can co-exist on an actor (one per damage type), ` +
           `and the PF2e UI routes these through PersistentDamageEditor. Use foundry_eval with ` +
           `actor.deleteEmbeddedDocuments against a specific id for now.`,
@@ -419,7 +419,7 @@ export async function removeConditionBody(
   // -- Issue the API call.
   await actor.decreaseCondition(resolvedSlug, willRemove ? { forceRemove: true } : undefined);
 
-  // -- Post-call cascade enforcement (mirrors remove_item_from_actor):
+  // -- Post-call cascade enforcement (mirrors pf2e_remove_item_from_actor):
   // PF2e's cascade-on-delete hook depends on the parent carrying a
   // matching GrantItem rule. We pre-walked by the child's grantedBy flag,
   // which is the truthier signal; force-delete any cascade-tagged

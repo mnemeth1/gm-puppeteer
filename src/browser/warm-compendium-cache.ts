@@ -5,19 +5,19 @@ import type { Logger } from '../logging.js';
  * Kicks off the background compendium warm and returns immediately.
  *
  * The warm exists to populate Foundry's *internal* compendium cache so
- * the user's first search_compendium query of the session is fast.
+ * the user's first pf2e_search_compendium query of the session is fast.
  * scripts/probe-compendium-doc-cache.mjs verified that Foundry v14 /
  * PF2e 8.1.2 already self-caches both pack.getIndex({ fields }) and
  * pack.getDocument(id) results on identity — a second call with the
  * same arguments is a no-op. So this warm does NOT maintain its own
- * Map; it just calls the same Foundry APIs that search_compendium
+ * Map; it just calls the same Foundry APIs that pf2e_search_compendium
  * would call, getting the docs into Foundry's cache where they stay
  * for the rest of the session.
  *
  * Two phases:
  *
  *   Phase 1 — widened getIndex over every Actor + Item pack in
- *     parallel. After this, every search_compendium Stage-A call
+ *     parallel. After this, every pf2e_search_compendium Stage-A call
  *     hits Foundry's index cache instead of paying the cold cost
  *     (which is ~250 ms for a small pack, up to ~25 s for the
  *     5636-entry equipment-srd on a large world). Foundry serializes

@@ -12,14 +12,14 @@ const CreateScrollOrWandInput = z
       .string()
       .min(1)
       .describe(
-        'World actor id (matches the actorId returned by get_actor_inventory). The destination actor.',
+        'World actor id (matches the actorId returned by pf2e_get_actor_inventory). The destination actor.',
       ),
     spellUuid: z
       .string()
       .min(1)
       .describe(
         'Full compendium Spell UUID (e.g. "Compendium.pf2e.spells-srd.Item.gKKqvLohtrSJj3BM"), ' +
-          'as returned by search_compendium with documentType: "Item" and filter type: "spell". ' +
+          'as returned by pf2e_search_compendium with documentType: "Item" and filter type: "spell". ' +
           'Must resolve to an Item whose type is "spell". Cantrips, focus spells, and rituals ' +
           "are rejected — they don't have a meaningful scroll/wand equivalent in PF2e.",
       ),
@@ -69,7 +69,7 @@ const CreateScrollOrWandInput = z
   .strict();
 
 export const createScrollOrWandTool: ToolDefinition<typeof CreateScrollOrWandInput> = {
-  name: 'create_scroll_or_wand',
+  name: 'pf2e_create_scroll_or_wand',
   description:
     'Generate a spell-specific scroll or wand consumable from a Spell UUID and place it on an ' +
     'actor. Mirrors PF2e\'s "drag a spell onto an actor" UI workflow: clones the generic per-rank ' +
@@ -82,7 +82,7 @@ export const createScrollOrWandTool: ToolDefinition<typeof CreateScrollOrWandInp
     'have a meaningful scroll/wand equivalent in the PF2e rules. For PF2e rules text on specific ' +
     'spells, look up the spell at https://2e.aonprd.com/ rather than parsing the embedded ' +
     'description. For granting an existing physical compendium item (a Wand of Heal compendium ' +
-    'entry, a Healing Potion), use add_item_to_actor instead — this tool is specifically for ' +
+    'entry, a Healing Potion), use pf2e_add_item_to_actor instead — this tool is specifically for ' +
     'spell-to-consumable generation.',
   inputSchema: CreateScrollOrWandInput,
   async handler(input, ctx) {
@@ -109,7 +109,7 @@ export const createScrollOrWandTool: ToolDefinition<typeof CreateScrollOrWandInp
         spellUuid: input.spellUuid,
         quantity: result.item.quantity,
       },
-      'create_scroll_or_wand',
+      'pf2e_create_scroll_or_wand',
     );
     return [jsonText(result)];
   },

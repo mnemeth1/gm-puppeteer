@@ -1,5 +1,5 @@
 /**
- * page.evaluate body for request_check. Posts a PF2e `@Check[...]`
+ * page.evaluate body for pf2e_request_check. Posts a PF2e `@Check[...]`
  * inline-button chat message asking a player to roll a check for their
  * own character. Rolls nothing itself — the player clicks the button.
  *
@@ -8,7 +8,7 @@
  * actual roll. The message is whispered to the actor's owner(s) plus
  * GMs, and its speaker is set to the target PC so the PF2e button
  * resolves the roll to that character. For an NPC's real check use
- * `roll_check`; for raw dice use `roll_dice`.
+ * `pf2e_roll_check`; for raw dice use `roll_dice`.
  *
  * The posted content is a full sentence, not a bare button — the
  * enriched `@Check` anchor is wrapped as `<Name>, roll a/an <button>
@@ -146,8 +146,8 @@ export async function requestCheckBody(input: RequestCheckInput): Promise<Reques
   if (actor.type !== 'character') {
     return fail(
       `Actor '${actor.name ?? input.actorId}' is not a player character (type ` +
-        `${actor.type ?? 'unknown'}). request_check asks a player to roll for their PC. ` +
-        `To roll an NPC's check yourself, use roll_check.`,
+        `${actor.type ?? 'unknown'}). pf2e_request_check asks a player to roll for their PC. ` +
+        `To roll an NPC's check yourself, use pf2e_roll_check.`,
       { actorId: input.actorId, actorType: actor.type ?? null, reason: 'ACTOR_NOT_A_PC' },
     );
   }

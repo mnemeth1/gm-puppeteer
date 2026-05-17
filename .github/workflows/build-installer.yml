@@ -1,0 +1,136 @@
+name: build-installer
+
+# Builds the self-contained Windows installer. Every push to main uploads the
+# .exe as a workflow artifact; pushing a v* tag also publishes a GitHub Release
+# with the .exe attached.
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Run tests
+        run: npm test
+
+      # ---- Derive version strings -------------------------------------------
+      - name: Compute installer version
+        shell: pwsh
+        run: |
+          if ($env:GITHUB_REF -like 'refs/tags/v*') {
+            $v = $env:GITHUB_REF_NAME
+          } else {
+            $v = "0.0.0-dev+$($env:GITHUB_SHA.Substring(0,7))"
+          }
+          "APP_VERSION=$v" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          $nodeVer = (node --version).TrimStart('v')
+          "NODE_VERSION=$nodeVer" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+
+      # ---- Stage the runtime payload ----------------------------------------
+      - name: Stage dist
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force staging\dist | Out-Null
+          Copy-Item -Recurse -Force dist\* staging\dist\
+
+      - name: Install production node_modules into staging
+        shell: pwsh
+        run: |
+          Copy-Item package.json, package-lock.json staging\
+          Push-Location staging
+          # --ignore-scripts: skip puppeteer's postinstall; Chromium is staged
+          # separately below and reached via PUPPETEER_EXECUTABLE_PATH.
+          npm ci --omit=dev --ignore-scripts
+          Pop-Location
+
+      - name: Bundle the Node 24 Windows runtime
+        shell: pwsh
+        run: |
+          $zip = "node-v$($env:NODE_VERSION)-win-x64"
+          curl.exe -fL -o node.zip "https://nodejs.org/dist/v$($env:NODE_VERSION)/$zip.zip"
+          Expand-Archive node.zip -DestinationPath node-extract -Force
+          New-Item -ItemType Directory -Force staging\node | Out-Null
+          Copy-Item -Recurse -Force "node-extract\$zip\*" staging\node\
+
+      - name: Cache Chromium
+        id: chromium-cache
+        uses: actions/cache@v4
+        with:
+          path: staging\chromium
+          key: chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Download Chromium for Puppeteer
+        if: steps.chromium-cache.outputs.cache-hit != 'true'
+        shell: pwsh
+        env:
+          PUPPETEER_CACHE_DIR: ${{ github.workspace }}\staging\chromium
+        run: npx puppeteer browsers install chrome
+
+      - name: Resolve flattened Chromium directory
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem -Recurse -Filter chrome.exe staging\chromium |
+                 Select-Object -First 1
+          if (-not $exe) { throw 'chrome.exe not found under staging\chromium' }
+          "CHROME_DIR=$($exe.Directory.FullName)" |
+            Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Compile installer
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          & $iscc `
+            "/DAppVersion=$($env:APP_VERSION)" `
+            "/DChromeDir=$($env:CHROME_DIR)" `
+            installer\gm-puppeteer.iss
+          if ($LASTEXITCODE -ne 0) { throw "ISCC failed ($LASTEXITCODE)" }
+
+      # A code-signing step (signtool) could slot in here before upload.
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gm-puppeteer-installer
+          path: installer\Output\*.exe
+          retention-days: 14
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download installer artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: gm-puppeteer-installer
+          path: dist-installer
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist-installer/*.exe
+          generate_release_notes: true

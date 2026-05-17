@@ -4,7 +4,7 @@ import { useItemBody, type UseItemResult } from '../evaluators/use-item.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
 /**
- * Schema for `use_item`. Single-shape input: actorId, itemId. The tool
+ * Schema for `pf2e_use_item`. Single-shape input: actorId, itemId. The tool
  * runs the PF2e use pipeline for one item per call — quantity is fixed
  * at 1. Callers who want to consume multiple charges or items invoke
  * the tool repeatedly.
@@ -21,14 +21,14 @@ const UseItemInput = z
       .string()
       .min(1)
       .describe(
-        'World actor id (matches the actorId returned by get_actor_inventory). The actor who ' +
+        'World actor id (matches the actorId returned by pf2e_get_actor_inventory). The actor who ' +
           'is using the item.',
       ),
     itemId: z
       .string()
       .min(1)
       .describe(
-        'Id of an item ALREADY ON the actor (the `id` field returned by get_actor_inventory). ' +
+        'Id of an item ALREADY ON the actor (the `id` field returned by pf2e_get_actor_inventory). ' +
           'This is NOT a compendium UUID — the item must be embedded on this actor. Must be ' +
           'type "consumable" (potion, scroll, wand, elixir, talisman, etc.) or type "equipment" ' +
           'with an activation; other physical types (weapon, armor, shield, backpack, treasure, ' +
@@ -38,7 +38,7 @@ const UseItemInput = z
   .strict();
 
 export const useItemTool: ToolDefinition<typeof UseItemInput> = {
-  name: 'use_item',
+  name: 'pf2e_use_item',
   description:
     "Activate or consume one item from a world actor's inventory: drink a potion, read a " +
     "scroll, expend a wand charge, click an equipment activation. Runs PF2e's use pipeline " +
@@ -54,8 +54,8 @@ export const useItemTool: ToolDefinition<typeof UseItemInput> = {
     'items are gated with NO_CHARGES_REMAINING when at zero, since PF2e silently no-ops in ' +
     'that case. Wand and scroll consumption silently aborts on actors without a spellcasting ' +
     'entry; the tool detects this and returns USE_HAD_NO_EFFECT with a hint. ' +
-    'For pure state edits (set quantity, decrement without chat), use update_item_quantity or ' +
-    'remove_item_from_actor. For weapon attacks, armor donning, and other non-use interactions, ' +
+    'For pure state edits (set quantity, decrement without chat), use pf2e_update_item_quantity or ' +
+    'pf2e_remove_item_from_actor. For weapon attacks, armor donning, and other non-use interactions, ' +
     'use foundry_eval or wait for the dedicated tools. PF2e rules text on specific items ' +
     '(what a Bestial Mutagen actually does) lives at https://2e.aonprd.com/ — this tool ' +
     'executes the mechanical pipeline but does not explain item effects.',
@@ -86,7 +86,7 @@ export const useItemTool: ToolDefinition<typeof UseItemInput> = {
         deleted: result.item.deleted,
         chatMessageId: result.chatMessageId,
       },
-      'use_item',
+      'pf2e_use_item',
     );
     return [jsonText(result)];
   },

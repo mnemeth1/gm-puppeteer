@@ -1,9 +1,9 @@
 /**
- * page.evaluate body for move_item_to_container. Relocates an existing
+ * page.evaluate body for pf2e_move_item_to_container. Relocates an existing
  * physical item on an actor into a different container on the same
  * actor, or to root inventory (containerId: null). The third member of
- * the inventory-mutation cluster, alongside `add_item_to_actor`
- * (merge-add) and `update_item_quantity` (set quantity). First tool to
+ * the inventory-mutation cluster, alongside `pf2e_add_item_to_actor`
+ * (merge-add) and `pf2e_update_item_quantity` (set quantity). First tool to
  * mutate a relational field (system.containerId) rather than a scalar.
  *
  * Behavior nuances confirmed by scripts/probe-move-item-to-container.mjs
@@ -21,19 +21,19 @@
  *    no-op at the document layer: `updateEmbeddedDocuments` returns
  *    `[]`, does NOT throw. The tool surfaces this via
  *    `containerIdBefore === containerIdAfter` in the response — no
- *    separate `noop` flag (mirrors update_item_quantity's qtyBefore /
+ *    separate `noop` flag (mirrors pf2e_update_item_quantity's qtyBefore /
  *    qtyAfter precedent).
  *  - Foundry does NOT auto-merge stacks when a containerId update
  *    aligns two siblings on `compendiumSource + containerId +
  *    identification.status` (Phase 1 Q4 verified two distinct stacks
  *    survive). The tool implements the merge branch explicitly,
- *    identical in shape to `add_item_to_actor`'s merge identity:
+ *    identical in shape to `pf2e_add_item_to_actor`'s merge identity:
  *    same `_stats.compendiumSource` + same destination `containerId` +
  *    same `system.identification.status`. The merge folds the source
  *    item's quantity into the matching sibling and deletes the source.
  *    The source item's id is intentionally NOT echoed in the merged
  *    response — it no longer exists; callers holding stale ids must
- *    refresh via `get_actor_inventory`.
+ *    refresh via `pf2e_get_actor_inventory`.
  *  - Moving a container with contents leaves the contents inside the
  *    container (their `containerId` references are unaffected by the
  *    parent's move; Phase 1 Q5 verified). No cascade work needed.
@@ -56,8 +56,8 @@
  *    nothing.
  *
  * No quantity input — partial-stack moves (split-and-move) are
- * out of scope; compose from `update_item_quantity` (decrement source) +
- * `add_item_to_actor` (create destination) until a dedicated
+ * out of scope; compose from `pf2e_update_item_quantity` (decrement source) +
+ * `pf2e_add_item_to_actor` (create destination) until a dedicated
  * `split_item` tool exists.
  *
  * No identification input — identification changes are a separate
@@ -65,11 +65,11 @@
  *
  * No `destinationActorId` — cross-actor transfer has different
  * semantics (rune carryover, identification rules, merge identity
- * spans actors) and belongs in a future `transfer_item_between_actors`
+ * spans actors) and belongs in a future `pf2e_transfer_item_between_actors`
  * tool.
  *
  * No numeric inputs — the strict-int / no-coerce convention from
- * `update_item_quantity` is intentionally absent here because the
+ * `pf2e_update_item_quantity` is intentionally absent here because the
  * surface has no scalar parameters.
  *
  * Note: This function is serialized via Puppeteer's `page.evaluate`,
@@ -188,8 +188,8 @@ export async function moveItemToContainerBody(
   });
 
   // Surface the identified (canonical) name regardless of an item's
-  // current identification status. Mirrors update_item_quantity /
-  // remove_item_from_actor.
+  // current identification status. Mirrors pf2e_update_item_quantity /
+  // pf2e_remove_item_from_actor.
   const identifiedName = (item: ItemDocLike): string => {
     const sys = (item.system as AnyRecord | undefined) ?? {};
     const ident = sys.identification as AnyRecord | undefined;
@@ -236,7 +236,7 @@ export async function moveItemToContainerBody(
   const targetType: string = typeof target.type === 'string' ? target.type : '';
   if (!PHYSICAL_ITEM_TYPES.has(targetType)) {
     return fail(
-      `move_item_to_container requires a physical item type; this item is '${targetType}'. ` +
+      `pf2e_move_item_to_container requires a physical item type; this item is '${targetType}'. ` +
         `Non-physical items (feats, actions, spells, ancestries, etc.) do not have a ` +
         `\`system.containerId\` field — Foundry silently drops the update. Physical types: ` +
         `${PHYSICAL_TYPES_LIST}. Use foundry_eval if you need to manipulate non-physical items.`,
@@ -332,7 +332,7 @@ export async function moveItemToContainerBody(
       ? (target.system.quantity as number)
       : 1;
 
-  // -- Merge candidate lookup. Same identity check as add_item_to_actor:
+  // -- Merge candidate lookup. Same identity check as pf2e_add_item_to_actor:
   //   same compendium source (non-null) + same destination containerId
   //   (null counts) + same identification status. The source item is
   //   excluded explicitly (id mismatch).
@@ -342,7 +342,7 @@ export async function moveItemToContainerBody(
   // identity in their contents — so folding qty-1 + qty-1 into a qty-2
   // backpack would be a UX disaster (the source backpack's contents
   // would be orphaned at the actor top level). Foundry's UI doesn't
-  // merge containers either. This is a known gap in `add_item_to_actor`
+  // merge containers either. This is a known gap in `pf2e_add_item_to_actor`
   // too, but doesn't surface there because the source is always a fresh
   // compendium import with no contents.
   let mergeMatch: ItemDocLike | null = null;

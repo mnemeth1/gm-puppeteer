@@ -7,8 +7,8 @@ import {
 import { jsonText, type ToolDefinition } from './types.js';
 
 /**
- * Schema for `transfer_item_between_actors`. Cross-actor cousin of
- * `move_item_to_container`. The single tool covers five operations
+ * Schema for `pf2e_transfer_item_between_actors`. Cross-actor cousin of
+ * `pf2e_move_item_to_container`. The single tool covers five operations
  * (transferred, transferredAndMerged, split, splitAndMerged,
  * cascadeTransferred) — the evaluator picks the right one based on
  * `quantity` and the target item's type.
@@ -20,21 +20,21 @@ const TransferItemBetweenActorsInput = z
       .min(1)
       .describe(
         'World actor id holding the item that will be transferred away (matches the actorId ' +
-          'returned by get_actor_inventory).',
+          'returned by pf2e_get_actor_inventory).',
       ),
     destinationActorId: z
       .string()
       .min(1)
       .describe(
         'World actor id that will receive the item. Must differ from sourceActorId — use ' +
-          'move_item_to_container for same-actor moves.',
+          'pf2e_move_item_to_container for same-actor moves.',
       ),
     itemId: z
       .string()
       .min(1)
       .describe(
         'Id of the item to transfer (the `id` field on the source actor returned by ' +
-          'get_actor_inventory). Must be a physical inventory type: weapon, armor, shield, ' +
+          'pf2e_get_actor_inventory). Must be a physical inventory type: weapon, armor, shield, ' +
           'consumable, equipment, backpack, treasure, ammo.',
       ),
     destinationContainerId: z
@@ -75,7 +75,7 @@ const TransferItemBetweenActorsInput = z
 
 export const transferItemBetweenActorsTool: ToolDefinition<typeof TransferItemBetweenActorsInput> =
   {
-    name: 'transfer_item_between_actors',
+    name: 'pf2e_transfer_item_between_actors',
     description:
       'Move a physical inventory item from one actor to another. Handles single-stack transfer, ' +
       'partial-stack split transfer (move N of a stack), stack-merging into matching destination ' +
@@ -91,10 +91,10 @@ export const transferItemBetweenActorsTool: ToolDefinition<typeof TransferItemBe
       'into a destination stack; {operation: "cascadeTransferred", root, descendants} for a ' +
       'container subtree move (descendants list every nested item with its remapped ' +
       'containerIdAfter on the destination). Source itemIds in the response refer to the source ' +
-      'actor and are no longer valid post-call; refresh via get_actor_inventory on the destination. ' +
-      'Merge identity matches add_item_to_actor: compendium source + destination containerId + ' +
+      'actor and are no longer valid post-call; refresh via pf2e_get_actor_inventory on the destination. ' +
+      'Merge identity matches pf2e_add_item_to_actor: compendium source + destination containerId + ' +
       'identification status. Pass merge: "never" to opt out. ' +
-      'Same-actor calls are rejected (use move_item_to_container). Non-physical items are rejected ' +
+      'Same-actor calls are rejected (use pf2e_move_item_to_container). Non-physical items are rejected ' +
       '(use foundry_eval). Source items with PF2e ChoiceSet rules are rejected (would block on ' +
       'a selection dialog in headless context). Partial-quantity on a container is rejected ' +
       '(backpacks have unique identity in their contents).',
@@ -156,7 +156,7 @@ export const transferItemBetweenActorsTool: ToolDefinition<typeof TransferItemBe
       ) {
         logFields.brokenGrantLinkCount = result.brokenGrantLinks.length;
       }
-      ctx.log.info(logFields, 'transfer_item_between_actors');
+      ctx.log.info(logFields, 'pf2e_transfer_item_between_actors');
       return [jsonText(result)];
     },
   };

@@ -1,9 +1,9 @@
 /**
- * page.evaluate body for apply_condition. First tool in the condition-
+ * page.evaluate body for pf2e_apply_condition. First tool in the condition-
  * mutation cluster. Applies a PF2e condition to an actor — by slug, with
  * optional value for valued conditions (frightened, sickened, stupefied,
- * etc.). Sibling to `remove_condition` (decrement / clear) and
- * `set_condition_value` (absolute set) — this is the take-max apply
+ * etc.). Sibling to `pf2e_remove_condition` (decrement / clear) and
+ * `pf2e_set_condition_value` (absolute set) — this is the take-max apply
  * operation.
  *
  * Semantics confirmed by scripts/probe-apply-condition.mjs against
@@ -69,14 +69,14 @@
  *    which would block in the headless GM client. v1 rejects with
  *    `PERSISTENT_DAMAGE_NOT_SUPPORTED` and a pointer to foundry_eval +
  *    raw `createEmbeddedDocuments` with the structured `{formula,
- *    damageType, dc}` shape from get_actor_state.
+ *    damageType, dc}` shape from pf2e_get_actor_state.
  *
  *  - **Cascade visibility.** Applying dying spawns unconscious; uncon-
  *    scious spawns blinded + prone (verified Phase 1 — 4-deep chain via
  *    `flags.pf2e.grantedBy.id`). The tool surfaces the FULL transitive
  *    closure in `cascadeGranted` (BFS from the applied condition), so
  *    GM tools downstream see every condition that landed in one
- *    response. Mirrors add_item_to_actor's `cascadeGranted` shape, but
+ *    response. Mirrors pf2e_add_item_to_actor's `cascadeGranted` shape, but
  *    transitive rather than direct-only (cascade chains are deeper in
  *    PF2e's condition graph than in the GrantItem-rule graph).
  *
@@ -85,13 +85,13 @@
  *    `silent` flag is needed because there is nothing to suppress.
  *
  *  - **Actor type support.** `character`, `npc`, `familiar` — same set
- *    as get_actor_state. Reject `army`, `hazard`, `loot`, `party`,
+ *    as pf2e_get_actor_state. Reject `army`, `hazard`, `loot`, `party`,
  *    `vehicle` with ACTOR_TYPE_UNSUPPORTED.
  *
  *  - **No-op as success.** When the requested value is at-or-below
  *    current (after clamping requested at max), the result is
- *    `operation: "noop"`. Same precedent as `update_item_quantity`
- *    (qtyBefore === qtyAfter) and `move_item_to_container`
+ *    `operation: "noop"`. Same precedent as `pf2e_update_item_quantity`
+ *    (qtyBefore === qtyAfter) and `pf2e_move_item_to_container`
  *    (containerIdBefore === containerIdAfter). Reason discriminates the
  *    non-valued ("already_present") vs valued
  *    ("already_at_or_above_requested_value") sub-cases.
@@ -158,7 +158,7 @@ export interface ApplyConditionErr {
 
 export type ApplyConditionResult = ApplyConditionOk | ApplyConditionErr;
 
-/** Actor types this tool will mutate. Mirrors get_actor_state's set. */
+/** Actor types this tool will mutate. Mirrors pf2e_get_actor_state's set. */
 export const SUPPORTED_ACTOR_TYPES = ['character', 'npc', 'familiar'] as const;
 
 export async function applyConditionBody(
@@ -224,7 +224,7 @@ export async function applyConditionBody(
   const actorType = typeof actor.type === 'string' ? actor.type : '';
   if (!SUPPORTED.has(actorType)) {
     return fail(
-      `Actor type '${actorType}' is not supported by apply_condition. ` +
+      `Actor type '${actorType}' is not supported by pf2e_apply_condition. ` +
         `Supported types: character, npc, familiar. ` +
         `(party/loot/hazard/vehicle/army actors do not carry the condition machinery.)`,
       {
@@ -257,7 +257,7 @@ export async function applyConditionBody(
   // -- Reject persistent-damage up front (opens a dialog).
   if (input.slug === PERSISTENT_DAMAGE_SLUG) {
     return fail(
-      `Slug 'persistent-damage' is not supported by apply_condition because PF2e's ` +
+      `Slug 'persistent-damage' is not supported by pf2e_apply_condition because PF2e's ` +
         `increaseCondition path opens PersistentDamageEditor (a UI dialog) which blocks in the ` +
         `headless GM client. Use foundry_eval with actor.createEmbeddedDocuments and the ` +
         `structured persistent shape ({formula, damageType, dc, criticalHit}) for now; a ` +

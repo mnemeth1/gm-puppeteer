@@ -47,8 +47,8 @@ export const getTokenDetailsTool: ToolDefinition<typeof GetTokenDetailsInput> = 
     'so the projection reflects what is actually rendered. Defaults to the active scene; pass ' +
     'sceneId for a different scene. Companion to get_scene_tokens: pass any token id from the ' +
     'list into this tool for full detail. NOT a stat-block view — for actor-side combat state ' +
-    '(HP, AC, conditions, saves, initiative) call get_actor_state; for the full NPC/creature ' +
-    'stat block (skills, attacks, spells, defenses) call get_creature_details. NOT for ' +
+    '(HP, AC, conditions, saves, initiative) call pf2e_get_actor_state; for the full NPC/creature ' +
+    'stat block (skills, attacks, spells, defenses) call pf2e_get_creature_details. NOT for ' +
     'enumerating tokens — use get_scene_tokens when you need the list. NOT for actors not yet ' +
     'placed on a scene — token documents only exist scene-bound; use list_world_actors for the ' +
     'actor directory and place_token_at_grid / place_token_at_screen_pixel to create one. Pass ' +

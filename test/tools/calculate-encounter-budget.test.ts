@@ -30,7 +30,7 @@ async function run(input: {
   return JSON.parse((blocks[0] as { text: string }).text) as CalculateEncounterBudgetResult;
 }
 
-describe('calculate_encounter_budget', () => {
+describe('pf2e_calculate_encounter_budget', () => {
   it('moderate L5 party-of-4: 80 XP, no party-size adjustment', async () => {
     const r = await run({ partyLevel: 5, partySize: 4, difficulty: 'moderate' });
     expect(r.totalXp).toBe(80);

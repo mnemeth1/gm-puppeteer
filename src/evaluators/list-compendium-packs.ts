@@ -2,15 +2,15 @@
  * page.evaluate body for list_compendium_packs. Enumerates `game.packs`
  * (the CompendiumCollection registry) and projects the minimum
  * identifying fields a caller needs to pick a pack id for a downstream
- * tool (`search_compendium`'s `pack` / `packs` filter, etc.). NOT a
- * search-of-pack-contents view — that is `search_compendium`'s surface.
+ * tool (`pf2e_search_compendium`'s `pack` / `packs` filter, etc.). NOT a
+ * search-of-pack-contents view — that is `pf2e_search_compendium`'s surface.
  *
  * Behavior nuances confirmed by probe against Foundry v14.361 + PF2e 8.1.2:
  *
  *  - **`collection` / `documentName` are non-empty strings.** Probed
  *    across all 95 sandbox packs: 0 missing, 0 non-string for either
  *    field. `collection` is the pack id callers pass back into
- *    `search_compendium` (e.g. `pf2e.pathfinder-bestiary`).
+ *    `pf2e_search_compendium` (e.g. `pf2e.pathfinder-bestiary`).
  *    `documentName` is the Foundry document class (`Actor`, `Item`,
  *    `JournalEntry`, `RollTable`, `Macro`; in other worlds `Scene`,
  *    `Adventure`, `Cards` may also appear).

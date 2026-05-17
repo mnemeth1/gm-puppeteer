@@ -1,21 +1,21 @@
 /**
- * page.evaluate body for get_creature_details. Returns full per-creature
+ * page.evaluate body for pf2e_get_creature_details. Returns full per-creature
  * data for any Foundry Actor of type `npc`, `hazard`, or `familiar`
- * resolved by UUID. NPC sibling of get_item_details: UUID-input, per-type
+ * resolved by UUID. NPC sibling of pf2e_get_item_details: UUID-input, per-type
  * projection, opt-in escape hatches.
  *
- * **Scope vs get_actor_state.** This tool is the **static stat-block**
+ * **Scope vs pf2e_get_actor_state.** This tool is the **static stat-block**
  * reference — AC, HP, saves, perception, abilities, speeds, strikes,
  * spellcasting, skills. It works on BOTH compendium-resident creatures
  * (for encounter prep before spawning) and world-resident NPCs (for
  * inspection after spawning). It deliberately does NOT enumerate
  * conditions, effects, vitals (dying/wounded/doomed), resources (hero
  * points, focus pool), or encounter state — those are runtime concerns
- * that belong to get_actor_state.
+ * that belong to pf2e_get_actor_state.
  *
- * **Scope vs get_actor_state on PCs.** PC actors (`type === 'character'`)
+ * **Scope vs pf2e_get_actor_state on PCs.** PC actors (`type === 'character'`)
  * are rejected with ACTOR_TYPE_UNSUPPORTED. PCs go through
- * get_actor_state — they have a different surface (class/ancestry/
+ * pf2e_get_actor_state — they have a different surface (class/ancestry/
  * heritage identity, hero points, full skill tree by rank) that this
  * tool doesn't model.
  *
@@ -30,7 +30,7 @@
  *    `system.publication` (the item path). Same `{title, authors,
  *    license, remaster}` shape. PF2e gives ad-hoc / system-default
  *    actors an empty stamp (`{title: "", ...}`); we collapse that to
- *    `null` using the same empty-title-sentinel as get_item_details.
+ *    `null` using the same empty-title-sentinel as pf2e_get_item_details.
  *  - **Traits / rarity / size.** `system.traits.value` (array),
  *    `system.traits.rarity` (string), `system.traits.size.value`
  *    (e.g. "tiny", "sm", "med", "lg", etc.).
@@ -134,7 +134,7 @@
  *    NPCs. `system.description.value` is the item-pattern path used by
  *    items; actors typically don't populate it. We try `publicNotes`
  *    first and fall back to `description.value`. Subject to the
- *    `descriptionFormat` flag like get_item_details.
+ *    `descriptionFormat` flag like pf2e_get_item_details.
  *
  * Note: This function is serialized via Puppeteer's `page.evaluate`,
  * which ships only the function's own source string to the browser.
@@ -417,9 +417,9 @@ export async function getCreatureDetailsBody(
       error: {
         code: 'ACTOR_TYPE_UNSUPPORTED',
         message:
-          `Actor type '${actorType}' is not supported by get_creature_details. ` +
+          `Actor type '${actorType}' is not supported by pf2e_get_creature_details. ` +
           `Supported types: npc, hazard, familiar. ` +
-          `For PC actors (type='character'), use get_actor_state. ` +
+          `For PC actors (type='character'), use pf2e_get_actor_state. ` +
           `For army/loot/party/vehicle, use foundry_eval — this tool is for creature stat blocks.`,
         details: { uuid: input.uuid, type: actorType, reason: 'ACTOR_TYPE_UNSUPPORTED' },
       },
@@ -492,7 +492,7 @@ export async function getCreatureDetailsBody(
   const sourceUuidRaw = get(doc._stats, 'compendiumSource');
   const sourceUuid = typeof sourceUuidRaw === 'string' ? sourceUuidRaw : null;
 
-  // Empty-title sentinel collapses to null — same rule as get_item_details.
+  // Empty-title sentinel collapses to null — same rule as pf2e_get_item_details.
   let publication: PublicationInfo | null = null;
   const pubRaw = obj(get(get(sys, 'details'), 'publication'));
   if (pubRaw) {
@@ -930,7 +930,7 @@ export async function getCreatureDetailsBody(
   // PF2e's live `actor.system` includes Stat instances, Map-like
   // collections, and other class instances that CDP's structured-clone
   // pipeline drops to `undefined`. JSON-roundtrip coerces them to plain
-  // values that survive the wire — same pattern as get_actor_state.
+  // values that survive the wire — same pattern as pf2e_get_actor_state.
   if (input.includeRawSystem) {
     try {
       out.rawSystem = JSON.parse(JSON.stringify(sys)) as Record<string, unknown>;

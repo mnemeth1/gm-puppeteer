@@ -4,7 +4,7 @@ import { rollCheckBody, type RollCheckResult } from '../evaluators/roll-check.js
 import { jsonText, type ToolDefinition } from './types.js';
 
 /**
- * Schema for `roll_check`. Rolls one non-PC actor's real statistic
+ * Schema for `pf2e_roll_check`. Rolls one non-PC actor's real statistic
  * check (perception, a skill, or a save) through the PF2e pipeline.
  * Character actors are rejected — the deputy never rolls for a PC.
  */
@@ -16,7 +16,7 @@ const RollCheckInput = z
       .describe(
         'World actor id of the NPC / hazard / familiar to roll for (as returned by ' +
           'list_world_actors). Character actors are rejected with ACTOR_IS_PC — use ' +
-          'request_check to ask a player to roll for their own PC.',
+          'pf2e_request_check to ask a player to roll for their own PC.',
       ),
     checkType: z
       .enum([
@@ -66,7 +66,7 @@ const RollCheckInput = z
   .strict();
 
 export const rollCheckTool: ToolDefinition<typeof RollCheckInput> = {
-  name: 'roll_check',
+  name: 'pf2e_roll_check',
   description:
     "Roll a non-PC actor's real statistic check and post the result to Foundry's chat " +
     "log. This runs the actor's actual stat-block modifier through the PF2e check " +
@@ -77,7 +77,7 @@ export const rollCheckTool: ToolDefinition<typeof RollCheckInput> = {
     'criticalSuccess / success / failure / criticalFailure (null when no dc was given). ' +
     'This tool is for NPCs, hazards, and familiars only: character actors are rejected ' +
     'with ACTOR_IS_PC. To ask a player to roll a check for their own character, use ' +
-    'request_check. For arbitrary dice not tied to a stat block, use roll_dice.',
+    'pf2e_request_check. For arbitrary dice not tied to a stat block, use roll_dice.',
   inputSchema: RollCheckInput,
   async handler(input, ctx) {
     const { page } = await ctx.browser.ensureStarted();
@@ -102,7 +102,7 @@ export const rollCheckTool: ToolDefinition<typeof RollCheckInput> = {
         visibility: result.visibility,
         chatMessageId: result.chatMessageId,
       },
-      'roll_check',
+      'pf2e_roll_check',
     );
     return [jsonText(result)];
   },

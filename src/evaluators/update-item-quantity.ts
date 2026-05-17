@@ -1,8 +1,8 @@
 /**
- * page.evaluate body for update_item_quantity. Sets the absolute
+ * page.evaluate body for pf2e_update_item_quantity. Sets the absolute
  * `system.quantity` on a physical inventory item embedded on an actor.
- * The set-operation sibling of `add_item_to_actor` (merge-add) and
- * `remove_item_from_actor` (decrement).
+ * The set-operation sibling of `pf2e_add_item_to_actor` (merge-add) and
+ * `pf2e_remove_item_from_actor` (decrement).
  *
  * Behavior nuances confirmed by scripts/probe-update-item-quantity.mjs
  * and scripts/probe-update-item-quantity-phase1.mjs against Foundry
@@ -30,10 +30,10 @@
  *    body re-validates `Number.isInteger` defensively in case a future
  *    direct caller bypasses zod.
  *  - Setting `system.quantity` to a negative integer is silently clamped
- *    to 0 by Foundry's schema (carried over from remove_item_from_actor
+ *    to 0 by Foundry's schema (carried over from pf2e_remove_item_from_actor
  *    Probe F). The zod layer rejects negative input with `.min(1)`, and
  *    `quantity: 0` is rejected with a dedicated `QUANTITY_ZERO` reason
- *    code that points the caller at `remove_item_from_actor`.
+ *    code that points the caller at `pf2e_remove_item_from_actor`.
  *  - Setting `system.quantity` on a non-physical type (feat, action,
  *    spell, etc.) is silently dropped by Foundry's schema — the field
  *    is not stored on the document. The tool's `UPDATE_ON_NON_PHYSICAL`
@@ -43,7 +43,7 @@
  * No cascade or ejection logic applies here — `updateEmbeddedDocuments`
  * does not trigger document deletes, so neither GrantItem cascade-deletes
  * nor container-ejection apply to a quantity change. This is a meaningful
- * simplification over `remove_item_from_actor`.
+ * simplification over `pf2e_remove_item_from_actor`.
  *
  * Note: This function is serialized via Puppeteer's `page.evaluate`, which
  * ships only the function's own source string to the browser. Module-scope
@@ -138,7 +138,7 @@ export async function updateItemQuantityBody(
     error: { code: 'INVALID_INPUT', message, details },
   });
 
-  // Same canonical-name helper as remove_item_from_actor. Surfacing the
+  // Same canonical-name helper as pf2e_remove_item_from_actor. Surfacing the
   // identified name keeps logs/audit clear ("you updated a Longsword
   // stack") even when the item displays an unidentified alias.
   const identifiedName = (item: ItemDocLike): string => {
@@ -175,7 +175,7 @@ export async function updateItemQuantityBody(
   const targetType: string = typeof target.type === 'string' ? target.type : '';
   if (!PHYSICAL_ITEM_TYPES.has(targetType)) {
     return fail(
-      `update_item_quantity requires a physical item type; this item is '${targetType}'. ` +
+      `pf2e_update_item_quantity requires a physical item type; this item is '${targetType}'. ` +
         `Non-physical items (feats, actions, spells, ancestries, etc.) do not have a ` +
         `\`system.quantity\` field — Foundry silently drops the update. Physical types: ` +
         `weapon, armor, shield, consumable, equipment, backpack, treasure, ammo.`,
@@ -193,8 +193,8 @@ export async function updateItemQuantityBody(
   // "5" → 5, -3 → 0).
   if (input.quantity === 0) {
     return fail(
-      `Setting quantity to 0 is not supported by update_item_quantity. Use ` +
-        `remove_item_from_actor with mode: "delete" to remove the item, or ` +
+      `Setting quantity to 0 is not supported by pf2e_update_item_quantity. Use ` +
+        `pf2e_remove_item_from_actor with mode: "delete" to remove the item, or ` +
         `mode: "decrement" with quantity equal to current to clamp it.`,
       {
         quantity: input.quantity,

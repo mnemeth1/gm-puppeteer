@@ -122,7 +122,7 @@ export const updateTokenTool: ToolDefinition<typeof UpdateTokenInput> = {
     '(use `move_token`). NOT for creating tokens (use `place_token_at_grid` or ' +
     '`place_token_at_screen_pixel`). NOT for deleting tokens (use `delete_token`). NOT ' +
     'for actor stat-block changes — those live on the actor document and are owned by ' +
-    '`get_actor_state` and other actor tools.',
+    '`pf2e_get_actor_state` and other actor tools.',
   inputSchema: UpdateTokenInput,
   async handler(input, ctx) {
     const { page } = await ctx.browser.ensureStarted();

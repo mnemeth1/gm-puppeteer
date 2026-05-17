@@ -24,10 +24,26 @@ any game system. A specialized Pathfinder 2e layer adds powerful features like
 condition management, encounter budgeting, scroll/wand creation, and creature
 stat block handling.
 
+## Download
+
+> [!WARNING]
+> The Windows installer is **not code-signed**. The first time you run it,
+> Windows SmartScreen will show a blue **"Windows protected your PC"** screen —
+> this is expected for any unsigned installer. To continue, click the small
+> **More info** link, then press the **Run anyway** button that appears.
+
+# ⬇️ [Download the latest Windows installer](https://github.com/mnemeth1/gm-puppeteer/releases/latest)
+
+Grab the `gm-puppeteer-setup-*.exe` from the latest release: a self-contained,
+per-user installer (~250–300 MB) that bundles its own Node runtime and Chromium
+— no separate installs needed. See
+[Install on Windows](#install-on-windows-installer) for what the setup wizard
+walks you through.
+
 ## Tools
 
 64 typed tools. The catalog below is grouped by area; the final group —
-and `roll_check` / `request_check` — require the Pathfinder 2e system
+and `pf2e_roll_check` / `pf2e_request_check` — require the Pathfinder 2e system
 loaded, the rest are Foundry-core.
 
 ### Scenes & canvas
@@ -52,14 +68,14 @@ loaded, the rest are Foundry-core.
 
 - **`list_world_actors`** — enumerate every actor in the world (id, uuid, name, type, level, folder, active-scene presence).
 - **`create_actor_from_compendium`** — import a compendium actor into the world.
-- **`get_actor_inventory`** — read-only list of an actor's physical inventory and currency.
-- **`get_item_details`** — read-only full-detail view of any Foundry Item by UUID.
-- **`add_item_to_actor`** — grant a physical item from a compendium source to an actor.
-- **`remove_item_from_actor`** — delete an inventory item or decrement its quantity.
-- **`update_item_quantity`** — set the absolute quantity of a physical item on an actor.
-- **`update_item_uses`** — set the remaining charges/uses on an item (e.g. wand recharge).
-- **`move_item_to_container`** — relocate a physical item between containers (or to/from root).
-- **`transfer_item_between_actors`** — move a physical item (or container subtree) between actors.
+- **`pf2e_get_actor_inventory`** — read-only list of an actor's physical inventory and currency.
+- **`pf2e_get_item_details`** — read-only full-detail view of any Foundry Item by UUID.
+- **`pf2e_add_item_to_actor`** — grant a physical item from a compendium source to an actor.
+- **`pf2e_remove_item_from_actor`** — delete an inventory item or decrement its quantity.
+- **`pf2e_update_item_quantity`** — set the absolute quantity of a physical item on an actor.
+- **`pf2e_update_item_uses`** — set the remaining charges/uses on an item (e.g. wand recharge).
+- **`pf2e_move_item_to_container`** — relocate a physical item between containers (or to/from root).
+- **`pf2e_transfer_item_between_actors`** — move a physical item (or container subtree) between actors.
 
 ### Combat
 
@@ -73,8 +89,8 @@ loaded, the rest are Foundry-core.
 ### Dice & checks
 
 - **`roll_dice`** — evaluate a raw dice formula and post it to chat; optional NPC speaker, GM/blind visibility.
-- **`roll_check`** — roll a non-PC actor's real statistic check via the PF2e pipeline and post the result (PF2e).
-- **`request_check`** — post a whispered full-sentence PF2e `@Check` prompt asking a player to roll for their PC (PF2e).
+- **`pf2e_roll_check`** — roll a non-PC actor's real statistic check via the PF2e pipeline and post the result (PF2e).
+- **`pf2e_request_check`** — post a whispered full-sentence PF2e `@Check` prompt asking a player to roll for their PC (PF2e).
 
 ### Chat
 
@@ -107,7 +123,7 @@ loaded, the rest are Foundry-core.
 
 ### Compendium
 
-- **`search_compendium`** — name/structured-filter search across compendium packs.
+- **`pf2e_search_compendium`** — name/structured-filter search across compendium packs.
 - **`list_compendium_packs`** — enumerate compendium packs (id, label, system, document type).
 
 ### World & diagnostics
@@ -119,15 +135,15 @@ loaded, the rest are Foundry-core.
 
 Require the PF2e system loaded on the world.
 
-- **`get_creature_details`** — full stat-block view of any NPC, hazard, or familiar by UUID.
-- **`get_actor_state`** — read-only projection of an actor's combat-relevant state.
-- **`get_available_conditions`** — enumerate PF2e conditions with valued/unvalued status and caps.
-- **`apply_condition`** — apply a PF2e condition to an actor (take-max semantics).
-- **`remove_condition`** — decrement or remove a PF2e condition from an actor.
-- **`set_condition_value`** — set a valued PF2e condition to an absolute value on an actor.
-- **`create_scroll_or_wand`** — generate a spell-specific scroll or wand from a Spell UUID onto an actor.
-- **`use_item`** — run the PF2e use pipeline for one consumable or equipment activation.
-- **`calculate_encounter_budget`** — PF2e GMG XP budget, cost table, and mix skeletons for a party.
+- **`pf2e_get_creature_details`** — full stat-block view of any NPC, hazard, or familiar by UUID.
+- **`pf2e_get_actor_state`** — read-only projection of an actor's combat-relevant state.
+- **`pf2e_get_available_conditions`** — enumerate PF2e conditions with valued/unvalued status and caps.
+- **`pf2e_apply_condition`** — apply a PF2e condition to an actor (take-max semantics).
+- **`pf2e_remove_condition`** — decrement or remove a PF2e condition from an actor.
+- **`pf2e_set_condition_value`** — set a valued PF2e condition to an absolute value on an actor.
+- **`pf2e_create_scroll_or_wand`** — generate a spell-specific scroll or wand from a Spell UUID onto an actor.
+- **`pf2e_use_item`** — run the PF2e use pipeline for one consumable or equipment activation.
+- **`pf2e_calculate_encounter_budget`** — PF2e GMG XP budget, cost table, and mix skeletons for a party.
 
 ## Prerequisites
 
@@ -156,6 +172,29 @@ npm run build
 
 This compiles TypeScript to `dist/`. The server entry point is
 `dist/index.js`. Re-run `npm run build` after any source change.
+
+## Install on Windows (installer)
+
+For a non-developer Windows setup there is a self-contained installer — no
+clone, no `npm`, no separate Node install. Download the latest
+`gm-puppeteer-setup-*.exe` from the project's GitHub Releases and run it.
+
+The installer:
+
+- installs per-user to `%LOCALAPPDATA%\gm-puppeteer` (no administrator rights);
+- bundles a Node 24 runtime, the prebuilt server, and its own Chromium, so it
+  works fully offline once downloaded;
+- collects every setting from the [Configuration](#configuration) table in a
+  wizard and writes them to a `.env` in the install directory;
+- detects Claude Desktop, Claude Code, Cursor, and OpenCode, and can merge a
+  `gm-puppeteer` MCP entry into the ones you tick (all unticked by default; a
+  timestamped backup of each config is written first).
+
+To reconfigure later, edit `%LOCALAPPDATA%\gm-puppeteer\.env` and restart your
+MCP client — that one file is the single source of truth. The installer is
+unsigned, so Windows SmartScreen will warn on first run ("More info" → "Run
+anyway"). The installer is built by `.github/workflows/build-installer.yml`;
+see [`installer/README.md`](installer/README.md) to build it locally.
 
 ## Configuration
 

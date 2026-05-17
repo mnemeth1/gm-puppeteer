@@ -1,4 +1,4 @@
-import { isAbsolute } from 'node:path';
+import { isAbsolute, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadConfig } from '../src/config.js';
 
@@ -27,8 +27,11 @@ describe('loadConfig', () => {
   });
 
   it('resolves FORGE_PROFILE_DIR to an absolute path', () => {
-    const cfg = loadConfig({ FORGE_PROFILE_DIR: '/srv/forge/session' });
-    expect(cfg.forgeProfileDir).toBe('/srv/forge/session');
+    // Build the input via resolve() so the literal is absolute on both POSIX
+    // and Windows (a bare '/srv/...' gains a drive letter on Windows).
+    const absolute = resolve('/srv/forge/session');
+    const cfg = loadConfig({ FORGE_PROFILE_DIR: absolute });
+    expect(cfg.forgeProfileDir).toBe(absolute);
     // A relative path is resolved against cwd.
     expect(isAbsolute(loadConfig({ FORGE_PROFILE_DIR: 'my-profile' }).forgeProfileDir)).toBe(true);
   });

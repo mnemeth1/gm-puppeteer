@@ -1,5 +1,5 @@
 /**
- * page.evaluate body for search_compendium. Two-stage filter pass:
+ * page.evaluate body for pf2e_search_compendium. Two-stage filter pass:
  *
  *   Stage A — Widened index. For each pack visited, call
  *     pack.getIndex({ fields: [...] }) with the paths the active

@@ -9,14 +9,14 @@ const AddItemToActorInput = z
       .string()
       .min(1)
       .describe(
-        'World actor id (matches the actorId returned by get_actor_inventory). The destination actor.',
+        'World actor id (matches the actorId returned by pf2e_get_actor_inventory). The destination actor.',
       ),
     sourceUuid: z
       .string()
       .min(1)
       .describe(
         'Full compendium Item UUID (e.g. "Compendium.pf2e.equipment-srd.Item.LJdbVTOZog39EEbi"), ' +
-          'as returned by search_compendium. Must point to a physical inventory item type. ' +
+          'as returned by pf2e_search_compendium. Must point to a physical inventory item type. ' +
           'Actor-embedded UUIDs (Actor.X.Item.Y) are rejected — cross-actor moves are not yet ' +
           'supported.',
       ),
@@ -60,7 +60,7 @@ const AddItemToActorInput = z
   .strict();
 
 export const addItemToActorTool: ToolDefinition<typeof AddItemToActorInput> = {
-  name: 'add_item_to_actor',
+  name: 'pf2e_add_item_to_actor',
   description:
     'Grant a physical inventory item from a compendium source to a world actor. Handles ' +
     'quantity, container placement, identification status, and automatic stack-merging ' +
@@ -100,7 +100,7 @@ export const addItemToActorTool: ToolDefinition<typeof AddItemToActorInput> = {
             }),
         cascadeCount: result.cascadeGranted?.length ?? 0,
       },
-      'add_item_to_actor',
+      'pf2e_add_item_to_actor',
     );
     return [jsonText(result)];
   },

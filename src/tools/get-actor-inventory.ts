@@ -19,7 +19,7 @@ const GetActorInventoryInput = z
   .strict();
 
 export const getActorInventoryTool: ToolDefinition<typeof GetActorInventoryInput> = {
-  name: 'get_actor_inventory',
+  name: 'pf2e_get_actor_inventory',
   description:
     "Read-only list view of an actor's physical inventory (weapons, armor, shields, " +
     'consumables, equipment, treasure, containers, ammo) plus their currency. Returns one ' +
@@ -28,7 +28,7 @@ export const getActorInventoryTool: ToolDefinition<typeof GetActorInventoryInput
     'runes. NO description text. Containers are returned as normal entries; nested items ' +
     'point back via containerId. Non-physical items (feats, spells, ancestries, conditions, ' +
     'NPC strike defs, etc.) are excluded — those belong to future per-domain tools. Use ' +
-    'get_item_details for full per-item data including description.',
+    'pf2e_get_item_details for full per-item data including description.',
   inputSchema: GetActorInventoryInput,
   async handler(input, ctx) {
     const { page } = await ctx.browser.ensureStarted();

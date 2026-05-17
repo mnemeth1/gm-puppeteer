@@ -27,11 +27,13 @@ const SELECTOR_JOIN_SUBMIT = '#join-game-form button[name="join"]';
 
 const VIEWPORT = { width: 1920, height: 1080 } as const;
 
+// The sandbox-disabling flags are a Linux/WSL workaround (no user namespaces
+// in the dev/CI containers) and a security downgrade we do not want on the
+// bundled-Chromium Windows installer build, where the sandbox works fine.
+// `--enable-unsafe-swiftshader` is needed on every platform: software WebGL
+// is what lets Foundry's PIXI canvas render headless.
 const CHROME_LAUNCH_ARGS = [
-  '--no-sandbox',
-  '--disable-setuid-sandbox',
-  // Software WebGL needs an explicit opt-in on recent Chromium so Foundry's
-  // PIXI canvas works in headless. Has no effect for trusted-content use.
+  ...(process.platform === 'win32' ? [] : ['--no-sandbox', '--disable-setuid-sandbox']),
   '--enable-unsafe-swiftshader',
 ] as const;
 

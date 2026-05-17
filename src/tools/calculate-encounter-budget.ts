@@ -216,7 +216,7 @@ function computeBudget(
 }
 
 export const calculateEncounterBudgetTool: ToolDefinition<typeof CalculateEncounterBudgetInput> = {
-  name: 'calculate_encounter_budget',
+  name: 'pf2e_calculate_encounter_budget',
   description:
     'Encode the PF2e Gamemastery Guide encounter-budget math. Given a partyLevel (1-25), ' +
     'partySize (1-12), and difficulty (trivial/low/moderate/severe/extreme), return the total ' +
@@ -229,8 +229,8 @@ export const calculateEncounterBudgetTool: ToolDefinition<typeof CalculateEncoun
     'suggestedMixes is a SKELETON, not a roster — the LLM still has to pick actual creatures ' +
     "that fit the GM's scene and theme. An empty suggestedMixes array means no template hit " +
     'the budget exactly; the caller can compose from the creatureCosts table directly. ' +
-    'Not for: choosing specific creatures (use search_compendium + the upcoming ' +
-    'get_creature_details), rolling random encounters (that is the roll-tables cluster — ' +
+    'Not for: choosing specific creatures (use pf2e_search_compendium + the upcoming ' +
+    'pf2e_get_creature_details), rolling random encounters (that is the roll-tables cluster — ' +
     'deferring to dice skips the AI thematic-curation step), or computing treasure budgets ' +
     '(separate concern). Fractional party sizes are not supported.',
   inputSchema: CalculateEncounterBudgetInput,
@@ -244,7 +244,7 @@ export const calculateEncounterBudgetTool: ToolDefinition<typeof CalculateEncoun
         totalXp: result.totalXp,
         mixCount: result.suggestedMixes.length,
       },
-      'calculate_encounter_budget',
+      'pf2e_calculate_encounter_budget',
     );
     return [jsonText(result)];
   },

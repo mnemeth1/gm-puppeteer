@@ -2,7 +2,7 @@
  * page.evaluate body for list_world_actors. Enumerates every actor in
  * `game.actors.contents` and projects the minimum identifying / triage
  * fields a caller needs to pick an `actorId` for a downstream tool
- * (`get_actor_state`, `get_actor_inventory`, `get_creature_details`,
+ * (`pf2e_get_actor_state`, `pf2e_get_actor_inventory`, `pf2e_get_creature_details`,
  * mutation tools, etc.). NOT a stat-block view.
  *
  * Behavior nuances confirmed by probe against Foundry v14.361 + PF2e 8.1.2:

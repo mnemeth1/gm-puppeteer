@@ -13,7 +13,7 @@ const CreateActorFromCompendiumInput = z
       .min(1)
       .describe(
         'Full compendium document UUID, e.g. "Compendium.pf2e.iconics.Actor.TMDFyqQtryffdHvE". ' +
-          'Returned by `search_compendium` under the `uuid` field.',
+          'Returned by `pf2e_search_compendium` under the `uuid` field.',
       ),
     name: z
       .string()

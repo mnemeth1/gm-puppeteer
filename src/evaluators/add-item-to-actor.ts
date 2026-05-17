@@ -1,5 +1,5 @@
 /**
- * page.evaluate body for add_item_to_actor. Grants a physical item from a
+ * page.evaluate body for pf2e_add_item_to_actor. Grants a physical item from a
  * compendium source to a world actor. Handles quantity, container
  * placement, identification status, and stack-merging that emulates the
  * Foundry UI's drag-to-merge behavior.
@@ -207,7 +207,7 @@ export async function addItemToActorBody(
   const sourceType = typeof source.type === 'string' ? source.type : '';
   if (!PHYSICAL_ITEM_TYPES.has(sourceType)) {
     return fail(
-      `sourceUuid points to a ${sourceType}; add_item_to_actor handles physical inventory items only (${PHYSICAL_TYPES_LIST}). Use foundry_eval to grant non-physical items.`,
+      `sourceUuid points to a ${sourceType}; pf2e_add_item_to_actor handles physical inventory items only (${PHYSICAL_TYPES_LIST}). Use foundry_eval to grant non-physical items.`,
       { sourceUuid: input.sourceUuid, type: sourceType },
     );
   }
@@ -264,7 +264,7 @@ export async function addItemToActorBody(
   // Containers (type='backpack') are excluded from the merge path entirely
   // — two containers are NOT interchangeable, they carry identity in their
   // contents, and Foundry's UI doesn't merge them either. Same exclusion
-  // as in move_item_to_container's merge logic. In practice this branch
+  // as in pf2e_move_item_to_container's merge logic. In practice this branch
   // is forward-compat: the source is always a fresh compendium import
   // with empty contents, but the response would still lie about merge vs.
   // create if a user granted a second backpack to an existing stack.

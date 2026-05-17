@@ -7,24 +7,24 @@ import {
 import { jsonText, type ToolDefinition } from './types.js';
 
 /**
- * Schema for `move_item_to_container`. Single-shape input: actorId,
+ * Schema for `pf2e_move_item_to_container`. Single-shape input: actorId,
  * itemId, containerId (nullable — null = root inventory), merge
  * (defaults true).
  *
  * No numeric inputs — the strict-int / no-coerce convention from
- * `update_item_quantity` is intentionally absent here because the
+ * `pf2e_update_item_quantity` is intentionally absent here because the
  * surface has no scalar parameters.
  *
  * Out-of-scope inputs (do NOT add):
  *   - `quantity` — partial-stack moves are split-and-move; compose from
- *     `update_item_quantity` (decrement source) + `add_item_to_actor`
+ *     `pf2e_update_item_quantity` (decrement source) + `pf2e_add_item_to_actor`
  *     (create destination) until a `split_item` tool exists.
  *   - `identified` — identification changes are a separate concern;
  *     the move preserves the source's identification status.
  *   - `destinationActorId` — cross-actor transfer has different
  *     semantics (rune carryover, identification rules, merge identity
  *     across actors) and belongs in a future
- *     `transfer_item_between_actors` tool.
+ *     `pf2e_transfer_item_between_actors` tool.
  */
 const MoveItemToContainerInput = z
   .object({
@@ -32,14 +32,14 @@ const MoveItemToContainerInput = z
       .string()
       .min(1)
       .describe(
-        'World actor id (matches the actorId returned by get_actor_inventory). The actor whose ' +
+        'World actor id (matches the actorId returned by pf2e_get_actor_inventory). The actor whose ' +
           'item will be relocated.',
       ),
     itemId: z
       .string()
       .min(1)
       .describe(
-        'Id of the item to move (the `id` field returned by get_actor_inventory). NOT a ' +
+        'Id of the item to move (the `id` field returned by pf2e_get_actor_inventory). NOT a ' +
           'compendium UUID — the item must already be embedded on this actor. Must be a physical ' +
           'item type (weapon, armor, shield, consumable, equipment, backpack, treasure, ammo).',
       ),
@@ -66,10 +66,10 @@ const MoveItemToContainerInput = z
   .strict();
 
 export const moveItemToContainerTool: ToolDefinition<typeof MoveItemToContainerInput> = {
-  name: 'move_item_to_container',
+  name: 'pf2e_move_item_to_container',
   description:
     'Move a physical item between containers on the same actor, or to/from root inventory. ' +
-    'Sibling to add_item_to_actor (compendium → actor) and update_item_quantity (set quantity) — ' +
+    'Sibling to pf2e_add_item_to_actor (compendium → actor) and pf2e_update_item_quantity (set quantity) — ' +
     'this is the relational-field-mutation member of the inventory cluster, changing only ' +
     '`system.containerId`. ' +
     'Returns either {operation: "moved", item: {id, name, type, quantity, containerIdBefore, ' +
@@ -77,8 +77,8 @@ export const moveItemToContainerTool: ToolDefinition<typeof MoveItemToContainerI
     'clean same-destination no-op, NOT an error), or {operation: "merged", mergedInto: {id, name, ' +
     'type, qtyBefore, qtyAfter}} when the destination already had a matching sibling and merge ' +
     'folded the source into it (the source item id is no longer valid; refresh via ' +
-    'get_actor_inventory). ' +
-    'Merge identity matches add_item_to_actor: same compendium source + same destination ' +
+    'pf2e_get_actor_inventory). ' +
+    'Merge identity matches pf2e_add_item_to_actor: same compendium source + same destination ' +
     'containerId + same identification status. Pass merge: false to opt out. ' +
     'Moving a container with contents leaves the contents inside it (their containerId references ' +
     'are unaffected — Foundry handles this implicitly). ' +
@@ -86,7 +86,7 @@ export const moveItemToContainerTool: ToolDefinition<typeof MoveItemToContainerI
     '`system.containerId` field). Cycle-prevention is enforced by the tool: moving an item ' +
     'into itself, or into one of its own descendants, is rejected with CYCLE_DETECTED. ' +
     'Out of scope (use other tools / wait for dedicated ones): partial-stack moves (compose from ' +
-    'update_item_quantity + add_item_to_actor), cross-actor transfer, identification changes, ' +
+    'pf2e_update_item_quantity + pf2e_add_item_to_actor), cross-actor transfer, identification changes, ' +
     'sort-order reorder.',
   inputSchema: MoveItemToContainerInput,
   async handler(input, ctx) {
@@ -114,7 +114,7 @@ export const moveItemToContainerTool: ToolDefinition<typeof MoveItemToContainerI
           containerIdBefore: result.item.containerIdBefore,
           containerIdAfter: result.item.containerIdAfter,
         },
-        'move_item_to_container',
+        'pf2e_move_item_to_container',
       );
     } else {
       ctx.log.info(
@@ -126,7 +126,7 @@ export const moveItemToContainerTool: ToolDefinition<typeof MoveItemToContainerI
           qtyBefore: result.mergedInto.qtyBefore,
           qtyAfter: result.mergedInto.qtyAfter,
         },
-        'move_item_to_container',
+        'pf2e_move_item_to_container',
       );
     }
     return [jsonText(result)];

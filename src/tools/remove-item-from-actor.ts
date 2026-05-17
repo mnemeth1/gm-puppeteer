@@ -7,7 +7,7 @@ import {
 import { jsonText, type ToolDefinition } from './types.js';
 
 /**
- * Schema for `remove_item_from_actor`.
+ * Schema for `pf2e_remove_item_from_actor`.
  *
  * Flat object with a `mode` enum (`delete` | `decrement`). `quantity` and
  * `deleteIfZero` are only valid when `mode === 'decrement'`; supplying them
@@ -25,14 +25,14 @@ const RemoveItemFromActorInput = z
       .string()
       .min(1)
       .describe(
-        'World actor id (matches the actorId returned by get_actor_inventory). The actor to ' +
+        'World actor id (matches the actorId returned by pf2e_get_actor_inventory). The actor to ' +
           'modify.',
       ),
     itemId: z
       .string()
       .min(1)
       .describe(
-        'Id of an item ALREADY ON the actor (the `id` field returned by get_actor_inventory). ' +
+        'Id of an item ALREADY ON the actor (the `id` field returned by pf2e_get_actor_inventory). ' +
           'This is NOT a compendium UUID — the item must be embedded on this actor. For ' +
           "mode 'decrement', must be a physical item type (weapon, armor, shield, consumable, " +
           'equipment, backpack, treasure, ammo) — non-physical types like feats have no ' +
@@ -59,7 +59,7 @@ const RemoveItemFromActorInput = z
         "How many to remove from the stack (mode 'decrement' only). Default 1. Decrementing by " +
           'more than the current quantity is allowed and clamps to 0 — combined with ' +
           '`deleteIfZero: true`, this naturally collapses to a delete. If you want strict bounds, ' +
-          'read the current quantity via get_actor_inventory before calling.',
+          'read the current quantity via pf2e_get_actor_inventory before calling.',
       ),
     deleteIfZero: z
       .boolean()
@@ -92,10 +92,10 @@ const RemoveItemFromActorInput = z
   });
 
 export const removeItemFromActorTool: ToolDefinition<typeof RemoveItemFromActorInput> = {
-  name: 'remove_item_from_actor',
+  name: 'pf2e_remove_item_from_actor',
   description:
     "Remove an item from a world actor's inventory, OR decrement its quantity. Companion to " +
-    'add_item_to_actor. Two modes: "delete" removes the item entry entirely; "decrement" ' +
+    'pf2e_add_item_to_actor. Two modes: "delete" removes the item entry entirely; "decrement" ' +
     "reduces a physical item's `system.quantity` by N (default 1) and by default also deletes " +
     'the entry when quantity reaches 0. ' +
     'Returns one of three operations: ' +
@@ -108,7 +108,7 @@ export const removeItemFromActorTool: ToolDefinition<typeof RemoveItemFromActorI
     'contents — PF2e ejects them to the actor top-level by clearing their containerId. These ' +
     'promoted items are reported in `ejectedToTopLevel`. PF2e GrantItem children of the deleted ' +
     "item are auto-cascade-deleted and reported in `cascadeDeleted` (reason: 'grantedBy'). " +
-    'Use get_actor_inventory to discover the itemId to remove. For cross-actor moves or ' +
+    'Use pf2e_get_actor_inventory to discover the itemId to remove. For cross-actor moves or ' +
     'setting an exact quantity (not delta), use foundry_eval or wait for the dedicated tools.',
   inputSchema: RemoveItemFromActorInput,
   async handler(input, ctx) {
@@ -154,7 +154,7 @@ export const removeItemFromActorTool: ToolDefinition<typeof RemoveItemFromActorI
       logCtx.ejectedCount = result.ejectedToTopLevel.length;
       logCtx.cascadeCount = result.cascadeDeleted.length;
     }
-    ctx.log.info(logCtx, 'remove_item_from_actor');
+    ctx.log.info(logCtx, 'pf2e_remove_item_from_actor');
     return [jsonText(result)];
   },
 };

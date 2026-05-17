@@ -6,7 +6,7 @@
  * the projection-narrow `get_scene_tokens` view.
  *
  * Stat-block / combat data does NOT belong here; that lives on the linked
- * actor and is owned by `get_actor_state` and `get_creature_details`. This
+ * actor and is owned by `pf2e_get_actor_state` and `pf2e_get_creature_details`. This
  * tool returns the token document only and surfaces `actorId` + `actorMissing`
  * so a caller can chain.
  *

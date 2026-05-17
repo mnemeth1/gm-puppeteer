@@ -5,8 +5,8 @@
  * This is the GM-side "just roll some dice" path: a private GM d30, a
  * d10 spoken by an NPC, an open table d20. It is core-Foundry only —
  * no PF2e statistic pipeline, no degree-of-success. For an NPC's real
- * stat-block check use `roll_check`; to ask a player to roll, use
- * `request_check`.
+ * stat-block check use `pf2e_roll_check`; to ask a player to roll, use
+ * `pf2e_request_check`.
  *
  * Visibility maps to the core `Roll.toMessage` `rollMode` option:
  *   - public → 'publicroll' — visible to everyone (empty whisper).

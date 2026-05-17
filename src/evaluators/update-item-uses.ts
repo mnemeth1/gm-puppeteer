@@ -1,8 +1,8 @@
 /**
- * page.evaluate body for update_item_uses. Sets the absolute
+ * page.evaluate body for pf2e_update_item_uses. Sets the absolute
  * `system.uses.value` on a charges-tracking physical item embedded on
- * an actor. Sibling to `use_item` (decrement-with-side-effects) and
- * `update_item_quantity` (sets `system.quantity`).
+ * an actor. Sibling to `pf2e_use_item` (decrement-with-side-effects) and
+ * `pf2e_update_item_quantity` (sets `system.quantity`).
  *
  * Behavior nuances confirmed against Foundry v14.361 + PF2e 8.1.2:
  *  - `updateEmbeddedDocuments("Item", [{_id, "system.uses.value": N}])`
@@ -17,13 +17,13 @@
  *    detect over-set without a follow-up read.
  *  - `value === 0` is a legitimate "depleted" state. Direct field
  *    write does NOT trigger `autoDestroy` — that pipeline only fires
- *    inside `ConsumablePF2e.consume()`. Use `remove_item_from_actor`
+ *    inside `ConsumablePF2e.consume()`. Use `pf2e_remove_item_from_actor`
  *    if the item should also be deleted.
  *  - For potion-like items (`uses.max === 1`), the live counter that
- *    `use_item` decrements is `system.quantity`, not `system.uses.value`.
+ *    `pf2e_use_item` decrements is `system.quantity`, not `system.uses.value`.
  *    This tool writes `uses.value` faithfully regardless; semantic
  *    interpretation is the caller's. The tool description steers
- *    callers toward `update_item_quantity` for those items.
+ *    callers toward `pf2e_update_item_quantity` for those items.
  *  - Setting `system.uses.value` on an item without a `system.uses`
  *    field (e.g. a longsword) is silently dropped by Foundry — the
  *    schema does not store it. The tool's `ITEM_HAS_NO_USES_FIELD`
@@ -130,7 +130,7 @@ export async function updateItemUsesBody(
     error: { code: 'INVALID_INPUT', message, details },
   });
 
-  // Same canonical-name helper as update_item_quantity. Surfacing the
+  // Same canonical-name helper as pf2e_update_item_quantity. Surfacing the
   // identified name keeps logs/audit clear even when the item displays
   // an unidentified alias.
   const identifiedName = (item: ItemDocLike): string => {
@@ -167,7 +167,7 @@ export async function updateItemUsesBody(
   const targetType: string = typeof target.type === 'string' ? target.type : '';
   if (!PHYSICAL_ITEM_TYPES.has(targetType)) {
     return fail(
-      `update_item_uses requires a physical item type; this item is '${targetType}'. ` +
+      `pf2e_update_item_uses requires a physical item type; this item is '${targetType}'. ` +
         `Non-physical items (feats, actions, spells, ancestries, etc.) do not have a ` +
         `\`system.uses\` field — Foundry silently drops the update. Physical types: ` +
         `weapon, armor, shield, consumable, equipment, backpack, treasure, ammo. ` +
@@ -192,7 +192,7 @@ export async function updateItemUsesBody(
       `Item '${identifiedName(target)}' (type=${targetType}) has no \`system.uses\` ` +
         `tracker — there is no charges field to set. Items with \`system.uses\` are ` +
         `typically wands, scrolls, talismans, batons, and equipment with limited ` +
-        `activations. Use get_item_details to inspect the item's tracker before retrying.`,
+        `activations. Use pf2e_get_item_details to inspect the item's tracker before retrying.`,
       {
         itemId: input.itemId,
         type: targetType,
@@ -205,7 +205,7 @@ export async function updateItemUsesBody(
   // the MCP boundary, but the evaluator re-validates so a future direct
   // caller doesn't get silent Foundry coercion (1.5 → 1, "5" → 5).
   // Lower bound is 0 (depleted is legitimate) — divergence from
-  // update_item_quantity, which rejects 0.
+  // pf2e_update_item_quantity, which rejects 0.
   if (
     typeof input.value !== 'number' ||
     !Number.isInteger(input.value) ||

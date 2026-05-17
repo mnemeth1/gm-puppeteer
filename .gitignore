@@ -25,3 +25,7 @@ debug-output/
 
 # Local dev smoke-test harness for the browser login flow
 scripts/smoke-login.mjs
+
+# Windows installer build outputs (CI staging tree + compiled .exe)
+staging/
+installer/Output/

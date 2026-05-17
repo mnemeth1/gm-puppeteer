@@ -104,20 +104,20 @@ function hasAnyFilter(input: SearchCompendiumArgs): boolean {
 }
 
 export const searchCompendiumTool: ToolDefinition<typeof SearchCompendiumInput> = {
-  name: 'search_compendium',
+  name: 'pf2e_search_compendium',
   description:
     "Search the world's compendium packs for documents by name and/or structured filters. " +
     'Filters compose with AND: `query` (name substring), `pack`/`packs`, `type`, `actorType`, ' +
     '`itemType`, `level: {min, max}`, `traits[]` (any-of), `rarity`, `source[]` (any-of). All ' +
     'are optional, but at least one must be provided. Returns lightweight rows ' +
     '({id, uuid, name, type, pack, packLabel, img, level, traits, rarity, source}); follow-up ' +
-    'reads go through `get_item_details` or `get_creature_details`. `descriptionMatch` opts in ' +
+    'reads go through `pf2e_get_item_details` or `pf2e_get_creature_details`. `descriptionMatch` opts in ' +
     'to a full-document body scan and includes description fields on hits — expensive, so ' +
     'always pre-narrow with the cheap filters first. Searches *world content* (stat blocks, ' +
     'items, monsters to drop on scenes). NOT for PF2e rules text (actions, spells, feats, ' +
     'conditions, traits) — fetch those from https://2e.aonprd.com/ via web-fetch. Roll tables ' +
     'live in compendia as RollTable documents (use `type: "RollTable"`) but encounter-prep ' +
-    'should use this tool plus `get_creature_details`, not random rolls.',
+    'should use this tool plus `pf2e_get_creature_details`, not random rolls.',
   inputSchema: SearchCompendiumInput,
   async handler(input, ctx) {
     if (!hasAnyFilter(input)) {
@@ -127,7 +127,7 @@ export const searchCompendiumTool: ToolDefinition<typeof SearchCompendiumInput> 
           error: {
             code: 'NO_FILTERS',
             message:
-              'search_compendium requires at least one of query, pack, packs, type, actorType, itemType, level, traits, rarity, source, or descriptionMatch. Refusing to scan all world packs unconditionally.',
+              'pf2e_search_compendium requires at least one of query, pack, packs, type, actorType, itemType, level, traits, rarity, source, or descriptionMatch. Refusing to scan all world packs unconditionally.',
           },
         }),
       ];

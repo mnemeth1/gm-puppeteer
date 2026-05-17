@@ -4,8 +4,8 @@ import { applyConditionBody, type ApplyConditionResult } from '../evaluators/app
 import { jsonText, type ToolDefinition } from './types.js';
 
 /**
- * Schema for `apply_condition`. First tool in the condition-mutation
- * cluster (siblings `remove_condition` and `set_condition_value` to
+ * Schema for `pf2e_apply_condition`. First tool in the condition-mutation
+ * cluster (siblings `pf2e_remove_condition` and `pf2e_set_condition_value` to
  * follow). Take-max semantics: "ensure this condition is at value N
  * or above; otherwise no change."
  *
@@ -23,7 +23,7 @@ import { jsonText, type ToolDefinition } from './types.js';
  * No `silent` flag — Phase 1 confirmed that `actor.increaseCondition`
  * does NOT post to chat in PF2e 8.1.2. Nothing to suppress.
  *
- * No `source` / `grantedBy` parameter — apply_condition is direct
+ * No `source` / `grantedBy` parameter — pf2e_apply_condition is direct
  * application, not effect-cascade-grant. Use foundry_eval with raw
  * createEmbeddedDocuments if a manual grantedBy chain is needed.
  *
@@ -40,7 +40,7 @@ const ApplyConditionInput = z
       .string()
       .min(1)
       .describe(
-        'World actor id (matches the actorId returned by get_actor_state). The actor that will ' +
+        'World actor id (matches the actorId returned by pf2e_get_actor_state). The actor that will ' +
           'receive the condition. Must be a character, npc, or familiar; other actor types ' +
           '(party/loot/hazard/vehicle/army) are rejected.',
       ),
@@ -73,15 +73,15 @@ const ApplyConditionInput = z
   .strict();
 
 export const applyConditionTool: ToolDefinition<typeof ApplyConditionInput> = {
-  name: 'apply_condition',
+  name: 'pf2e_apply_condition',
   description:
     'Apply a PF2e condition to an actor. First tool in the condition-mutation cluster (sibling to ' +
-    'remove_condition and set_condition_value). Take-max semantics: the actor ends up at ' +
+    'pf2e_remove_condition and pf2e_set_condition_value). Take-max semantics: the actor ends up at ' +
     'max(current, value) for valued conditions, clamped to the effective max; non-valued ' +
     'conditions are toggled on if absent. ' +
     'Returns either {operation: "applied", condition, cascadeGranted?} when state changed, or ' +
     '{operation: "noop", condition, reason} when the actor was already at or above the requested ' +
-    "value (a clean no-op, NOT an error). Mirrors update_item_quantity's no-op-as-success " +
+    "value (a clean no-op, NOT an error). Mirrors pf2e_update_item_quantity's no-op-as-success " +
     'precedent. ' +
     'Cascade effects (e.g. dying spawns unconscious, which spawns blinded + prone) are surfaced in ' +
     'cascadeGranted as a transitive closure of every condition that landed in the call. ' +
@@ -121,7 +121,7 @@ export const applyConditionTool: ToolDefinition<typeof ApplyConditionInput> = {
           clamped: result.condition.clamped,
           cascadeCount: result.cascadeGranted?.length ?? 0,
         },
-        'apply_condition',
+        'pf2e_apply_condition',
       );
     } else {
       ctx.log.info(
@@ -133,7 +133,7 @@ export const applyConditionTool: ToolDefinition<typeof ApplyConditionInput> = {
           currentValue: result.condition.value,
           reason: result.reason,
         },
-        'apply_condition',
+        'pf2e_apply_condition',
       );
     }
     return [jsonText(result)];

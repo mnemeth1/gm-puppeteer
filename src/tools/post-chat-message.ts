@@ -10,7 +10,7 @@ import { jsonText, type ToolDefinition } from './types.js';
  * Schema for `post_chat_message`. Writes one message to Foundry's chat
  * log — GM narration, NPC dialogue, or a whisper to a player. Speaker
  * and visibility are independent parameters. This is not a roll tool:
- * for dice use `roll_dice` / `roll_check` / `request_check`.
+ * for dice use `roll_dice` / `pf2e_roll_check` / `pf2e_request_check`.
  */
 const PostChatMessageInput = z
   .object({
@@ -69,7 +69,7 @@ export const postChatMessageTool: ToolDefinition<typeof PostChatMessageInput> = 
     'independent, so an NPC can whisper a player just as the GM can. Returns ' +
     '{chatMessageId, speaker:{actorId, alias}, visibility, isWhisper, whisperedTo:' +
     '[{userId, userName, viaActorId}], whisperTargets:[{actorId, actorName}]}. This ' +
-    'tool does not roll dice — use roll_dice, roll_check, or request_check for that — ' +
+    'tool does not roll dice — use roll_dice, pf2e_roll_check, or pf2e_request_check for that — ' +
     'and does not read chat; use get_chat_messages to read the log.',
   inputSchema: PostChatMessageInput,
   async handler(input, ctx) {

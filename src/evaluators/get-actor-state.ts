@@ -1,12 +1,12 @@
 /**
- * page.evaluate body for get_actor_state. Returns a focused projection
+ * page.evaluate body for pf2e_get_actor_state. Returns a focused projection
  * of an actor's combat-relevant state: HP, AC, saves, perception,
  * attributes, speeds, conditions, effects, resources, IWR, vitals
  * (dying/wounded/doomed). Opt-in flags expand into skills, spellcasting,
  * encounter state, and the full raw system blob.
  *
  * Foundation read-tool for the condition-mutation cluster
- * (`apply_condition` / `remove_condition` / `set_condition_value`): those
+ * (`pf2e_apply_condition` / `pf2e_remove_condition` / `pf2e_set_condition_value`): those
  * tools need to know what's already on an actor before mutating, and the
  * projection's `conditions[]` shape (slug + value + grantedBy) directly
  * informs their input/response surface.
@@ -17,7 +17,7 @@
  *  - **Conditions** live as embedded items with `type === 'condition'`,
  *    enumerable via `actor.itemTypes.condition`. Per-item fields:
  *      `system.slug` — canonical PF2e slug, e.g. "frightened",
- *        "off-guard". This is what apply/remove_condition will accept.
+ *        "off-guard". This is what apply/pf2e_remove_condition will accept.
  *      `system.value: {isValued: bool, value: number | null}` —
  *        non-valued conditions (off-guard, prone) have
  *        `isValued: false, value: null`; valued (frightened, sickened,
@@ -418,7 +418,7 @@ export async function getActorStateBody(input: GetActorStateInput): Promise<GetA
       error: {
         code: 'ACTOR_TYPE_UNSUPPORTED',
         message:
-          `Actor type '${actorType}' is not supported by get_actor_state. ` +
+          `Actor type '${actorType}' is not supported by pf2e_get_actor_state. ` +
           `Supported types: character, npc, familiar. ` +
           `(party/loot/hazard/vehicle/army actors have a different shape ` +
           `and should be queried with their own future tools or foundry_eval.)`,
@@ -805,7 +805,7 @@ export async function getActorStateBody(input: GetActorStateInput): Promise<GetA
   // result). PF2e implements `toJSON` on its stat objects, so a
   // JSON.stringify roundtrip coerces the tree to plain objects/arrays/
   // primitives that survive the wire. This is the same pattern
-  // search_compendium uses when shipping index entries.
+  // pf2e_search_compendium uses when shipping index entries.
   if (input.includeRawSystem) {
     try {
       out.rawSystem = JSON.parse(JSON.stringify(sys)) as Record<string, unknown>;

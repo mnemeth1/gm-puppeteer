@@ -4,7 +4,7 @@ import { requestCheckBody, type RequestCheckResult } from '../evaluators/request
 import { jsonText, type ToolDefinition } from './types.js';
 
 /**
- * Schema for `request_check`. Posts a PF2e `@Check[...]` inline-button
+ * Schema for `pf2e_request_check`. Posts a PF2e `@Check[...]` inline-button
  * chat message asking a player to roll a check for their own PC. The
  * prompt is whispered to the actor's owner(s) plus GMs; the player
  * clicks the button to roll. This is the only player-facing roll tool —
@@ -18,7 +18,7 @@ const RequestCheckInput = z
       .describe(
         'World actor id of the player character to ask for a roll (as returned by ' +
           'list_world_actors). Must be a character actor — NPCs are rejected with ' +
-          'ACTOR_NOT_A_PC (use roll_check for NPC checks). When several PCs share the ' +
+          'ACTOR_NOT_A_PC (use pf2e_roll_check for NPC checks). When several PCs share the ' +
           "target's name, pick the one with onActiveScene: true in list_world_actors — " +
           'that is the character currently in play.',
       ),
@@ -84,7 +84,7 @@ const RequestCheckInput = z
   .strict();
 
 export const requestCheckTool: ToolDefinition<typeof RequestCheckInput> = {
-  name: 'request_check',
+  name: 'pf2e_request_check',
   description:
     'Ask a player to roll a check for their own character. Posts an explicit sentence ' +
     'with a clickable PF2e @Check button to Foundry\'s chat — e.g. "Valeros, roll a ' +
@@ -96,7 +96,7 @@ export const requestCheckTool: ToolDefinition<typeof RequestCheckInput> = {
     'player (default: GM-only). Returns {actor:{id, name}, checkType, dc, basic, ' +
     'checkExpression, whisperedTo:[{id, name}], chatMessageId}. ' +
     "Use this for player characters only — it is the deputy's player-facing roll path. " +
-    "To roll an NPC's real check yourself use roll_check; for raw dice use roll_dice.",
+    "To roll an NPC's real check yourself use pf2e_roll_check; for raw dice use roll_dice.",
   inputSchema: RequestCheckInput,
   async handler(input, ctx) {
     const { page } = await ctx.browser.ensureStarted();
@@ -123,7 +123,7 @@ export const requestCheckTool: ToolDefinition<typeof RequestCheckInput> = {
         whisperCount: result.whisperedTo.length,
         chatMessageId: result.chatMessageId,
       },
-      'request_check',
+      'pf2e_request_check',
     );
     return [jsonText(result)];
   },

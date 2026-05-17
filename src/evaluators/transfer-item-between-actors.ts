@@ -1,5 +1,5 @@
 /**
- * page.evaluate body for transfer_item_between_actors. Moves a physical
+ * page.evaluate body for pf2e_transfer_item_between_actors. Moves a physical
  * item from one actor's inventory to another's. Five operations live
  * inside one evaluator: full transfer, full-transfer-with-merge,
  * partial-stack split, partial-stack split-with-merge, and cascade
@@ -7,11 +7,11 @@
  *
  * This is the fifth inventory-mutation tool and the first that touches
  * two actors in a single call. The same-actor cousin
- * `move_item_to_container` rejects this surface explicitly
+ * `pf2e_move_item_to_container` rejects this surface explicitly
  * (src/evaluators/move-item-to-container.ts:66-69) because cross-actor
  * carries enough additional semantics (rune carryover, identification
  * status carryover, merge identity spanning actors, equipment state
- * reset) that bundling it into `move_item_to_container` would be a
+ * reset) that bundling it into `pf2e_move_item_to_container` would be a
  * "do not conflate" violation.
  *
  * Behavior nuances confirmed by scripts/probe-transfer-item-between-actors.mjs
@@ -21,7 +21,7 @@
  *    `createEmbeddedDocuments` (e.g. a PF2e schema rejection on the
  *    payload) leaves the source intact. The reverse order would risk
  *    silent data loss.
- *  - Stack-merge identity is identical to `add_item_to_actor`:
+ *  - Stack-merge identity is identical to `pf2e_add_item_to_actor`:
  *    `_stats.compendiumSource` + destination `containerId` + identification
  *    status. Containers (`type: "backpack"`) are excluded from merge
  *    because they have unique identity in their contents.
@@ -78,7 +78,7 @@
  *    on the destination because the transferred items receive fresh
  *    ids that the user could not have referenced in
  *    `destinationContainerId`. The destination container is validated
- *    for type-is-backpack the same way `move_item_to_container` does.
+ *    for type-is-backpack the same way `pf2e_move_item_to_container` does.
  *
  * Note: This function is serialized via Puppeteer's `page.evaluate`,
  * which ships only the function's own source string to the browser.
@@ -340,7 +340,7 @@ export async function transferItemBetweenActorsBody(
   if (input.sourceActorId === input.destinationActorId) {
     return fail(
       `sourceActorId and destinationActorId are the same actor (${input.sourceActorId}). ` +
-        `Use move_item_to_container for same-actor moves.`,
+        `Use pf2e_move_item_to_container for same-actor moves.`,
       { actorId: input.sourceActorId, reason: 'TRANSFER_TO_SAME_ACTOR' },
     );
   }
@@ -381,7 +381,7 @@ export async function transferItemBetweenActorsBody(
   const targetType: string = typeof target.type === 'string' ? target.type : '';
   if (!PHYSICAL_ITEM_TYPES.has(targetType)) {
     return fail(
-      `transfer_item_between_actors requires a physical item type; this item is '${targetType}'. ` +
+      `pf2e_transfer_item_between_actors requires a physical item type; this item is '${targetType}'. ` +
         `Non-physical items (feats, actions, spells, ancestries, etc.) do not move between actors ` +
         `this way. Physical types: ${PHYSICAL_TYPES_LIST}. Use foundry_eval if you need to ` +
         `manipulate non-physical items.`,

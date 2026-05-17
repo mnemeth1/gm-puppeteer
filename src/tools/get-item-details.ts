@@ -17,8 +17,8 @@ const GetItemDetailsInput = z
       .describe(
         'Full Foundry Item UUID. Two shapes are accepted uniformly: ' +
           '`Actor.{actorId}.Item.{itemId}` for actor-embedded items (the value returned in ' +
-          '`uuid` fields by get_actor_inventory), and `Compendium.{packCollectionId}.Item.{docId}` ' +
-          'for compendium-resident items (the value returned by search_compendium). Resolves via ' +
+          '`uuid` fields by pf2e_get_actor_inventory), and `Compendium.{packCollectionId}.Item.{docId}` ' +
+          'for compendium-resident items (the value returned by pf2e_search_compendium). Resolves via ' +
           "Foundry's `fromUuid` — handles both shapes without preloading the pack. Returns " +
           "NOT_FOUND error if the UUID doesn't resolve, WRONG_DOCUMENT_TYPE if it resolves to a " +
           'non-Item document.',
@@ -51,15 +51,15 @@ const GetItemDetailsInput = z
   .strict();
 
 export const getItemDetailsTool: ToolDefinition<typeof GetItemDetailsInput> = {
-  name: 'get_item_details',
+  name: 'pf2e_get_item_details',
   description:
     'Read-only fetch of full per-item data for any Foundry Item by UUID. Returns identification, ' +
     'provenance (compendium source, PF2e sourcebook citation), description (HTML and/or ' +
     'text-stripped with @-syntax preserved), traits, and a type-specific projection block. ' +
     'Physical items also get a shared `physical` block with bulk, price, equipment state, ' +
-    'identification status, hardness, HP. Companion to get_actor_inventory — pass any `uuid` ' +
+    'identification status, hardness, HP. Companion to pf2e_get_actor_inventory — pass any `uuid` ' +
     'value from inventory results to get full details. Also works on compendium-resident items ' +
-    'via `Compendium.{pack}.Item.{id}` UUIDs (use search_compendium to find them). Type-specific ' +
+    'via `Compendium.{pack}.Item.{id}` UUIDs (use pf2e_search_compendium to find them). Type-specific ' +
     'projections cover: weapon, armor, shield, consumable, equipment, container, treasure, ammo, ' +
     'feat, action, ancestry, heritage, background, class, lore, spell. Unknown types fall back ' +
     'to a raw-system view. Pass `includeRules: true` for raw PF2e rule elements (active-effects ' +
@@ -80,7 +80,7 @@ export const getItemDetailsTool: ToolDefinition<typeof GetItemDetailsInput> = {
     if (!KNOWN_PROJECTIONS.has(result.type)) {
       ctx.log.warn(
         { uuid: input.uuid, type: result.type },
-        'get_item_details: no typed projection for item type — falling back to rawSystem',
+        'pf2e_get_item_details: no typed projection for item type — falling back to rawSystem',
       );
     }
     return [jsonText(result)];

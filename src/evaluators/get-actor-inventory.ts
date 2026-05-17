@@ -1,7 +1,7 @@
 /**
- * page.evaluate body for get_actor_inventory. Returns a lightweight
+ * page.evaluate body for pf2e_get_actor_inventory. Returns a lightweight
  * structural projection of an actor's physical inventory plus their
- * currency. No description text — get_item_details handles the
+ * currency. No description text — pf2e_get_item_details handles the
  * detail-view shape.
  *
  * Behavior nuances confirmed by scripts/probe-actor-inventory*.mjs

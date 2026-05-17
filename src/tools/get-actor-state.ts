@@ -4,13 +4,13 @@ import { getActorStateBody, type GetActorStateResult } from '../evaluators/get-a
 import { jsonText, type ToolDefinition } from './types.js';
 
 /**
- * Schema for `get_actor_state`. Single required input (`actorId`) plus
+ * Schema for `pf2e_get_actor_state`. Single required input (`actorId`) plus
  * four opt-in flags that expand the projection.
  *
  * No `descriptionFormat`-style flag — this tool does not return HTML
  * descriptions of conditions or effects. Callers needing condition or
  * effect description text should pass the entry's id back through
- * `get_item_details` (or fetch the canonical PF2e rules from Archives
+ * `pf2e_get_item_details` (or fetch the canonical PF2e rules from Archives
  * of Nethys).
  *
  * No condition-filtering flag — the conditions array is returned in
@@ -66,14 +66,14 @@ const GetActorStateInput = z
   .strict();
 
 export const getActorStateTool: ToolDefinition<typeof GetActorStateInput> = {
-  name: 'get_actor_state',
+  name: 'pf2e_get_actor_state',
   description:
     "Read-only projection of an actor's combat-relevant state: HP, AC, saves, perception (with " +
     'senses), ability modifiers, speeds, active conditions, active effects, hero points / focus, ' +
     'immunities/weaknesses/resistances, and vitals (dying/wounded/doomed). Supports character, ' +
-    'npc, and familiar actor types. Companion to get_actor_inventory (items) and get_item_details ' +
+    'npc, and familiar actor types. Companion to pf2e_get_actor_inventory (items) and pf2e_get_item_details ' +
     "(per-item drill-down) — this tool is the “what's this actor's situation?” surface and the " +
-    'foundation for the condition-mutation cluster (apply_condition / remove_condition). ' +
+    'foundation for the condition-mutation cluster (pf2e_apply_condition / pf2e_remove_condition). ' +
     'AC.value is the effective AC with all current modifiers applied (raised shield, frightened, ' +
     'unconscious, etc.). Save and perception modifiers are likewise effective values. The ' +
     '`conditions[]` array lists embedded condition items with slug + value + grantedBy linkage; ' +
@@ -82,10 +82,10 @@ export const getActorStateTool: ToolDefinition<typeof GetActorStateInput> = {
     'Opt-in flags: includeSkills (full skill array), includeSpellcasting (entries with slots), ' +
     'includeEncounterState (full combatant shape vs just the inCombat boolean), includeRawSystem ' +
     '(full system blob). ' +
-    'Out of scope: inventory (use get_actor_inventory), per-item details (use get_item_details), ' +
-    'condition/effect HTML descriptions (use get_item_details on the embedded item id, or fetch ' +
-    'canonical rules from Archives of Nethys), mutation (use the future apply_condition / ' +
-    'remove_condition / set_condition_value tools), party aggregates, NPC stat-block lookup, ' +
+    'Out of scope: inventory (use pf2e_get_actor_inventory), per-item details (use pf2e_get_item_details), ' +
+    'condition/effect HTML descriptions (use pf2e_get_item_details on the embedded item id, or fetch ' +
+    'canonical rules from Archives of Nethys), mutation (use the future pf2e_apply_condition / ' +
+    'pf2e_remove_condition / pf2e_set_condition_value tools), party aggregates, NPC stat-block lookup, ' +
     'deltas vs. previous state.',
   inputSchema: GetActorStateInput,
   async handler(input, ctx) {

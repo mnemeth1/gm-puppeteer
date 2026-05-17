@@ -1,22 +1,22 @@
 /**
- * page.evaluate body for set_condition_value. Third tool in the condition-
- * mutation cluster (siblings: apply_condition for take-max increment,
- * remove_condition for decrement/clear). Sets a VALUED PF2e condition to
- * an absolute value N — fills the gap between apply_condition (which can
- * only raise) and remove_condition (which can only decrement-by-1 or
+ * page.evaluate body for pf2e_set_condition_value. Third tool in the condition-
+ * mutation cluster (siblings: pf2e_apply_condition for take-max increment,
+ * pf2e_remove_condition for decrement/clear). Sets a VALUED PF2e condition to
+ * an absolute value N — fills the gap between pf2e_apply_condition (which can
+ * only raise) and pf2e_remove_condition (which can only decrement-by-1 or
  * force-clear). Useful when a GM wants an exact mid-encounter value
  * ("frightened to 2") without cycling through multiple sibling calls.
  *
  * Semantics confirmed by scripts/probe-set-condition-value.mjs against
  * Foundry v14.361 + PF2e 8.1.2:
  *
- *  - **Going-up API.** Reuses apply_condition's mechanism:
+ *  - **Going-up API.** Reuses pf2e_apply_condition's mechanism:
  *    `actor.increaseCondition(slug, {value: delta, max})` with delta =
  *    (requested - current) for existing-bump, or requested directly on
  *    first-time creation. Fires the GrantItem cascade (e.g. dying →
  *    unconscious → blinded + prone) on first-time creation. Same
- *    take-max math as apply_condition (the only difference is that
- *    apply_condition refuses to lower; this tool routes the lower-case
+ *    take-max math as pf2e_apply_condition (the only difference is that
+ *    pf2e_apply_condition refuses to lower; this tool routes the lower-case
  *    to the down-path below).
  *
  *  - **Going-down API.** UNIFORM across vitals and non-vitals:
@@ -38,28 +38,28 @@
  *  - **Cascade visibility.** Cascade fires on item CREATION, not on
  *    item value-update. Therefore:
  *      * Going up from absent → N: cascadeGranted populated (same BFS
- *        from apply_condition's buildAppliedResponse).
+ *        from pf2e_apply_condition's buildAppliedResponse).
  *      * Going up from existing-lower → N: cascadeGranted omitted (the
  *        parent item already exists; no new cascade fires).
  *      * Going down → N (N > 0): cascadeGranted omitted (no cascade
  *        deletions; children persist until parent fully removed).
  *
- *  - **value: 0 rejected.** Mirrors update_item_quantity's qty-0 policy.
+ *  - **value: 0 rejected.** Mirrors pf2e_update_item_quantity's qty-0 policy.
  *    The zod schema rejects at the MCP boundary via `.min(1)`; the
  *    evaluator carries its own defensive guard for direct callers. The
- *    rejection points to remove_condition (mode: "remove") as the
+ *    rejection points to pf2e_remove_condition (mode: "remove") as the
  *    canonical clearing path.
  *
- *  - **Non-valued conditions rejected.** set_condition_value is for
+ *  - **Non-valued conditions rejected.** pf2e_set_condition_value is for
  *    valued conditions only (frightened, sickened, stupefied, slowed,
  *    drained, clumsy, enfeebled, stunned, dying, wounded, doomed). Non-
  *    valued conditions (off-guard, prone, blinded, fascinated, etc.)
- *    toggle on/off — apply_condition is the on-switch, remove_condition
+ *    toggle on/off — pf2e_apply_condition is the on-switch, pf2e_remove_condition
  *    is the off-switch. Rejected with NON_VALUED_CONDITION_NOT_SUPPORTED
  *    and a pointer to the siblings.
  *
- *  - **persistent-damage rejected.** Same story as apply_condition /
- *    remove_condition — `increaseCondition('persistent-damage')` opens a
+ *  - **persistent-damage rejected.** Same story as pf2e_apply_condition /
+ *    pf2e_remove_condition — `increaseCondition('persistent-damage')` opens a
  *    UI dialog (PersistentDamageEditor) that blocks in the headless
  *    client.
  *
@@ -70,14 +70,14 @@
  *
  *  - **No-op.** When the condition is already present and the (clamped)
  *    requested value equals the current value, operation: "noop",
- *    reason: "already_at_requested_value". Mirrors the apply_condition
- *    and update_item_quantity no-op precedents.
+ *    reason: "already_at_requested_value". Mirrors the pf2e_apply_condition
+ *    and pf2e_update_item_quantity no-op precedents.
  *
  *  - **No chat posted.** Inherited from increaseCondition and
  *    updateEmbeddedDocuments. Same as siblings.
  *
  *  - **Actor type support.** character, npc, familiar — same set as
- *    apply_condition / remove_condition / get_actor_state.
+ *    pf2e_apply_condition / pf2e_remove_condition / pf2e_get_actor_state.
  *
  * Note: This function is serialized via Puppeteer's `page.evaluate`,
  * which ships only the function's own source string to the browser.
@@ -141,7 +141,7 @@ export interface SetConditionValueErr {
 
 export type SetConditionValueResult = SetConditionValueOk | SetConditionValueErr;
 
-/** Actor types this tool will mutate. Mirrors apply_condition's set. */
+/** Actor types this tool will mutate. Mirrors pf2e_apply_condition's set. */
 export const SUPPORTED_ACTOR_TYPES = ['character', 'npc', 'familiar'] as const;
 
 export async function setConditionValueBody(
@@ -211,7 +211,7 @@ export async function setConditionValueBody(
   const actorType = typeof actor.type === 'string' ? actor.type : '';
   if (!SUPPORTED.has(actorType)) {
     return fail(
-      `Actor type '${actorType}' is not supported by set_condition_value. ` +
+      `Actor type '${actorType}' is not supported by pf2e_set_condition_value. ` +
         `Supported types: character, npc, familiar. ` +
         `(party/loot/hazard/vehicle/army actors do not carry the condition machinery.)`,
       {
@@ -244,7 +244,7 @@ export async function setConditionValueBody(
   // -- Reject persistent-damage up front.
   if (input.slug === PERSISTENT_DAMAGE_SLUG) {
     return fail(
-      `Slug 'persistent-damage' is not supported by set_condition_value because PF2e's ` +
+      `Slug 'persistent-damage' is not supported by pf2e_set_condition_value because PF2e's ` +
         `increaseCondition path opens PersistentDamageEditor (a UI dialog) which blocks in the ` +
         `headless GM client. Use foundry_eval with actor.createEmbeddedDocuments / ` +
         `updateEmbeddedDocuments and the structured persistent shape ` +
@@ -267,10 +267,10 @@ export async function setConditionValueBody(
   // -- Reject non-valued conditions.
   if (!isValued) {
     return fail(
-      `Slug '${input.slug}' is a non-valued condition; set_condition_value is for valued ` +
+      `Slug '${input.slug}' is a non-valued condition; pf2e_set_condition_value is for valued ` +
         `conditions only (frightened, sickened, stupefied, slowed, drained, clumsy, enfeebled, ` +
         `stunned, dying, wounded, doomed). Non-valued conditions toggle on/off — use ` +
-        `apply_condition to set on and remove_condition to clear.`,
+        `pf2e_apply_condition to set on and pf2e_remove_condition to clear.`,
       {
         slug: input.slug,
         reason: 'NON_VALUED_CONDITION_NOT_SUPPORTED',
@@ -284,7 +284,7 @@ export async function setConditionValueBody(
   if (!Number.isInteger(input.value) || input.value < 1) {
     return fail(
       `value must be an integer >= 1; received ${input.value}. To clear a condition entirely, ` +
-        `use remove_condition with mode: "remove".`,
+        `use pf2e_remove_condition with mode: "remove".`,
       {
         slug: input.slug,
         value: input.value,
@@ -334,7 +334,7 @@ export async function setConditionValueBody(
   // -- Branch: going up vs going down.
   let resultItem: ItemDocLike | null;
   if (!existedBefore || valueApplied > currentValue) {
-    // Going up. Reuse apply_condition's pattern.
+    // Going up. Reuse pf2e_apply_condition's pattern.
     const delta = existedBefore ? valueApplied - currentValue : valueApplied;
     const applied = await actor.increaseCondition(input.slug, {
       value: delta,

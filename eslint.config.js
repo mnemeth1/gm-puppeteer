@@ -60,4 +60,19 @@ export default [
       'no-undef': 'off',
     },
   },
+  {
+    // Installer helper — a plain Node script run by the Windows installer,
+    // not part of the shipped build.
+    files: ['installer/**/*.{js,mjs}'],
+    languageOptions: {
+      ecmaVersion: 2023,
+      sourceType: 'module',
+      globals: {
+        ...globals.node,
+      },
+    },
+    rules: {
+      'no-console': 'off',
+    },
+  },
 ];

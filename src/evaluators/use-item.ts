@@ -1,5 +1,5 @@
 /**
- * page.evaluate body for use_item. Runs the PF2e item-use pipeline for
+ * page.evaluate body for pf2e_use_item. Runs the PF2e item-use pipeline for
  * a single item embedded on an actor. Sibling to the inventory-mutation
  * cluster but distinct in intent: this tool *runs* the use pipeline
  * (chat card, charges, embedded-spell cast) rather than just editing
@@ -234,10 +234,10 @@ export async function useItemBody(input: UseItemInput): Promise<UseItemResult> {
   // -- Reject non-physical types up front.
   if (!PHYSICAL_TYPES.has(targetType)) {
     return fail(
-      `use_item requires a physical item; this item is '${targetType}'. ` +
+      `pf2e_use_item requires a physical item; this item is '${targetType}'. ` +
         `Non-physical types (feat, action, spell, ancestry, class, etc.) have no use ` +
         `pipeline at the inventory layer — feat/action activation lives in PF2e's ` +
-        `action-roll pipeline, which is out of scope for use_item.`,
+        `action-roll pipeline, which is out of scope for pf2e_use_item.`,
       {
         itemId: input.itemId,
         type: targetType,
@@ -249,7 +249,7 @@ export async function useItemBody(input: UseItemInput): Promise<UseItemResult> {
   // -- Reject physical types that have no meaningful use verb.
   if (targetType !== 'consumable' && targetType !== 'equipment') {
     return fail(
-      `use_item does not support type '${targetType}'. Only 'consumable' items (potions, ` +
+      `pf2e_use_item does not support type '${targetType}'. Only 'consumable' items (potions, ` +
         `scrolls, wands, elixirs, talismans, etc.) and 'equipment' items with activations are ` +
         `supported. Weapons are not "used" — they are wielded; armor and shields are worn; ` +
         `backpacks store items; treasure and ammo have no use pipeline.`,

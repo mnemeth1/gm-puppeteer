@@ -23,8 +23,8 @@ export const getSceneTokensTool: ToolDefinition<typeof GetSceneTokensInput> = {
     'taking action. x/y are the top-left of the token bounding box in canvas ' +
     'pixels; width/height are in grid squares (1 for Medium, 2 for Large). ' +
     'disposition is the Foundry TOKEN_DISPOSITIONS enum (-2 secret, -1 hostile, ' +
-    '0 neutral, 1 friendly). NOT a stat-block view — call get_actor_state or ' +
-    'get_creature_details for combat-relevant detail. NOT for actors that are ' +
+    '0 neutral, 1 friendly). NOT a stat-block view — call pf2e_get_actor_state or ' +
+    'pf2e_get_creature_details for combat-relevant detail. NOT for actors that are ' +
     'not placed on the scene — use list_world_actors for the world directory.',
   inputSchema: GetSceneTokensInput,
   async handler(input, ctx) {

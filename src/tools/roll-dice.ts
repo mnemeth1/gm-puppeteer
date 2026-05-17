@@ -7,8 +7,8 @@ import { jsonText, type ToolDefinition } from './types.js';
  * Schema for `roll_dice`. Evaluates one raw dice formula and posts it.
  * This is the GM's own roll — arbitrary dice, optionally spoken by an
  * NPC, optionally private. It does not run any PF2e check pipeline:
- * for an NPC's real stat-block check use `roll_check`, and to ask a
- * player to roll use `request_check`.
+ * for an NPC's real stat-block check use `pf2e_roll_check`, and to ask a
+ * player to roll use `pf2e_request_check`.
  */
 const RollDiceInput = z
   .object({
@@ -61,8 +61,8 @@ export const rollDiceTool: ToolDefinition<typeof RollDiceInput> = {
     'does not). Returns {formula, total, result, terms:[{faces, results}], flavor, ' +
     'visibility, speaker:{actorId, alias}, chatMessageId}. ' +
     "For an NPC's real stat-block check (the Redcap's actual Stealth modifier, degree of " +
-    'success) use roll_check. To ask a player to roll a check for their own character, ' +
-    "use request_check — never roll a PC's checks for them with this tool.",
+    'success) use pf2e_roll_check. To ask a player to roll a check for their own character, ' +
+    "use pf2e_request_check — never roll a PC's checks for them with this tool.",
   inputSchema: RollDiceInput,
   async handler(input, ctx) {
     const { page } = await ctx.browser.ensureStarted();

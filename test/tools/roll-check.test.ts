@@ -16,7 +16,7 @@ function makeCtx(evaluate: ReturnType<typeof vi.fn>): {
   return { browser: browser as unknown as BrowserSession, log: log as unknown as Logger };
 }
 
-describe('roll_check', () => {
+describe('pf2e_roll_check', () => {
   it('returns the evaluator result as a JSON content block on success', async () => {
     const evalResult = {
       ok: true,

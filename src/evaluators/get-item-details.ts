@@ -1,6 +1,6 @@
 /**
- * page.evaluate body for get_item_details. Returns full per-item data for
- * any Foundry Item resolved by UUID. Companion to get_actor_inventory:
+ * page.evaluate body for pf2e_get_item_details. Returns full per-item data for
+ * any Foundry Item resolved by UUID. Companion to pf2e_get_actor_inventory:
  * inventory returns only structural fields, this returns the detail view
  * (description, traits, runes, type-specific projection, plus the shared
  * physical-item block).
@@ -32,7 +32,7 @@
  *    (`@UUID[...]{Label}`, `@Damage[1d6[slashing]]`, `@Check[reflex|dc:20]`).
  *    These are semantic. When stripping HTML, we strip only the tags;
  *    @-syntax is preserved verbatim.
- *  - Rune shape is asymmetric per type (this already bit get_actor_inventory):
+ *  - Rune shape is asymmetric per type (this already bit pf2e_get_actor_inventory):
  *      weapon: {potency, striking, property[], effects[]}
  *      armor:  {potency, resilient, property[]}
  *      shield: {reinforcing}  — a single number, NOT a nested object

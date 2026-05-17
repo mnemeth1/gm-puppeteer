@@ -1,5 +1,5 @@
 /**
- * page.evaluate body for roll_check. Rolls a non-PC actor's real
+ * page.evaluate body for pf2e_roll_check. Rolls a non-PC actor's real
  * statistic check through the PF2e check pipeline and posts the result
  * to chat.
  *
@@ -8,7 +8,7 @@
  * against an optional DC, and lands the roll in chat as an audit trail.
  *
  * Agency gate: character actors are rejected with ACTOR_IS_PC. The
- * deputy never rolls a PC's checks — use `request_check` to ask the
+ * deputy never rolls a PC's checks — use `pf2e_request_check` to ask the
  * player to roll instead. For arbitrary dice unconnected to a stat
  * block, use `roll_dice`.
  *
@@ -136,12 +136,12 @@ export async function rollCheckBody(input: RollCheckInput): Promise<RollCheckRes
     });
   }
 
-  // -- Agency gate: never roll a PC's checks. request_check is the PC path.
+  // -- Agency gate: never roll a PC's checks. pf2e_request_check is the PC path.
   if (actor.type === 'character') {
     return fail(
-      `Actor '${actor.name ?? input.actorId}' is a player character. roll_check rolls ` +
+      `Actor '${actor.name ?? input.actorId}' is a player character. pf2e_roll_check rolls ` +
         `only for non-PC actors (NPCs, hazards, familiars). To ask the player to roll a ` +
-        `check for their own character, use request_check instead.`,
+        `check for their own character, use pf2e_request_check instead.`,
       { actorId: input.actorId, actorType: actor.type, reason: 'ACTOR_IS_PC' },
     );
   }

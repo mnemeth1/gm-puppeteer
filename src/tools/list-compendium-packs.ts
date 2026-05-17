@@ -23,9 +23,9 @@ export const listCompendiumPacksTool: ToolDefinition<typeof ListCompendiumPacksI
     '("Actor" | "Item" | "JournalEntry" | "RollTable" | "Macro" | "Scene" | ' +
     'other Foundry document types), sorted by label. Optional filters: ' +
     'documentType (exact match) and system (exact match), composed with AND. ' +
-    "Use this to discover the pack ids to pass into search_compendium's " +
+    "Use this to discover the pack ids to pass into pf2e_search_compendium's " +
     'pack / packs filter when the universe of available packs is unknown. ' +
-    'NOT for searching pack contents — use search_compendium for that. NOT ' +
+    'NOT for searching pack contents — use pf2e_search_compendium for that. NOT ' +
     'for PF2e rules text (actions, spells, feats, conditions, traits) — fetch ' +
     'those from https://2e.aonprd.com/ via web-fetch.',
   inputSchema: ListCompendiumPacksInput,

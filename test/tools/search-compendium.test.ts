@@ -16,7 +16,7 @@ function makeCtx(evaluate: ReturnType<typeof vi.fn>): {
   return { browser: browser as unknown as BrowserSession, log: log as unknown as Logger };
 }
 
-describe('search_compendium', () => {
+describe('pf2e_search_compendium', () => {
   it('forwards a name query with default limit, returns results as text content', async () => {
     const mock: SearchCompendiumResult = {
       query: 'goblin',

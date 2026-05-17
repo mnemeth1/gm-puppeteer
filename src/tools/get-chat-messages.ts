@@ -10,7 +10,7 @@ import { jsonText, type ToolDefinition } from './types.js';
  * Schema for `get_chat_messages`. Read-only window onto Foundry's chat
  * log, with PF2e check and damage cards parsed into structured form.
  * This tool does not post — use `post_chat_message` to write — and does
- * not roll — use `roll_dice` / `roll_check` / `request_check`.
+ * not roll — use `roll_dice` / `pf2e_roll_check` / `pf2e_request_check`.
  */
 const GetChatMessagesInput = z
   .object({
@@ -52,7 +52,7 @@ export const getChatMessagesTool: ToolDefinition<typeof GetChatMessagesInput> = 
     'persistent}], outcome, targetActorId} for a damage roll, or {kind:"other", ' +
     'pf2eCardType} for everything else. Read as the GM, so whispered messages are ' +
     'included. This tool is read-only: to post a message use post_chat_message; to ' +
-    'roll dice use roll_dice, roll_check, or request_check.',
+    'roll dice use roll_dice, pf2e_roll_check, or pf2e_request_check.',
   inputSchema: GetChatMessagesInput,
   async handler(input, ctx) {
     const { page } = await ctx.browser.ensureStarted();

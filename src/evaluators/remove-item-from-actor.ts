@@ -1,5 +1,5 @@
 /**
- * page.evaluate body for remove_item_from_actor. Removes an embedded item
+ * page.evaluate body for pf2e_remove_item_from_actor. Removes an embedded item
  * from an actor's inventory or decrements its quantity. Two modes:
  *
  *  - `delete`   — remove the item entry entirely.
@@ -148,7 +148,7 @@ export interface RemoveItemFromActorErr {
 export type RemoveItemFromActorResult = RemoveItemFromActorOk | RemoveItemFromActorErr;
 
 /** Physical inventory item types this tool supports for `decrement` mode.
- * Mirrors `add_item_to_actor`'s set. Exported for the tool layer to reuse
+ * Mirrors `pf2e_add_item_to_actor`'s set. Exported for the tool layer to reuse
  * in user-facing error messages. */
 export const PHYSICAL_INVENTORY_TYPES = [
   'weapon',
@@ -385,7 +385,7 @@ export async function removeItemFromActorBody(
   // Clamp on overflow: decrementing more than current is allowed and
   // collapses to 0. With deleteIfZero defaulting true, this naturally
   // becomes a delete — matches the "tool figures out create-vs-merge"
-  // pattern from add_item_to_actor.
+  // pattern from pf2e_add_item_to_actor.
   const newQty = Math.max(0, currentQty - input.quantity);
 
   if (newQty > 0) {
