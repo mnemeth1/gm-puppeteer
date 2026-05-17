@@ -3,8 +3,8 @@
 ;
 ; Builds a per-user, self-contained installer that bundles a Node 24 runtime,
 ; the prebuilt dist/, production node_modules, and Chromium. The wizard collects
-; the 12 environment settings into a .env file and can register the MCP server
-; with detected clients (Claude Desktop, Claude Code, Cursor, OpenCode).
+; the environment settings into a .env file and can register the MCP server
+; with detected clients (Claude Desktop, Cursor).
 ;
 ; Compiled by .github/workflows/build-installer.yml with:
 ;   ISCC.exe /DAppVersion=<v> /DChromeDir=<flattened chromium dir> gm-puppeteer.iss
@@ -47,6 +47,9 @@ LicenseFile=..\UNLICENSE
 Compression=lzma2/ultra
 SolidCompression=yes
 WizardStyle=modern
+; Always write a Setup log to %TEMP% so client-registration failures surfaced
+; by ConfigureClients (clients.pas) point the user at real diagnostics.
+SetupLogging=yes
 UninstallDisplayName=GM-Puppeteer
 #ifdef HaveIcon
 SetupIconFile=assets\gm-puppeteer.ico
@@ -84,14 +87,13 @@ var
 
   LogLevelCombo:  TNewComboBox;
   TimeoutEdit:    TNewEdit;
-  PacksEdit:      TNewEdit;
   HeadlessCheck:  TNewCheckBox;
   WarmCheck:      TNewCheckBox;
+  Pf2eCheck:      TNewCheckBox;
 
-  ClientDetected:   array[0..3] of Boolean;
-  ClientConfigPath: array[0..3] of String;
-  ClientUsesCli:    array[0..3] of Boolean;
-  ClientItemIndex:  array[0..3] of Integer;
+  ClientDetected:   array[0..1] of Boolean;
+  ClientConfigPath: array[0..1] of String;
+  ClientItemIndex:  array[0..1] of Integer;
 
 #include "scripts\envpage.pas"
 #include "scripts\clients.pas"

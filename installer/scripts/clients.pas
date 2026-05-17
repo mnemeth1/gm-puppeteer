@@ -3,24 +3,21 @@
 
   Pulled into the [Code] section of gm-puppeteer.iss with an #include
   directive. Uses the global ClientDetected / ClientConfigPath /
-  ClientUsesCli / ClientItemIndex arrays and the ForgePage / ClientPage
-  handles declared in the main script.
+  ClientItemIndex arrays and the ForgePage / ClientPage handles declared
+  in the main script.
 
-  Client indices: 0 Claude Desktop, 1 Claude Code, 2 Cursor, 3 OpenCode.
-  These are merged via the bundled merge-mcp.mjs helper; Claude Code, when
-  its CLI is present, is configured through `claude mcp add` instead.
+  Client indices: 0 Claude Desktop, 1 Cursor. Both are merged via the
+  bundled merge-mcp.mjs helper.
   =========================================================================== }
 
 const
-  CLIENT_COUNT = 4;
+  CLIENT_COUNT = 2;
 
 function ClientId(I: Integer): String;
 begin
   case I of
     0: Result := 'claude-desktop';
-    1: Result := 'claude-code';
-    2: Result := 'cursor';
-    3: Result := 'opencode';
+    1: Result := 'cursor';
   else
     Result := '';
   end;
@@ -30,56 +27,67 @@ function ClientLabel(I: Integer): String;
 begin
   case I of
     0: Result := 'Claude Desktop';
-    1: Result := 'Claude Code';
-    2: Result := 'Cursor';
-    3: Result := 'OpenCode';
+    1: Result := 'Cursor';
   else
     Result := '';
   end;
 end;
 
-function B01(B: Boolean): String;
-begin
-  if B then Result := '1' else Result := '0';
-end;
-
-{ True if `Exe` resolves on PATH (via `where`). }
-function CommandOnPath(Exe: String): Boolean;
-var
-  ResultCode: Integer;
-begin
-  Result := Exec(ExpandConstant('{cmd}'), '/C where ' + Exe + ' >nul 2>nul',
-    '', SW_HIDE, ewWaitUntilTerminated, ResultCode) and (ResultCode = 0);
-end;
-
-{ Resolve Claude Desktop's config path: the standard %APPDATA% location when
-  present, else the MSIX (Microsoft Store) sandboxed path. Returns '' when
-  Claude Desktop is not installed. }
-function FindClaudeDesktopConfig: String;
+{ Resolve the MSIX (Microsoft Store) Claude Desktop's sandboxed config path by
+  scanning %LOCALAPPDATA%\Packages\Claude*. Prefers a package whose config file
+  already exists, then one whose Roaming\Claude directory exists, then the first
+  package directory found. Returns '' when no Claude MSIX package is installed. }
+function FindClaudeMsixConfig: String;
 var
   FR: TFindRec;
-  Base: String;
+  Base, Cfg, WithDir, AnyPkg: String;
 begin
   Result := '';
-  if DirExists(ExpandConstant('{userappdata}\Claude')) or
-     DirExists(ExpandConstant('{localappdata}\Programs\Claude')) then begin
-    Result := ExpandConstant('{userappdata}\Claude\claude_desktop_config.json');
-    Exit;
-  end;
+  WithDir := '';
+  AnyPkg := '';
   Base := ExpandConstant('{localappdata}\Packages');
   if FindFirst(Base + '\Claude*', FR) then begin
     try
       repeat
         if (FR.Attributes and FILE_ATTRIBUTE_DIRECTORY) <> 0 then begin
-          Result := Base + '\' + FR.Name +
+          Cfg := Base + '\' + FR.Name +
             '\LocalCache\Roaming\Claude\claude_desktop_config.json';
-          Exit;
+          if FileExists(Cfg) then begin
+            Result := Cfg;
+            Exit;
+          end;
+          if (WithDir = '') and
+             DirExists(Base + '\' + FR.Name + '\LocalCache\Roaming\Claude') then
+            WithDir := Cfg;
+          if AnyPkg = '' then AnyPkg := Cfg;
         end;
       until not FindNext(FR);
     finally
       FindClose(FR);
     end;
   end;
+  if WithDir <> '' then Result := WithDir
+  else Result := AnyPkg;
+end;
+
+{ Resolve Claude Desktop's config path. The Microsoft Store (MSIX) build keeps
+  its config in a sandboxed per-package location and is checked FIRST: a stale
+  %APPDATA%\Claude directory must not outrank a real MSIX package, or the entry
+  gets written to a file the Store build never reads. Falls back to the standard
+  %APPDATA% path for a standalone install. Returns '' when Claude Desktop is not
+  installed. }
+function FindClaudeDesktopConfig: String;
+var
+  Msix: String;
+begin
+  Msix := FindClaudeMsixConfig;
+  if Msix <> '' then
+    Result := Msix
+  else if DirExists(ExpandConstant('{userappdata}\Claude')) or
+          DirExists(ExpandConstant('{localappdata}\Programs\Claude')) then
+    Result := ExpandConstant('{userappdata}\Claude\claude_desktop_config.json')
+  else
+    Result := '';
 end;
 
 { Probe the machine for each supported MCP client. Read-only. }
@@ -90,35 +98,17 @@ begin
   for I := 0 to CLIENT_COUNT - 1 do begin
     ClientDetected[I] := False;
     ClientConfigPath[I] := '';
-    ClientUsesCli[I] := False;
   end;
 
   { 0 — Claude Desktop }
   ClientConfigPath[0] := FindClaudeDesktopConfig;
   ClientDetected[0] := ClientConfigPath[0] <> '';
 
-  { 1 — Claude Code: prefer the `claude` CLI, else the user config file. }
-  if CommandOnPath('claude') then begin
-    ClientDetected[1] := True;
-    ClientUsesCli[1] := True;
-  end else if FileExists(ExpandConstant('{%USERPROFILE}\.claude.json')) then begin
-    ClientDetected[1] := True;
-    ClientConfigPath[1] := ExpandConstant('{%USERPROFILE}\.claude.json');
-  end;
-
-  { 2 — Cursor }
+  { 1 — Cursor }
   if DirExists(ExpandConstant('{%USERPROFILE}\.cursor')) or
      DirExists(ExpandConstant('{localappdata}\Programs\cursor')) then begin
-    ClientDetected[2] := True;
-    ClientConfigPath[2] := ExpandConstant('{%USERPROFILE}\.cursor\mcp.json');
-  end;
-
-  { 3 — OpenCode }
-  if DirExists(ExpandConstant('{%USERPROFILE}\.config\opencode')) or
-     CommandOnPath('opencode') then begin
-    ClientDetected[3] := True;
-    ClientConfigPath[3] :=
-      ExpandConstant('{%USERPROFILE}\.config\opencode\opencode.json');
+    ClientDetected[1] := True;
+    ClientConfigPath[1] := ExpandConstant('{%USERPROFILE}\.cursor\mcp.json');
   end;
 end;
 
@@ -154,9 +144,10 @@ begin
   Result := ExpandConstant('{app}\node\node.exe');
 end;
 
-{ Merge a file-based client (Claude Desktop / Cursor / OpenCode, and Claude
-  Code's fallback) via the bundled merge-mcp.mjs helper. }
-procedure ConfigureFileClient(I: Integer);
+{ Merge a file-based client (Claude Desktop / Cursor) via the bundled
+  merge-mcp.mjs helper. Returns False on a failed launch or non-zero exit
+  code. }
+function ConfigureFileClient(I: Integer): Boolean;
 var
   Params: String;
   ResultCode: Integer;
@@ -166,25 +157,11 @@ begin
     ' --config-path "' + ClientConfigPath[I] + '"' +
     ' --app-dir "' + ExpandConstant('{app}') + '"' +
     ' --action add';
-  if (not Exec(NodeExe, Params, '', SW_HIDE, ewWaitUntilTerminated, ResultCode))
-     or (ResultCode <> 0) then
+  Result := Exec(NodeExe, Params, '', SW_HIDE, ewWaitUntilTerminated,
+    ResultCode) and (ResultCode = 0);
+  if not Result then
     Log('gm-puppeteer: failed to configure ' + ClientId(I) +
       ' (rc=' + IntToStr(ResultCode) + ')');
-end;
-
-{ Register with Claude Code through its CLI (user scope). }
-procedure ConfigureClaudeCli;
-var
-  Params: String;
-  ResultCode: Integer;
-begin
-  Params := '/C claude mcp add gm-puppeteer --scope user -- ' +
-    '"' + NodeExe + '" ' +
-    '"--env-file=' + ExpandConstant('{app}\.env') + '" ' +
-    '"' + ExpandConstant('{app}\dist\index.js') + '"';
-  if (not Exec(ExpandConstant('{cmd}'), Params, '', SW_HIDE,
-       ewWaitUntilTerminated, ResultCode)) or (ResultCode <> 0) then
-    Log('gm-puppeteer: claude mcp add failed (rc=' + IntToStr(ResultCode) + ')');
 end;
 
 { Configure every ticked + detected client, recording the result in
@@ -192,27 +169,30 @@ end;
 procedure ConfigureClients;
 var
   I: Integer;
-  Configured: String;
+  Configured, Failed: String;
 begin
   Configured := '';
+  Failed := '';
   for I := 0 to CLIENT_COUNT - 1 do begin
     if ClientDetected[I] and ClientPage.Values[ClientItemIndex[I]] then begin
-      case I of
-        0, 2, 3: ConfigureFileClient(I);
-        1:
-          if ClientUsesCli[1] then ConfigureClaudeCli
-          else ConfigureFileClient(1);
-      end;
       if Configured <> '' then Configured := Configured + ',';
       Configured := Configured + ClientId(I);
       RegWriteStringValue(HKCU, 'Software\gm-puppeteer',
         'ConfigPath_' + ClientId(I), ClientConfigPath[I]);
-      RegWriteStringValue(HKCU, 'Software\gm-puppeteer',
-        'Cli_' + ClientId(I), B01(ClientUsesCli[I]));
+      if not ConfigureFileClient(I) then begin
+        if Failed <> '' then Failed := Failed + ', ';
+        Failed := Failed + ClientLabel(I);
+      end;
     end;
   end;
   RegWriteStringValue(HKCU, 'Software\gm-puppeteer',
     'ConfiguredClients', Configured);
+  if Failed <> '' then
+    MsgBox('GM-Puppeteer could not register with: ' + Failed + '.'
+           + #13#10 + #13#10
+           + 'The rest of the installation finished normally. The Setup log '
+           + 'in your %TEMP% folder has the details.',
+           mbError, MB_OK);
 end;
 
 { ----- Unconfiguration (uninstall time) ----- }
@@ -240,17 +220,9 @@ end;
   before files are deleted). }
 procedure RemoveClientEntry(Id: String);
 var
-  Cfg, UsesCli, Params: String;
+  Cfg, Params: String;
   ResultCode: Integer;
 begin
-  RegQueryStringValue(HKCU, 'Software\gm-puppeteer', 'Cli_' + Id, UsesCli);
-  if (Id = 'claude-code') and (UsesCli = '1') then begin
-    Exec(ExpandConstant('{cmd}'),
-      '/C claude mcp remove gm-puppeteer --scope user',
-      '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
-    Exit;
-  end;
-
   if not RegQueryStringValue(HKCU, 'Software\gm-puppeteer',
        'ConfigPath_' + Id, Cfg) then Exit;
   if Cfg = '' then Exit;

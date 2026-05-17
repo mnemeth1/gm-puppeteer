@@ -186,9 +186,9 @@ The installer:
   works fully offline once downloaded;
 - collects every setting from the [Configuration](#configuration) table in a
   wizard and writes them to a `.env` in the install directory;
-- detects Claude Desktop, Claude Code, Cursor, and OpenCode, and can merge a
-  `gm-puppeteer` MCP entry into the ones you tick (all unticked by default; a
-  timestamped backup of each config is written first).
+- detects Claude Desktop and Cursor, and can merge a `gm-puppeteer` MCP entry
+  into the ones you tick (all unticked by default; a timestamped backup of
+  each config is written first).
 
 To reconfigure later, edit `%LOCALAPPDATA%\gm-puppeteer\.env` and restart your
 MCP client — that one file is the single source of truth. The installer is

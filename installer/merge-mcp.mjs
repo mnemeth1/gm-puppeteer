@@ -12,7 +12,7 @@
  *   node merge-mcp.mjs --client <name> --config-path <file> --app-dir <dir> \
  *                      --action add|remove
  *
- *   --client       claude-desktop | claude-code | cursor | opencode
+ *   --client       claude-desktop | cursor
  *   --config-path  absolute path to the client's JSON config file
  *   --app-dir      gm-puppeteer install directory (holds node\, dist\, .env)
  *   --action       add (default) or remove
@@ -26,10 +26,8 @@ import { dirname, join } from 'node:path';
 
 const SERVER_NAME = 'gm-puppeteer';
 
-/** Clients whose servers live under a top-level `mcpServers` object. */
-const MCP_SERVERS_CLIENTS = new Set(['claude-desktop', 'claude-code', 'cursor']);
-/** Clients whose servers live under a top-level `mcp` object (OpenCode). */
-const MCP_KEY_CLIENTS = new Set(['opencode']);
+/** Supported clients — all store servers under a top-level `mcpServers` object. */
+const MCP_SERVERS_CLIENTS = new Set(['claude-desktop', 'cursor']);
 
 function parseArgs(argv) {
   const out = { action: 'add' };
@@ -60,20 +58,10 @@ function launchParts(appDir) {
   };
 }
 
-/** The server entry in each client's expected shape. */
-function buildEntry(client, appDir) {
+/** The server entry in Claude Desktop / Cursor shape: separate command + args. */
+function buildEntry(appDir) {
   const { nodeExe, envArg, entry } = launchParts(appDir);
-  if (MCP_KEY_CLIENTS.has(client)) {
-    // OpenCode: array-form command, `type: "local"`.
-    return { type: 'local', command: [nodeExe, envArg, entry], enabled: true };
-  }
-  // Claude Desktop / Claude Code / Cursor: separate command + args.
   return { command: nodeExe, args: [envArg, entry] };
-}
-
-/** Top-level key the client stores its servers under. */
-function containerKey(client) {
-  return MCP_KEY_CLIENTS.has(client) ? 'mcp' : 'mcpServers';
 }
 
 function readConfig(configPath) {
@@ -105,14 +93,14 @@ function main() {
   if (!args.client || !args.configPath) {
     fail(2, 'missing --client or --config-path');
   }
-  if (!MCP_SERVERS_CLIENTS.has(args.client) && !MCP_KEY_CLIENTS.has(args.client)) {
+  if (!MCP_SERVERS_CLIENTS.has(args.client)) {
     fail(2, `unknown --client: ${args.client}`);
   }
   if (args.action === 'add' && !args.appDir) {
     fail(2, '--app-dir is required for --action add');
   }
 
-  const key = containerKey(args.client);
+  const key = 'mcpServers';
   const config = readConfig(args.configPath);
 
   if (args.action === 'remove') {
@@ -133,7 +121,7 @@ function main() {
     config[key] = {};
   }
   const backupPath = backup(args.configPath);
-  config[key][SERVER_NAME] = buildEntry(args.client, args.appDir);
+  config[key][SERVER_NAME] = buildEntry(args.appDir);
 
   mkdirSync(dirname(args.configPath), { recursive: true });
   writeFileSync(args.configPath, `${JSON.stringify(config, null, 2)}\n`);
