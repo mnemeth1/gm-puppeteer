@@ -1,12 +1,20 @@
 name: build-installer
 
-# Builds the self-contained Windows installer. Every push to main uploads the
-# .exe as a workflow artifact; pushing a v* tag also publishes a GitHub Release
-# with the .exe attached.
+# Builds the self-contained Windows installer.
+#
+# Triggers:
+#  - push a v* tag   -> build, then publish a GitHub Release with the .exe.
+#  - manual dispatch -> build only; the .exe is uploaded as a workflow
+#    artifact, no Release. Run it from the repo's Actions tab when you want
+#    an installer without cutting a release.
+#
+# It deliberately does NOT build on ordinary pushes to main — per-commit
+# installer artifacts (~300 MB each) would otherwise eat the Actions storage
+# quota. Routine commits push freely with no CI cost.
 on:
   push:
-    branches: [main]
     tags: ['v*']
+  workflow_dispatch:
 
 permissions:
   contents: read

@@ -6,23 +6,25 @@ self-hosted.**
 GM-Puppeteer is a powerful, module-free MCP server that lets your AI fully
 control Foundry VTT v14 as a Game Master. It can build balanced encounters,
 manage tokens, run the combat tracker, update journals, handle loot, apply
-conditions, create scrolls and wands, and run deep Pathfinder 2e workflows —
-all through natural language.
+conditions, and drive deep, system-aware workflows for both Pathfinder 2e and
+D&D 5e — all through natural language.
 
 No modules required. Works on both local LAN and Forge-hosted worlds. Just give
 it a GM account and let the AI do the busywork while you focus on running the
 game.
 
 **Under the hood:** an MCP server that launches a headless (or visible)
-Chromium browser, logs into your Foundry world as a GM user, and exposes 64
+Chromium browser, logs into your Foundry world as a GM user, and exposes 69
 typed tools over the Model Context Protocol. All actions run through real
 Foundry APIs inside an authenticated GM session — giving it deep, reliable
 control without any custom modules or v13 limitations.
 
 The core toolset (scenes, tokens, journals, ownership, compendiums) works on
-any game system. A specialized Pathfinder 2e layer adds powerful features like
-condition management, encounter budgeting, scroll/wand creation, and creature
-stat block handling.
+any game system. On top of it sit two system-specific suites: a Pathfinder 2e
+suite (condition management, encounter budgeting, scroll/wand creation,
+inventory mutation, creature stat blocks) and a D&D 5e suite (compendium and
+rules search, creature and item detail, inventory) — each tuned for its game
+system.
 
 ## Download
 
@@ -42,12 +44,18 @@ walks you through.
 
 ## Tools
 
-66 typed tools. The catalog below is grouped by area; the two
-system-specific groups at the end — plus `pf2e_roll_check` /
-`pf2e_request_check` — are tuned for their game system (Pathfinder 2e or
-D&D 5e), the rest are Foundry-core.
+69 typed tools in three groups — a system-agnostic **core** plus a
+**Pathfinder 2e** and a **D&D 5e** suite. The core works on any Foundry world;
+each system suite expects its game system loaded and fails gracefully if
+called on the wrong one. `foundry_eval` is registered only when `ALLOW_EVAL`
+is set.
 
-### Scenes & canvas
+### Core tools
+
+System-agnostic — these work on any Foundry VTT world regardless of game
+system.
+
+#### Scenes & canvas
 
 - **`get_current_scene`** — typed metadata about the active scene.
 - **`list_scenes`** — enumerate every scene in the world (id, name, active flag, folder).
@@ -55,7 +63,7 @@ D&D 5e), the rest are Foundry-core.
 - **`activate_scene`** — set a scene as the world-active scene (broadcasts to all clients).
 - **`foundry_screenshot`** — capture the active scene canvas as a JPEG, with a screen↔canvas transform.
 
-### Tokens
+#### Tokens
 
 - **`get_scene_tokens`** — list tokens on a scene with ids, names, actor link, position, size, disposition.
 - **`get_token_details`** — full-detail view of a single token: position, appearance, vision, light, bars.
@@ -65,20 +73,12 @@ D&D 5e), the rest are Foundry-core.
 - **`delete_token`** — remove one or more tokens from a scene by token id.
 - **`update_token`** — modify token name, disposition, hidden flag, display modes, and sight.
 
-### Actors & inventory
+#### Actors
 
 - **`list_world_actors`** — enumerate every actor in the world (id, uuid, name, type, level, folder, active-scene presence).
 - **`create_actor_from_compendium`** — import a compendium actor into the world.
-- **`pf2e_get_actor_inventory`** — read-only list of an actor's physical inventory and currency.
-- **`pf2e_get_item_details`** — read-only full-detail view of any Foundry Item by UUID.
-- **`pf2e_add_item_to_actor`** — grant a physical item from a compendium source to an actor.
-- **`pf2e_remove_item_from_actor`** — delete an inventory item or decrement its quantity.
-- **`pf2e_update_item_quantity`** — set the absolute quantity of a physical item on an actor.
-- **`pf2e_update_item_uses`** — set the remaining charges/uses on an item (e.g. wand recharge).
-- **`pf2e_move_item_to_container`** — relocate a physical item between containers (or to/from root).
-- **`pf2e_transfer_item_between_actors`** — move a physical item (or container subtree) between actors.
 
-### Combat
+#### Combat
 
 - **`start_combat`** — create (or return) the combat encounter for a scene; round 0.
 - **`begin_combat`** — advance a scene's encounter to round 1 after initiative is rolled.
@@ -87,18 +87,7 @@ D&D 5e), the rest are Foundry-core.
 - **`remove_combatants`** — remove combatants from the combat by id; partial success.
 - **`get_combat_state`** — read round, turn, started flag, and the ordered combatant list.
 
-### Dice & checks
-
-- **`roll_dice`** — evaluate a raw dice formula and post it to chat; optional NPC speaker, GM/blind visibility.
-- **`pf2e_roll_check`** — roll a non-PC actor's real statistic check via the PF2e pipeline and post the result (PF2e).
-- **`pf2e_request_check`** — post a whispered full-sentence PF2e `@Check` prompt asking a player to roll for their PC (PF2e).
-
-### Chat
-
-- **`get_chat_messages`** — read a window of the chat log; PF2e check/damage cards parsed into structured form.
-- **`post_chat_message`** — post a raw-HTML chat message; optional NPC speaker, public / GM-only / player-whisper.
-
-### Journals
+#### Journals
 
 - **`list_journals`** — enumerate world journal entries (id, name, folder, page count, ownership).
 - **`get_journal_entry`** — table-of-contents view of one entry: per-page id/name/type/sort.
@@ -112,7 +101,7 @@ D&D 5e), the rest are Foundry-core.
 - **`delete_journal_page`** — delete a single page from an entry.
 - **`show_journal_entry`** — broadcast an entry to connected players' screens.
 
-### Ownership & users
+#### Ownership & users
 
 - **`list_users`** — enumerate Foundry users in the world (id, name, role, isGM, active).
 - **`list_actor_ownership`** — show per-actor ownership: `default` + per-user level.
@@ -122,43 +111,73 @@ D&D 5e), the rest are Foundry-core.
 - **`assign_journal_ownership`** — set a user's (or `default`) ownership on an entry or page.
 - **`remove_journal_ownership`** — clear a user's explicit ownership entry on an entry or page.
 
-### Compendium
+#### Dice & chat
 
-- **`pf2e_search_compendium`** — name/structured-filter search across compendium packs.
+- **`roll_dice`** — evaluate a raw dice formula and post it to chat; optional NPC speaker, GM/blind visibility.
+- **`get_chat_messages`** — read a window of the chat log; PF2e check/damage cards parsed into structured form.
+- **`post_chat_message`** — post a raw-HTML chat message; optional NPC speaker, public / GM-only / player-whisper.
+
+#### Compendium, world & diagnostics
+
 - **`list_compendium_packs`** — enumerate compendium packs (id, label, system, document type).
-
-### World & diagnostics
-
 - **`get_world_info`** — top-level world metadata: world, system, Foundry version, active scene, user.
 - **`foundry_eval`** — run arbitrary JS in the Foundry GM client; registered only when `ALLOW_EVAL` is set.
 
-### Pathfinder 2e–specific
+### Pathfinder 2e tools
 
-Require the PF2e system loaded on the world.
+Require the Pathfinder 2e system loaded on the world.
+
+#### Creatures & state
 
 - **`pf2e_get_creature_details`** — full stat-block view of any NPC, hazard, or familiar by UUID.
 - **`pf2e_get_actor_state`** — read-only projection of an actor's combat-relevant state.
+
+#### Inventory & items
+
+- **`pf2e_get_actor_inventory`** — read-only list of an actor's physical inventory and currency.
+- **`pf2e_get_item_details`** — read-only full-detail view of any Foundry Item by UUID.
+- **`pf2e_add_item_to_actor`** — grant a physical item from a compendium source to an actor.
+- **`pf2e_remove_item_from_actor`** — delete an inventory item or decrement its quantity.
+- **`pf2e_update_item_quantity`** — set the absolute quantity of a physical item on an actor.
+- **`pf2e_update_item_uses`** — set the remaining charges/uses on an item (e.g. wand recharge).
+- **`pf2e_move_item_to_container`** — relocate a physical item between containers (or to/from root).
+- **`pf2e_transfer_item_between_actors`** — move a physical item (or container subtree) between actors.
+
+#### Conditions
+
 - **`pf2e_get_available_conditions`** — enumerate PF2e conditions with valued/unvalued status and caps.
 - **`pf2e_apply_condition`** — apply a PF2e condition to an actor (take-max semantics).
 - **`pf2e_remove_condition`** — decrement or remove a PF2e condition from an actor.
 - **`pf2e_set_condition_value`** — set a valued PF2e condition to an absolute value on an actor.
+
+#### Checks
+
+- **`pf2e_roll_check`** — roll a non-PC actor's real statistic check via the PF2e pipeline and post the result.
+- **`pf2e_request_check`** — post a whispered full-sentence PF2e `@Check` prompt asking a player to roll for their PC.
+
+#### Compendium & utilities
+
+- **`pf2e_search_compendium`** — name/structured-filter search across compendium packs.
 - **`pf2e_create_scroll_or_wand`** — generate a spell-specific scroll or wand from a Spell UUID onto an actor.
 - **`pf2e_use_item`** — run the PF2e use pipeline for one consumable or equipment activation.
 - **`pf2e_calculate_encounter_budget`** — PF2e GMG XP budget, cost table, and mix skeletons for a party.
 
-### Dungeons & Dragons 5e–specific
+### D&D 5e tools
 
-Tuned for the D&D 5e system; useful on a world with it loaded.
+Require the D&D 5e system loaded on the world.
 
 - **`dnd5e_search_compendium`** — name/structured-filter search across D&D 5e compendium packs, on the system's native Compendium Browser engine.
 - **`dnd5e_search_rules`** — page-level full-text search across D&D 5e compendium rules-glossary journals.
+- **`dnd5e_get_creature_details`** — read-only D&D 5e NPC/vehicle stat block by UUID.
+- **`dnd5e_get_item_details`** — read-only full-detail view of any D&D 5e Item by UUID.
+- **`dnd5e_get_actor_inventory`** — read-only list view of a D&D 5e actor's physical inventory plus currency.
 
 ## Prerequisites
 
 - **Node.js 24+** on the machine that runs the MCP server (the Foundry host).
 - **Foundry VTT v14** with a world created and **launched and active**. The
-  **Pathfinder 2e** system is required for the PF2e tool layer; the
-  Foundry-core tools run without it.
+  core tools run on any game system; the Pathfinder 2e and D&D 5e tool suites
+  each require their corresponding system loaded on the world.
 - A **Gamemaster-role user** on the active world whose name matches
   `FOUNDRY_GM_USERNAME` (default `AI-GM`). The headless Chromium logs in
   as this user. It can have no password (set `FOUNDRY_GM_PASSWORD` empty) or a
@@ -382,5 +401,6 @@ the Chromium window and the login sequence.
 
 ## License
 
-See repository for license terms. PF2e rules content referenced by this
-project is the property of Paizo Inc.
+See repository for license terms. Pathfinder 2e content referenced by this
+project is the property of Paizo Inc.; Dungeons & Dragons content is the
+property of Wizards of the Coast.
