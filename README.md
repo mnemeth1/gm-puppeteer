@@ -171,6 +171,10 @@ Require the D&D 5e system loaded on the world.
 - **`dnd5e_get_creature_details`** — read-only D&D 5e NPC/vehicle stat block by UUID.
 - **`dnd5e_get_item_details`** — read-only full-detail view of any D&D 5e Item by UUID.
 - **`dnd5e_get_actor_inventory`** — read-only list view of a D&D 5e actor's physical inventory plus currency.
+- **`dnd5e_get_actor_state`** — read-only projection of a D&D 5e actor's combat-relevant state.
+- **`dnd5e_get_available_conditions`** — enumerate every applyable D&D 5e status (condition, pseudo-condition, or plain status), with the valued flag, exhaustion cap, and a rules-reference UUID.
+- **`dnd5e_apply_condition`** — apply a D&D 5e status to a character or npc; take-max exhaustion level, rider conditions surfaced as a cascade.
+- **`dnd5e_remove_condition`** — remove a D&D 5e status from a character or npc, or decrement exhaustion by one level; rider conditions surfaced as a cascade.
 
 ## Prerequisites
 

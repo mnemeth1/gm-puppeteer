@@ -15,9 +15,13 @@ import { createScrollOrWandTool } from './create-scroll-or-wand.js';
 import { deleteJournalEntryTool } from './delete-journal-entry.js';
 import { deleteJournalPageTool } from './delete-journal-page.js';
 import { deleteTokenTool } from './delete-token.js';
+import { dnd5eApplyConditionTool } from './dnd5e-apply-condition.js';
 import { dnd5eGetActorInventoryTool } from './dnd5e-get-actor-inventory.js';
+import { dnd5eGetActorStateTool } from './dnd5e-get-actor-state.js';
+import { dnd5eGetAvailableConditionsTool } from './dnd5e-get-available-conditions.js';
 import { dnd5eGetCreatureDetailsTool } from './dnd5e-get-creature-details.js';
 import { dnd5eGetItemDetailsTool } from './dnd5e-get-item-details.js';
+import { dnd5eRemoveConditionTool } from './dnd5e-remove-condition.js';
 import { dnd5eSearchCompendiumTool } from './dnd5e-search-compendium.js';
 import { dnd5eSearchRulesTool } from './dnd5e-search-rules.js';
 import { endCombatTool } from './end-combat.js';
@@ -87,9 +91,13 @@ export const tools: ReadonlyArray<ToolDefinition<z.ZodTypeAny>> = [
   deleteJournalEntryTool,
   deleteJournalPageTool,
   deleteTokenTool,
+  dnd5eApplyConditionTool,
   dnd5eGetActorInventoryTool,
+  dnd5eGetActorStateTool,
+  dnd5eGetAvailableConditionsTool,
   dnd5eGetCreatureDetailsTool,
   dnd5eGetItemDetailsTool,
+  dnd5eRemoveConditionTool,
   dnd5eSearchCompendiumTool,
   dnd5eSearchRulesTool,
   endCombatTool,
