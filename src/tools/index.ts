@@ -22,10 +22,12 @@ import { dnd5eGetActorStateTool } from './dnd5e-get-actor-state.js';
 import { dnd5eGetAvailableConditionsTool } from './dnd5e-get-available-conditions.js';
 import { dnd5eGetCreatureDetailsTool } from './dnd5e-get-creature-details.js';
 import { dnd5eGetItemDetailsTool } from './dnd5e-get-item-details.js';
+import { dnd5eMoveItemToContainerTool } from './dnd5e-move-item-to-container.js';
 import { dnd5eRemoveConditionTool } from './dnd5e-remove-condition.js';
 import { dnd5eRemoveItemFromActorTool } from './dnd5e-remove-item-from-actor.js';
 import { dnd5eSearchCompendiumTool } from './dnd5e-search-compendium.js';
 import { dnd5eSearchRulesTool } from './dnd5e-search-rules.js';
+import { dnd5eTransferItemBetweenActorsTool } from './dnd5e-transfer-item-between-actors.js';
 import { dnd5eUpdateItemQuantityTool } from './dnd5e-update-item-quantity.js';
 import { dnd5eUpdateItemUsesTool } from './dnd5e-update-item-uses.js';
 import { endCombatTool } from './end-combat.js';
@@ -102,10 +104,12 @@ export const tools: ReadonlyArray<ToolDefinition<z.ZodTypeAny>> = [
   dnd5eGetAvailableConditionsTool,
   dnd5eGetCreatureDetailsTool,
   dnd5eGetItemDetailsTool,
+  dnd5eMoveItemToContainerTool,
   dnd5eRemoveConditionTool,
   dnd5eRemoveItemFromActorTool,
   dnd5eSearchCompendiumTool,
   dnd5eSearchRulesTool,
+  dnd5eTransferItemBetweenActorsTool,
   dnd5eUpdateItemQuantityTool,
   dnd5eUpdateItemUsesTool,
   endCombatTool,

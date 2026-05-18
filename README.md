@@ -179,6 +179,8 @@ Require the D&D 5e system loaded on the world.
 - **`dnd5e_remove_item_from_actor`** — remove an item from a D&D 5e character or npc, or decrement its quantity; deleting a container ejects its direct contents to the inventory root.
 - **`dnd5e_update_item_quantity`** — set the absolute quantity of a physical item (weapon, equipment, consumable, tool, loot, container) on a D&D 5e character or npc.
 - **`dnd5e_update_item_uses`** — set the remaining charges of a uses-tracking item (wand, staff, charged magic item, or feat/spell with limited activations) on a D&D 5e character or npc.
+- **`dnd5e_move_item_to_container`** — relocate a physical item between containers, or to/from the inventory root, on a single D&D 5e character or npc; cycle-checked, with optional stack-merging at the destination.
+- **`dnd5e_transfer_item_between_actors`** — move a physical item from one D&D 5e actor to another: full-stack transfer, partial-stack split, stack-merging into a matching destination stack, or full-cascade transfer of a container plus its nested contents.
 
 ## Prerequisites
 
