@@ -301,6 +301,12 @@ reaches the LLM (a journal entry, chat message, roll table result, etc.) could
 in theory trigger execution. That's a real risk on any server where other
 people (or untrusted AIs) might interact with it.
 
+Be aware too that arbitrary, untested JavaScript run against a live world can
+corrupt or brick the game world — a single bad mutation (an orphaned embedded
+document, a malformed actor update) can leave the world un-loadable for every
+client — so treat `foundry_eval` as a power tool on a real campaign, not a
+scratchpad.
+
 - When `ALLOW_EVAL` is unset or `false` → `foundry_eval` is completely hidden
   and unavailable. All other tools work normally.
 - Set `ALLOW_EVAL=true` in your `.env` file only for your personal
