@@ -231,7 +231,7 @@ usual headless-Chrome system dependencies for your distro.
 ## Install & build
 
 ```
-git clone <repo-url> gm-puppeteer
+git clone https://github.com/mnemeth1/gm-puppeteer.git
 cd gm-puppeteer
 npm install
 npm run build
