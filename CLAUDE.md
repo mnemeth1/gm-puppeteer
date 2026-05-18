@@ -55,6 +55,10 @@ and add a one-line description to `README.md` (the user-facing tool
 catalog). Deep behavioral notes (return shape, error semantics,
 surprising defaults) belong in JSDoc on the evaluator file.
 
+**Keep the `README.md` tool list in sync.** Every added (or removed)
+tool needs a matching change to its catalog bullet under the right
+`####` group in the `## Tools` section.
+
 ## Critical implementation rules
 
 These cause silent failures — a bad build, a wedged client, or a
@@ -180,3 +184,15 @@ dev loop):
 - **`{ }` comments don't nest** — a `{...}` token (e.g. `{app}`) inside a
   `{ }` comment closes it early and the rest of the line compiles as
   code. Use `(* *)` comments or avoid brace tokens in comment prose.
+
+### Changelog
+
+`CHANGELOG.md` follows [Keep a Changelog](https://keepachangelog.com).
+**Update it in the same commit as any user-visible change** — a new or
+removed tool, a changed tool contract or return shape, a behavior fix.
+Add the entry under an `## [Unreleased]` heading at the top of the file
+(create `CHANGELOG.md` with that heading if it is absent), in the
+relevant `### Added` / `### Changed` / `### Fixed` group. Internal-only
+churn — refactors, tests, doc edits — does not need an entry. When
+cutting a release, rename the `[Unreleased]` heading to the version and
+add the date.
