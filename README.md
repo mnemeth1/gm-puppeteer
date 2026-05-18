@@ -103,7 +103,7 @@ system.
 
 #### Ownership & users
 
-- **`list_users`** — enumerate Foundry users in the world (id, name, role, isGM, active).
+- **`list_users`** — enumerate Foundry users in the world (id, name, role, isGM, active, idle, idleSeconds).
 - **`list_actor_ownership`** — show per-actor ownership: `default` + per-user level.
 - **`assign_actor_ownership`** — set a user's (or `default`) ownership level on an actor.
 - **`remove_actor_ownership`** — clear a user's explicit ownership entry on an actor.
@@ -166,21 +166,37 @@ Require the Pathfinder 2e system loaded on the world.
 
 Require the D&D 5e system loaded on the world.
 
-- **`dnd5e_search_compendium`** — name/structured-filter search across D&D 5e compendium packs, on the system's native Compendium Browser engine.
-- **`dnd5e_search_rules`** — page-level full-text search across D&D 5e compendium rules-glossary journals.
+#### Creatures & state
+
 - **`dnd5e_get_creature_details`** — read-only D&D 5e NPC/vehicle stat block by UUID.
-- **`dnd5e_get_item_details`** — read-only full-detail view of any D&D 5e Item by UUID.
-- **`dnd5e_get_actor_inventory`** — read-only list view of a D&D 5e actor's physical inventory plus currency.
 - **`dnd5e_get_actor_state`** — read-only projection of a D&D 5e actor's combat-relevant state.
-- **`dnd5e_get_available_conditions`** — enumerate every applyable D&D 5e status (condition, pseudo-condition, or plain status), with the valued flag, exhaustion cap, and a rules-reference UUID.
-- **`dnd5e_apply_condition`** — apply a D&D 5e status to a character or npc; take-max exhaustion level, rider conditions surfaced as a cascade.
-- **`dnd5e_remove_condition`** — remove a D&D 5e status from a character or npc, or decrement exhaustion by one level; rider conditions surfaced as a cascade.
+
+#### Inventory & items
+
+- **`dnd5e_get_actor_inventory`** — read-only list view of a D&D 5e actor's physical inventory plus currency.
+- **`dnd5e_get_item_details`** — read-only full-detail view of any D&D 5e Item by UUID.
 - **`dnd5e_add_item_to_actor`** — grant a physical compendium item (weapon, equipment, consumable, tool, loot, container) to a D&D 5e character or npc; handles quantity, container placement, identification, and stack-merging.
 - **`dnd5e_remove_item_from_actor`** — remove an item from a D&D 5e character or npc, or decrement its quantity; deleting a container ejects its direct contents to the inventory root.
 - **`dnd5e_update_item_quantity`** — set the absolute quantity of a physical item (weapon, equipment, consumable, tool, loot, container) on a D&D 5e character or npc.
 - **`dnd5e_update_item_uses`** — set the remaining charges of a uses-tracking item (wand, staff, charged magic item, or feat/spell with limited activations) on a D&D 5e character or npc.
 - **`dnd5e_move_item_to_container`** — relocate a physical item between containers, or to/from the inventory root, on a single D&D 5e character or npc; cycle-checked, with optional stack-merging at the destination.
 - **`dnd5e_transfer_item_between_actors`** — move a physical item from one D&D 5e actor to another: full-stack transfer, partial-stack split, stack-merging into a matching destination stack, or full-cascade transfer of a container plus its nested contents.
+
+#### Conditions
+
+- **`dnd5e_get_available_conditions`** — enumerate every applyable D&D 5e status (condition, pseudo-condition, or plain status), with the valued flag, exhaustion cap, and a rules-reference UUID.
+- **`dnd5e_apply_condition`** — apply a D&D 5e status to a character or npc; take-max exhaustion level, rider conditions surfaced as a cascade.
+- **`dnd5e_remove_condition`** — remove a D&D 5e status from a character or npc, or decrement exhaustion by one level; rider conditions surfaced as a cascade.
+
+#### Checks
+
+- **`dnd5e_roll_check`** — roll a non-PC D&D 5e actor's real ability, skill, saving-throw, or tool check through the dnd5e roll pipeline and post the result; supply a DC for a success/failure outcome.
+- **`dnd5e_request_check`** — post a whispered, clickable D&D 5e check button asking a player to roll an ability, skill, save, or tool check for their own character.
+
+#### Compendium & utilities
+
+- **`dnd5e_search_compendium`** — name/structured-filter search across D&D 5e compendium packs, on the system's native Compendium Browser engine.
+- **`dnd5e_search_rules`** — page-level full-text search across D&D 5e compendium rules-glossary journals.
 
 ## Prerequisites
 
@@ -253,22 +269,44 @@ default except where noted; `.env.example` carries the full, commented list.
 | `FORGE_MODE` | `false` | Enable the Forge-hosted session flow — see [Forge-hosted Foundry](#forge-hosted-foundry). |
 | `FORGE_PROFILE_DIR` | `.puppeteer-profile` | Chromium profile directory the Forge session is persisted in. Absolute path recommended. |
 | `FORGE_MANUAL_LOGIN_TIMEOUT_MS` | `300000` | How long to wait for a human to finish the visible Forge login. |
+| `FORGE_WAKE_TIMEOUT_MS` | `180000` | How long to wait for a cold/idled Forge instance to wake when (re)connecting. A Forge world idled for inactivity can take well over the 60 s login timeout to come back. |
 
 ### `ALLOW_EVAL` and the `foundry_eval` tool
 
-`foundry_eval` runs **arbitrary JavaScript** inside the live Foundry GM
-client. It is the deliberate escape hatch for probing APIs, diagnosing state,
-and covering gaps not yet served by a typed tool — and it is invaluable during
-development.
+This is the most powerful feature in gm-puppeteer — the one that turns a smart
+AI into a true AI Game Master with almost no limits.
 
-It is also a real risk on a server others connect to: Foundry-side content (a
-journal entry, a chat message) that reaches a connected LLM could in principle
-drive arbitrary execution. So it is **off by default** — when `ALLOW_EVAL` is
-unset or `false`, `foundry_eval` is not registered and is invisible to the
-client; every other tool is unaffected.
+When enabled, the `foundry_eval` tool lets the connected AI run any JavaScript
+code it wants directly inside your live Foundry VTT GM session.
 
-Set `ALLOW_EVAL=true` for your own development environment. Leave it off for
-any shared or published deployment.
+In plain English: if you ask the AI to do literally anything on the tabletop,
+it can figure out how. It can create custom macros on the fly, tweak actor
+data in ways no normal tool allows, hook into hidden Foundry APIs, build
+complex multi-step automations, add temporary house rules, or solve edge cases
+that nothing else can touch. A good AI model (Claude, Grok, GPT-4o, etc.)
+basically has god-mode access to your entire Foundry world when this tool is
+active.
+
+That power is intentional — it's the escape hatch that makes gm-puppeteer
+uniquely flexible. However, it is intentionally disabled by default for
+safety. Because the AI can run arbitrary code, any Foundry content that
+reaches the LLM (a journal entry, chat message, roll table result, etc.) could
+in theory trigger execution. That's a real risk on any server where other
+people (or untrusted AIs) might interact with it.
+
+- When `ALLOW_EVAL` is unset or `false` → `foundry_eval` is completely hidden
+  and unavailable. All other tools work normally.
+- Set `ALLOW_EVAL=true` in your `.env` file only for your personal
+  single-player setup or trusted development environment.
+
+**Bottom line recommendation:**
+
+- Leave it **OFF** for any shared server, public demo, or multi-user game.
+- Turn it **ON** when you want the AI to have unlimited creative freedom for
+  solo play or rapid prototyping.
+
+This single toggle is what separates "helpful AI assistant" from "AI that can
+genuinely run the entire game for you."
 
 ## Forge-hosted Foundry
 
@@ -321,6 +359,14 @@ redirect, and re-visiting it as the authenticated game owner lands on the Forge
   The headless restore polls for the world to finish loading, bounded by
   `FOUNDRY_LOGIN_TIMEOUT_MS` (default 60 s) — raise that if a heavy world
   needs longer.
+- **Idle recovery.** Forge idles an instance after a stretch with no
+  mouse/keyboard activity in the Foundry tab. When a tool call arrives after
+  such an idle, the server detects the dropped session and reconnects
+  automatically — relaunching from `FORGE_PROFILE_DIR` and waking the
+  instance — before running the tool. A cold wake can exceed the 60 s login
+  timeout, so the reconnect (and the initial Forge restore) is bounded by
+  `FORGE_WAKE_TIMEOUT_MS` (default 3 min) instead; raise it if your instance
+  wakes slowly.
 
 ## Connecting an MCP client
 
