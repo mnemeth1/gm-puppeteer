@@ -220,6 +220,9 @@ Require the D&D 5e system loaded on the world.
   as this user. It can have no password (set `FOUNDRY_GM_PASSWORD` empty) or a
   password you supply via config.
 - An MCP-capable client to connect to the server.
+- The **game system named in the world's description**. The MCP client reads
+  the world description verbatim; stating the system there (e.g. "Pathfinder
+  2e" or "D&D 5e") helps the client pick the right tool suite.
 
 The headless Chromium is downloaded by Puppeteer on `npm install`. On Linux it
 needs a handful of shared libraries — if Chromium fails to launch, install the
