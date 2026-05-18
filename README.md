@@ -115,7 +115,7 @@ system.
 #### Dice & chat
 
 - **`roll_dice`** — evaluate a raw dice formula and post it to chat; optional NPC speaker, GM/blind visibility.
-- **`get_chat_messages`** — read a window of the chat log; PF2e check/damage cards parsed into structured form.
+- **`get_chat_messages`** — read a window of the chat log; check/damage/activation cards parsed into structured form per system (PF2e and D&D 5e).
 - **`post_chat_message`** — post a raw-HTML chat message; optional NPC speaker, public / GM-only / player-whisper.
 
 #### Compendium, world & diagnostics

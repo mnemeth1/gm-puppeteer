@@ -8,9 +8,10 @@ import { jsonText, type ToolDefinition } from './types.js';
 
 /**
  * Schema for `get_chat_messages`. Read-only window onto Foundry's chat
- * log, with PF2e check and damage cards parsed into structured form.
- * This tool does not post — use `post_chat_message` to write — and does
- * not roll — use `roll_dice` / `pf2e_roll_check` / `pf2e_request_check`.
+ * log, with each message's check / damage / activation card parsed into
+ * a structured `card` shape per game system (PF2e and D&D 5e). This tool
+ * does not post — use `post_chat_message` to write — and does not roll —
+ * use `roll_dice` / `*_roll_check` / `*_request_check`.
  */
 const GetChatMessagesInput = z
   .object({
@@ -42,17 +43,27 @@ export const getChatMessagesTool: ToolDefinition<typeof GetChatMessagesInput> = 
   name: 'get_chat_messages',
   description:
     "Read a window of Foundry's chat log — what actually happened at the table: " +
-    'narration, NPC dialogue, dice rolls, and PF2e check / damage cards. Returns the ' +
-    'newest `limit` messages (default 20), oldest-first so a round reads top to bottom; ' +
-    'pass `sinceMessageId` to page forward from the last message you saw. Each message ' +
-    'carries {id, author, speaker, timestamp, contentHtml, flavorHtml, text (HTML- ' +
-    'stripped), isRoll, rollTotal, whisper, blind, style, card}. `card` is always ' +
-    'present: {kind:"check", checkType, dc, outcome, domains, rollTotal} for a PF2e ' +
-    'check, {kind:"damage", total, instances:[{damageType, category, total, ' +
-    'persistent}], outcome, targetActorId} for a damage roll, or {kind:"other", ' +
-    'pf2eCardType} for everything else. Read as the GM, so whispered messages are ' +
-    'included. This tool is read-only: to post a message use post_chat_message; to ' +
-    'roll dice use roll_dice, pf2e_roll_check, or pf2e_request_check.',
+    'narration, NPC dialogue, dice rolls, and check / damage / activation cards. ' +
+    'Returns the newest `limit` messages (default 20), oldest-first so a round reads ' +
+    'top to bottom; pass `sinceMessageId` to page forward from the last message you ' +
+    'saw. Each message carries {id, author, speaker, timestamp, contentHtml, ' +
+    'flavorHtml, text (HTML-stripped), isRoll, rollTotal, whisper, blind, style, ' +
+    'card}. `card` is always present and structured per game system: branch on ' +
+    '`card.system` ("pf2e" | "dnd5e" | null) first, then `card.kind`. ' +
+    'PF2e — {kind:"check", checkType, dc, outcome, domains, rollTotal}, ' +
+    '{kind:"damage", total, instances:[{damageType, category, total, persistent}], ' +
+    'outcome, targetActorId}, or {kind:"other", rawCardType}. ' +
+    'D&D 5e — {kind:"item-card", activityType, itemType, itemName, targets} for a ' +
+    'roll-less usage/activation card; {kind:"attack", rollTotal, naturalD20, ' +
+    'targetAc, outcome, targets}; {kind:"damage", total, damageTypes, isCritical}; ' +
+    '{kind:"save", ability, rollTotal, dc, outcome}; {kind:"check", checkType ' +
+    '(ability|skill|tool), key, rollTotal, dc, outcome}; {kind:"initiative", ' +
+    'rollTotal}; or {kind:"other", rawCardType}. D&D 5e never bakes an outcome into ' +
+    'a message — attack hit/crit and save pass/fail are derived, and 5e roll cards ' +
+    'carry originatingMessageId linking back to their usage card. Read as the GM, so ' +
+    'whispered messages are included. This tool is read-only: to post a message use ' +
+    'post_chat_message; to roll dice use roll_dice, pf2e_roll_check / ' +
+    'dnd5e_roll_check, or pf2e_request_check / dnd5e_request_check.',
   inputSchema: GetChatMessagesInput,
   async handler(input, ctx) {
     const { page } = await ctx.browser.ensureStarted();
