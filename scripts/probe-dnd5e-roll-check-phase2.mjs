@@ -42,9 +42,7 @@ try {
 
     const openWindows = () => {
       const inst = globalThis.foundry?.applications?.instances;
-      const fromInstances = inst
-        ? [...inst.values()].map((a) => a?.constructor?.name)
-        : null;
+      const fromInstances = inst ? [...inst.values()].map((a) => a?.constructor?.name) : null;
       const fromUi = globalThis.ui?.windows
         ? Object.values(globalThis.ui.windows).map((w) => w?.constructor?.name)
         : null;

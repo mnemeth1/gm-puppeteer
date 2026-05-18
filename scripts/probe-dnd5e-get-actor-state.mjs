@@ -145,11 +145,7 @@ try {
   );
   check('P1 PC details.level is a number', shapes.pc.levelType === 'number', shapes.pc.levelValue);
   check('P1 PC has a class item', !!shapes.pc.classItem, shapes.pc.classItem);
-  check(
-    'P1 PC statuses is a Set',
-    shapes.pc.statusesIsSet,
-    { statuses: shapes.pc.statuses },
-  );
+  check('P1 PC statuses is a Set', shapes.pc.statusesIsSet, { statuses: shapes.pc.statuses });
   check(
     'P1 PC ability carries value+mod+save+proficient',
     ['value', 'mod', 'save', 'proficient'].every((k) => shapes.pc.abilityStrKeys.includes(k)),
@@ -160,12 +156,15 @@ try {
     ['proficient', 'total', 'passive'].every((k) => shapes.pc.skillPrcKeys.includes(k)),
     shapes.pc.skillPrcKeys,
   );
+  check('P1 PC death-save block present', shapes.pc.death !== null, {
+    death: shapes.pc.death,
+    keys: shapes.pc.deathKeys,
+  });
   check(
-    'P1 PC death-save block present',
-    shapes.pc.death !== null,
-    { death: shapes.pc.death, keys: shapes.pc.deathKeys },
+    'P1 PC exhaustion is numeric',
+    shapes.pc.exhaustionType === 'number',
+    shapes.pc.exhaustionValue,
   );
-  check('P1 PC exhaustion is numeric', shapes.pc.exhaustionType === 'number', shapes.pc.exhaustionValue);
   check('P1 PC hd hit-dice block', shapes.pc.hdTypeof !== 'undefined', {
     ctor: shapes.pc.hdCtor,
     value: shapes.pc.hdValue,
@@ -295,7 +294,11 @@ try {
 
   // S8 — error paths.
   const s8a = await run(BOGUS_ID);
-  check('S8a bogus actorId → ACTOR_NOT_FOUND', !s8a.ok && s8a.error.code === 'ACTOR_NOT_FOUND', s8a);
+  check(
+    'S8a bogus actorId → ACTOR_NOT_FOUND',
+    !s8a.ok && s8a.error.code === 'ACTOR_NOT_FOUND',
+    s8a,
+  );
   const unsupported = await page.evaluate(() => {
     const a = game.actors.find((x) => x.type === 'vehicle' || x.type === 'group');
     return a ? a.id : null;

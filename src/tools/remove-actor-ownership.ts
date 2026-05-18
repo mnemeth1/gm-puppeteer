@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   removeActorOwnershipBody,
   type RemoveActorOwnershipResult,
@@ -45,7 +45,7 @@ export const removeActorOwnershipTool: ToolDefinition<typeof RemoveActorOwnershi
       userId: input.userId,
     })) as RemoveActorOwnershipResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     ctx.log.info(
       {

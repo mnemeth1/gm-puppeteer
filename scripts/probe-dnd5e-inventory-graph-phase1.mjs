@@ -96,10 +96,7 @@ try {
         }
         if (!weapon && type === 'weapon') weapon = { uuid, name: e.name ?? '', type };
         if (!equipment && type === 'equipment') equipment = { uuid, name: e.name ?? '', type };
-        if (
-          !anyPhysical &&
-          ['weapon', 'equipment', 'consumable', 'tool', 'loot'].includes(type)
-        ) {
+        if (!anyPhysical && ['weapon', 'equipment', 'consumable', 'tool', 'loot'].includes(type)) {
           anyPhysical = { uuid, name: e.name ?? '', type };
         }
       }
@@ -190,18 +187,13 @@ try {
       const c1 = await grant(containerUuid, 'c1');
       {
         const before = w1.toObject();
-        await actor.updateEmbeddedDocuments('Item', [
-          { _id: w1.id, 'system.container': c1.id },
-        ]);
+        await actor.updateEmbeddedDocuments('Item', [{ _id: w1.id, 'system.container': c1.id }]);
         const after = actor.items.get(w1.id).toObject();
-        const changed = diffPaths(before, after).filter(
-          (p) => !p.startsWith('_stats'),
-        );
+        const changed = diffPaths(before, after).filter((p) => !p.startsWith('_stats'));
         out.q2 = {
           changedPaths: changed,
           containerAfter: containerOf(actor.items.get(w1.id)),
-          onlyContainerFieldChanged:
-            changed.length === 1 && changed[0] === 'system.container',
+          onlyContainerFieldChanged: changed.length === 1 && changed[0] === 'system.container',
         };
       }
 
@@ -218,7 +210,11 @@ try {
           threw = true;
           out.q3error = String(err?.message ?? err);
         }
-        out.q3 = { threw, returnLen, containerStillC1: containerOf(actor.items.get(w1.id)) === c1.id };
+        out.q3 = {
+          threw,
+          returnLen,
+          containerStillC1: containerOf(actor.items.get(w1.id)) === c1.id,
+        };
       }
 
       // Q4 — self-cycle (depth 1) ---------------------------------------
@@ -226,9 +222,7 @@ try {
       {
         let threw = false;
         try {
-          await actor.updateEmbeddedDocuments('Item', [
-            { _id: a.id, 'system.container': a.id },
-          ]);
+          await actor.updateEmbeddedDocuments('Item', [{ _id: a.id, 'system.container': a.id }]);
         } catch (err) {
           threw = true;
           out.q4error = String(err?.message ?? err);
@@ -250,13 +244,9 @@ try {
         let threw = false;
         try {
           // B's parent = A
-          await actor.updateEmbeddedDocuments('Item', [
-            { _id: b.id, 'system.container': a.id },
-          ]);
+          await actor.updateEmbeddedDocuments('Item', [{ _id: b.id, 'system.container': a.id }]);
           // A's parent = B  → cycle
-          await actor.updateEmbeddedDocuments('Item', [
-            { _id: a.id, 'system.container': b.id },
-          ]);
+          await actor.updateEmbeddedDocuments('Item', [{ _id: a.id, 'system.container': b.id }]);
         } catch (err) {
           threw = true;
           out.q5error = String(err?.message ?? err);
@@ -281,9 +271,7 @@ try {
       {
         let threw = false;
         try {
-          await actor.updateEmbeddedDocuments('Item', [
-            { _id: w2.id, 'system.container': w1.id },
-          ]);
+          await actor.updateEmbeddedDocuments('Item', [{ _id: w2.id, 'system.container': w1.id }]);
         } catch (err) {
           threw = true;
           out.q6error = String(err?.message ?? err);
@@ -326,9 +314,7 @@ try {
         const rawBefore = eq.system?.equipped;
         let threw = false;
         try {
-          await actor.updateEmbeddedDocuments('Item', [
-            { _id: eq.id, 'system.equipped': true },
-          ]);
+          await actor.updateEmbeddedDocuments('Item', [{ _id: eq.id, 'system.equipped': true }]);
         } catch (err) {
           threw = true;
           out.q8error = String(err?.message ?? err);
@@ -426,9 +412,7 @@ try {
         out.q11 = {
           threw,
           allGone:
-            !actor.items.get(rootId) &&
-            !actor.items.get(childAId) &&
-            !actor.items.get(childBId),
+            !actor.items.get(rootId) && !actor.items.get(childAId) && !actor.items.get(childBId),
           controlUnaffected: containerOf(actor.items.get(w1.id)) === controlBefore,
         };
       }
@@ -474,14 +458,26 @@ try {
 
   // Sanity assertions — surface anything that contradicts the plan.
   assert(result.q1.isNull || result.q1.isUndefined, 'Q1: root container is null/absent', result.q1);
-  assert(result.q2.onlyContainerFieldChanged, 'Q2: only system.container drifts on a move', result.q2);
+  assert(
+    result.q2.onlyContainerFieldChanged,
+    'Q2: only system.container drifts on a move',
+    result.q2,
+  );
   assert(result.q3.threw === false, 'Q3: same-destination set does not throw', result.q3);
   assert(result.q7.childRefIntact, 'Q7: children survive a populated-container move', result.q7);
   assert(result.q8.isBareBoolean, 'Q8: system.equipped is a bare boolean', result.q8);
   assert(result.q10.treeShapeCorrect, 'Q10: keepId preserves the subtree shape', result.q10);
   assert(result.q10.threw === false, 'Q10: keepId create did not throw', result.q10);
-  assert(result.q11.allGone && !result.q11.threw, 'Q11: bulk-delete clears the subtree', result.q11);
-  assert(result.q12.survivesRoundTrip, 'Q12: compendiumSource survives toObject→create', result.q12);
+  assert(
+    result.q11.allGone && !result.q11.threw,
+    'Q11: bulk-delete clears the subtree',
+    result.q11,
+  );
+  assert(
+    result.q12.survivesRoundTrip,
+    'Q12: compendiumSource survives toObject→create',
+    result.q12,
+  );
 
   // --------------------------------------------------------------------
   // Teardown: delete every item not in the start snapshot.

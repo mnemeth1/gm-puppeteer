@@ -14,7 +14,7 @@ it a GM account and let the AI do the busywork while you focus on running the
 game.
 
 **Under the hood:** an MCP server that launches a headless (or visible)
-Chromium browser, logs into your Foundry world as a GM user, and exposes 69
+Chromium browser, logs into your Foundry world as a GM user, and exposes
 typed tools over the Model Context Protocol. All actions run through real
 Foundry APIs inside an authenticated GM session — giving it deep, reliable
 control without any custom modules or v13 limitations.
@@ -44,7 +44,7 @@ walks you through.
 
 ## Tools
 
-69 typed tools in three groups — a system-agnostic **core** plus a
+Typed tools in three groups — a system-agnostic **core** plus a
 **Pathfinder 2e** and a **D&D 5e** suite. The core works on any Foundry world;
 each system suite expects its game system loaded and fails gracefully if
 called on the wrong one. `foundry_eval` is registered only when `ALLOW_EVAL`
@@ -101,6 +101,10 @@ system.
 - **`update_journal_page`** — edit a text page body (replace/append/prepend), name, sort, or title.
 - **`delete_journal_page`** — delete a single page from an entry.
 - **`show_journal_entry`** — broadcast an entry to connected players' screens.
+- **`list_journal_folders`** — enumerate journal folders (id, name, parent, depth, entry/subfolder counts).
+- **`create_journal_folder`** — create a journal folder, optionally nested under a parent.
+- **`update_journal_folder`** — rename a journal folder and/or move it under a different parent (or to root).
+- **`delete_journal_folder`** — delete a journal folder; optionally delete its contents and subfolders.
 
 #### Ownership & users
 

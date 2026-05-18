@@ -158,8 +158,7 @@ try {
         const lvl = e.system?.level;
         if (lvl === 0 && !cantripUuid) cantripUuid = e.uuid;
         if (lvl === 1 && !leveledSpellUuid) leveledSpellUuid = e.uuid;
-        if (typeof lvl === 'number' && lvl >= 3 && !highLevelSpellUuid)
-          highLevelSpellUuid = e.uuid;
+        if (typeof lvl === 'number' && lvl >= 3 && !highLevelSpellUuid) highLevelSpellUuid = e.uuid;
       }
       if (leveledSpellUuid && cantripUuid && highLevelSpellUuid) break;
     }
@@ -208,9 +207,7 @@ try {
         }
       }
       if (!wandSample) {
-        const hit = index.find(
-          (e) => e.type === 'consumable' && e.system?.type?.value === 'wand',
-        );
+        const hit = index.find((e) => e.type === 'consumable' && e.system?.type?.value === 'wand');
         if (hit) {
           const doc = await fromUuid(hit.uuid);
           if (doc) wandSample = { uuid: hit.uuid, pack: pack.collection, ...describeDoc(doc) };
@@ -226,8 +223,7 @@ try {
       character: game.actors?.contents.find((a) => a.type === 'character')?.id ?? null,
       npc: game.actors?.contents.find((a) => a.type === 'npc')?.id ?? null,
       other:
-        game.actors?.contents.find((a) => a.type !== 'character' && a.type !== 'npc')?.id ??
-        null,
+        game.actors?.contents.find((a) => a.type !== 'character' && a.type !== 'npc')?.id ?? null,
     };
     report.worldItemCount = game.items?.size ?? 0;
     return report;
@@ -242,128 +238,121 @@ try {
   // Signature: createScrollFromSpell(spell, options={}, config={}).
   // The dialog-bypass and level live in CONFIG (3rd arg).
   // ====================================================================
-  const stageB = await page.evaluate(
-    async (spellSources) => {
-      const CONFIG = globalThis.CONFIG;
-      const dnd5e = globalThis.dnd5e;
-      const fromUuid = globalThis.fromUuid;
-      const Item5e = dnd5e?.documents?.Item5e ?? CONFIG?.Item?.documentClass ?? null;
-      const report = {};
+  const stageB = await page.evaluate(async (spellSources) => {
+    const CONFIG = globalThis.CONFIG;
+    const dnd5e = globalThis.dnd5e;
+    const fromUuid = globalThis.fromUuid;
+    const Item5e = dnd5e?.documents?.Item5e ?? CONFIG?.Item?.documentClass ?? null;
+    const report = {};
+    try {
+      report.createScrollFromCompendiumSpellSource =
+        typeof Item5e?.createScrollFromCompendiumSpell === 'function'
+          ? String(Item5e.createScrollFromCompendiumSpell)
+          : null;
+    } catch {
+      report.createScrollFromCompendiumSpellSource = 'unreadable';
+    }
+
+    const describeDoc = (doc) => {
+      if (!doc || typeof doc !== 'object') return { value: String(doc) };
+      const sys = doc.system ?? {};
+      let activitySummaries = null;
       try {
-        report.createScrollFromCompendiumSpellSource =
-          typeof Item5e?.createScrollFromCompendiumSpell === 'function'
-            ? String(Item5e.createScrollFromCompendiumSpell)
-            : null;
+        const act = sys.activities;
+        const list = act && typeof act.contents !== 'undefined' ? act.contents : null;
+        if (Array.isArray(list)) {
+          activitySummaries = list.map((a) => ({
+            id: a?.id ?? null,
+            type: a?.type ?? null,
+            name: a?.name ?? null,
+            ctor: a?.constructor?.name ?? null,
+          }));
+        }
       } catch {
-        report.createScrollFromCompendiumSpellSource = 'unreadable';
+        activitySummaries = 'unreadable';
       }
-
-      const describeDoc = (doc) => {
-        if (!doc || typeof doc !== 'object') return { value: String(doc) };
-        const sys = doc.system ?? {};
-        let activitySummaries = null;
-        try {
-          const act = sys.activities;
-          const list = act && typeof act.contents !== 'undefined' ? act.contents : null;
-          if (Array.isArray(list)) {
-            activitySummaries = list.map((a) => ({
-              id: a?.id ?? null,
-              type: a?.type ?? null,
-              name: a?.name ?? null,
-              ctor: a?.constructor?.name ?? null,
-            }));
-          }
-        } catch {
-          activitySummaries = 'unreadable';
-        }
-        let toObjectKeys = null;
-        try {
-          toObjectKeys =
-            typeof doc.toObject === 'function' ? Object.keys(doc.toObject()) : null;
-        } catch {
-          toObjectKeys = 'unreadable';
-        }
-        return {
-          ctor: doc.constructor?.name ?? null,
-          documentName: doc.documentName ?? null,
-          hasId: typeof doc.id === 'string' && doc.id.length > 0,
-          inWorldItems: doc.id ? !!globalThis.game.items?.get(doc.id) : false,
-          name: doc.name ?? null,
-          type: doc.type ?? null,
-          sysTypeValue: sys.type?.value ?? null,
-          sysLevel: sys.level ?? null,
-          quantity: sys.quantity ?? null,
-          uses: sys.uses ?? null,
-          container: sys.container ?? null,
-          identified: sys.identified ?? null,
-          properties: sys.properties ?? null,
-          flagsDnd5e: doc.flags?.dnd5e ?? null,
-          activitySummaries,
-          toObjectKeys,
-        };
+      let toObjectKeys = null;
+      try {
+        toObjectKeys = typeof doc.toObject === 'function' ? Object.keys(doc.toObject()) : null;
+      } catch {
+        toObjectKeys = 'unreadable';
+      }
+      return {
+        ctor: doc.constructor?.name ?? null,
+        documentName: doc.documentName ?? null,
+        hasId: typeof doc.id === 'string' && doc.id.length > 0,
+        inWorldItems: doc.id ? !!globalThis.game.items?.get(doc.id) : false,
+        name: doc.name ?? null,
+        type: doc.type ?? null,
+        sysTypeValue: sys.type?.value ?? null,
+        sysLevel: sys.level ?? null,
+        quantity: sys.quantity ?? null,
+        uses: sys.uses ?? null,
+        container: sys.container ?? null,
+        identified: sys.identified ?? null,
+        properties: sys.properties ?? null,
+        flagsDnd5e: doc.flags?.dnd5e ?? null,
+        activitySummaries,
+        toObjectKeys,
       };
+    };
 
-      const withTimeout = (p, ms) =>
-        Promise.race([
-          Promise.resolve(p)
-            .then((v) => ({ settled: true, value: v }))
-            .catch((e) => ({ settled: true, error: e?.message ?? String(e) })),
-          new Promise((res) => setTimeout(() => res({ timedOut: true }), ms)),
-        ]);
+    const withTimeout = (p, ms) =>
+      Promise.race([
+        Promise.resolve(p)
+          .then((v) => ({ settled: true, value: v }))
+          .catch((e) => ({ settled: true, error: e?.message ?? String(e) })),
+        new Promise((res) => setTimeout(() => res({ timedOut: true }), ms)),
+      ]);
 
-      const attempts = [];
-      const tryScroll = async (label, uuid, cfg) => {
-        if (!uuid || typeof Item5e?.createScrollFromSpell !== 'function') {
-          attempts.push({ label, skipped: true, uuidPresent: !!uuid });
-          return;
-        }
-        const spell = await fromUuid(uuid);
-        const raced = await withTimeout(
-          Item5e.createScrollFromSpell(spell, {}, cfg ?? {}),
-          15000,
-        );
-        if (raced.timedOut) {
-          attempts.push({ label, timedOut: true, config: cfg ?? {} });
-        } else if (raced.error) {
-          attempts.push({ label, threw: raced.error, config: cfg ?? {} });
-        } else {
-          attempts.push({
-            label,
-            ok: true,
-            config: cfg ?? {},
-            result: describeDoc(raced.value),
-          });
-        }
-      };
+    const attempts = [];
+    const tryScroll = async (label, uuid, cfg) => {
+      if (!uuid || typeof Item5e?.createScrollFromSpell !== 'function') {
+        attempts.push({ label, skipped: true, uuidPresent: !!uuid });
+        return;
+      }
+      const spell = await fromUuid(uuid);
+      const raced = await withTimeout(Item5e.createScrollFromSpell(spell, {}, cfg ?? {}), 15000);
+      if (raced.timedOut) {
+        attempts.push({ label, timedOut: true, config: cfg ?? {} });
+      } else if (raced.error) {
+        attempts.push({ label, threw: raced.error, config: cfg ?? {} });
+      } else {
+        attempts.push({
+          label,
+          ok: true,
+          config: cfg ?? {},
+          result: describeDoc(raced.value),
+        });
+      }
+    };
 
-      await tryScroll('leveled spell, {dialog:false}', spellSources.leveledSpellUuid, {
-        dialog: false,
-      });
-      await tryScroll('cantrip, {dialog:false}', spellSources.cantripUuid, {
-        dialog: false,
-      });
-      await tryScroll(
-        'leveled (lvl1) spell, {dialog:false, level:5}',
-        spellSources.leveledSpellUuid,
-        { dialog: false, level: 5 },
-      );
-      await tryScroll(
-        'high (lvl3+) spell, {dialog:false, level:1} (downcast?)',
-        spellSources.highLevelSpellUuid,
-        { dialog: false, level: 1 },
-      );
-      await tryScroll(
-        'leveled spell, {dialog:false, explanation:"none"}',
-        spellSources.leveledSpellUuid,
-        { dialog: false, explanation: 'none' },
-      );
+    await tryScroll('leveled spell, {dialog:false}', spellSources.leveledSpellUuid, {
+      dialog: false,
+    });
+    await tryScroll('cantrip, {dialog:false}', spellSources.cantripUuid, {
+      dialog: false,
+    });
+    await tryScroll(
+      'leveled (lvl1) spell, {dialog:false, level:5}',
+      spellSources.leveledSpellUuid,
+      { dialog: false, level: 5 },
+    );
+    await tryScroll(
+      'high (lvl3+) spell, {dialog:false, level:1} (downcast?)',
+      spellSources.highLevelSpellUuid,
+      { dialog: false, level: 1 },
+    );
+    await tryScroll(
+      'leveled spell, {dialog:false, explanation:"none"}',
+      spellSources.leveledSpellUuid,
+      { dialog: false, explanation: 'none' },
+    );
 
-      report.attempts = attempts;
-      report.worldItemCountAfter = globalThis.game.items?.size ?? 0;
-      return report;
-    },
-    stageA.spellSources,
-  );
+    report.attempts = attempts;
+    report.worldItemCountAfter = globalThis.game.items?.size ?? 0;
+    return report;
+  }, stageA.spellSources);
 
   log.info('stage B (factory) complete');
   console.error('=== STAGE B ===');

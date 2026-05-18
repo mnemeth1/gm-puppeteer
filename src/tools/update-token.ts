@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import { updateTokenBody, type UpdateTokenResult } from '../evaluators/update-token.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
@@ -138,8 +138,7 @@ export const updateTokenTool: ToolDefinition<typeof UpdateTokenInput> = {
     };
     const result = (await page.evaluate(updateTokenBody, args)) as UpdateTokenResult;
     if (!result.ok) {
-      const code = result.error.code === 'UPDATE_FAILED' ? 'EVAL_FAILED' : 'INVALID_INPUT';
-      throw new ToolError(code, result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     return [
       jsonText({

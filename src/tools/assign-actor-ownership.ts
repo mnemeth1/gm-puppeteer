@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   assignActorOwnershipBody,
   type AssignActorOwnershipResult,
@@ -52,7 +52,7 @@ export const assignActorOwnershipTool: ToolDefinition<typeof AssignActorOwnershi
       level: input.level,
     })) as AssignActorOwnershipResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     ctx.log.info(
       {

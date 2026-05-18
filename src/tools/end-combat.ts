@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import { endCombatBody, type EndCombatResult } from '../evaluators/end-combat.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
@@ -32,8 +32,7 @@ export const endCombatTool: ToolDefinition<typeof EndCombatInput> = {
     };
     const result = (await page.evaluate(endCombatBody, args)) as EndCombatResult;
     if (!result.ok) {
-      const code = result.error.code === 'DELETE_FAILED' ? 'EVAL_FAILED' : 'INVALID_INPUT';
-      throw new ToolError(code, result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     ctx.log.info(
       { sceneId: result.sceneId, combatId: result.combatId, deleted: result.deleted },

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import { addCombatantsBody, type AddCombatantsResult } from '../evaluators/add-combatants.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
@@ -50,8 +50,7 @@ export const addCombatantsTool: ToolDefinition<typeof AddCombatantsInput> = {
     };
     const result = (await page.evaluate(addCombatantsBody, args)) as AddCombatantsResult;
     if (!result.ok) {
-      const code = result.error.code === 'ADD_FAILED' ? 'EVAL_FAILED' : 'INVALID_INPUT';
-      throw new ToolError(code, result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     ctx.log.info(
       {

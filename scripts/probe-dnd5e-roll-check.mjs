@@ -88,7 +88,7 @@ try {
   if (r2.ok && r2.data.ok) {
     assert(r2.data.outcome === 'success' || r2.data.outcome === 'failure', 'outcome set', r2.data);
     assert(
-      (r2.data.outcome === 'success') === (r2.data.total >= 12),
+      (r2.data.outcome === 'success') === r2.data.total >= 12,
       'outcome consistent with total>=dc',
       r2.data,
     );

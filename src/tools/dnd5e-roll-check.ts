@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import { dnd5eRollCheckBody, type Dnd5eRollCheckResult } from '../evaluators/dnd5e-roll-check.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
@@ -86,7 +86,7 @@ export const dnd5eRollCheckTool: ToolDefinition<typeof Dnd5eRollCheckInput> = {
     };
     const result = (await page.evaluate(dnd5eRollCheckBody, args)) as Dnd5eRollCheckResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     ctx.log.info(
       {

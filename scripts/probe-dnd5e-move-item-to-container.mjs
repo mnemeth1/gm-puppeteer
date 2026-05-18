@@ -132,9 +132,7 @@ try {
 
   const actorIds = await page.evaluate(() => {
     const pc = globalThis.game.actors.find((a) => a.type === 'character');
-    const other = globalThis.game.actors.find(
-      (a) => a.type !== 'character' && a.type !== 'npc',
-    );
+    const other = globalThis.game.actors.find((a) => a.type !== 'character' && a.type !== 'npc');
     return {
       pc: pc ? { id: pc.id, name: pc.name } : null,
       other: other ? { id: other.id, name: other.name, type: other.type } : null,
@@ -223,7 +221,9 @@ try {
     log.info({ probe: 1, res }, 'probe 1: move root → container');
     assert(res.ok === true, 'probe 1: ok', { res });
     if (res.ok) {
-      assert(res.data.operation === 'moved', 'probe 1: operation=moved', { op: res.data.operation });
+      assert(res.data.operation === 'moved', 'probe 1: operation=moved', {
+        op: res.data.operation,
+      });
       assert(res.data.item?.containerBefore === null, 'probe 1: containerBefore=null', {
         before: res.data.item?.containerBefore,
       });
@@ -243,9 +243,13 @@ try {
     log.info({ probe: 2, res: res2 }, 'probe 2: move container → root');
     assert(res2.ok === true, 'probe 2: ok', { res: res2 });
     if (res2.ok) {
-      assert(res2.data.item?.containerBefore === containerId, 'probe 2: containerBefore=container', {
-        before: res2.data.item?.containerBefore,
-      });
+      assert(
+        res2.data.item?.containerBefore === containerId,
+        'probe 2: containerBefore=container',
+        {
+          before: res2.data.item?.containerBefore,
+        },
+      );
       assert(res2.data.item?.containerAfter === null, 'probe 2: containerAfter=null', {
         after: res2.data.item?.containerAfter,
       });
@@ -291,9 +295,13 @@ try {
       assert(res.data.operation === 'merged', 'probe 4: operation=merged', {
         op: res.data.operation,
       });
-      assert(res.data.mergedInto?.id === stackInContainer, 'probe 4: merged into the container stack', {
-        mergedInto: res.data.mergedInto?.id,
-      });
+      assert(
+        res.data.mergedInto?.id === stackInContainer,
+        'probe 4: merged into the container stack',
+        {
+          mergedInto: res.data.mergedInto?.id,
+        },
+      );
       assert(res.data.mergedInto?.newQuantity === 8, 'probe 4: newQuantity=8', {
         newQuantity: res.data.mergedInto?.newQuantity,
       });
@@ -412,9 +420,7 @@ try {
   // Probe 10: non-physical item → NON_PHYSICAL_ITEM.
   // ------------------------------------------------------------------
   {
-    const [featId] = await createItems(page, ACTOR_ID, [
-      { type: 'feat', name: '__probe_mv feat' },
-    ]);
+    const [featId] = await createItems(page, ACTOR_ID, [{ type: 'feat', name: '__probe_mv feat' }]);
     const res = await call({ actorId: ACTOR_ID, itemId: featId, containerId: p1Container });
     log.info({ probe: 10, res }, 'probe 10: non-physical item');
     assert(res.isError === true, 'probe 10: error', { res });
@@ -479,9 +485,7 @@ try {
     async (actorId, snap) => {
       const actor = globalThis.game.actors.get(actorId);
       const snapshotIds = new Set(snap.items.map((i) => i.id));
-      const orphanIds = actor.items.contents
-        .filter((i) => !snapshotIds.has(i.id))
-        .map((i) => i.id);
+      const orphanIds = actor.items.contents.filter((i) => !snapshotIds.has(i.id)).map((i) => i.id);
       for (const id of orphanIds) {
         if (actor.items.get(id)) await actor.items.get(id).delete();
       }
@@ -518,8 +522,7 @@ try {
         ),
       );
       const signaturesMatch =
-        snapSigs.length === finalSigs.length &&
-        snapSigs.every((s, idx) => s === finalSigs[idx]);
+        snapSigs.length === finalSigs.length && snapSigs.every((s, idx) => s === finalSigs[idx]);
       return {
         orphansDeleted: orphanIds.length,
         recreated: missing.length,
@@ -535,11 +538,10 @@ try {
   );
   log.info({ teardown }, 'teardown: restore to start-of-probe snapshot');
 
-  assert(
-    teardown.finalItemCount === snapshot.itemCount,
-    'probe 13: item count equals snapshot',
-    { snapshot: snapshot.itemCount, final: teardown.finalItemCount },
-  );
+  assert(teardown.finalItemCount === snapshot.itemCount, 'probe 13: item count equals snapshot', {
+    snapshot: snapshot.itemCount,
+    final: teardown.finalItemCount,
+  });
   assert(teardown.signaturesMatch === true, 'probe 13: signature multiset matches snapshot', {
     teardown,
   });

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   createJournalPageBody,
   type CreateJournalPageResult,
@@ -73,8 +73,7 @@ export const createJournalPageTool: ToolDefinition<typeof CreateJournalPageInput
       titleLevel: input.titleLevel,
     })) as CreateJournalPageResult;
     if (!result.ok) {
-      const code = result.error.code === 'FOUNDRY_REJECTED' ? 'EVAL_FAILED' : 'INVALID_INPUT';
-      throw new ToolError(code, result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     ctx.log.info(
       { entryId: result.entryId, pageId: result.pageId, name: result.name, sort: result.sort },

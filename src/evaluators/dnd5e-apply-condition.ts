@@ -140,7 +140,6 @@ export async function dnd5eApplyConditionBody(
   // Inlined: module-scope identifiers do NOT survive page.evaluate
   // serialization — only the function source is shipped to the browser.
   const SUPPORTED = new Set(['character', 'npc']);
-  const EXHAUSTION_ID = 'exhaustion';
 
   type AnyRecord = Record<string, unknown>;
   interface EffectLike {
@@ -222,10 +221,9 @@ export async function dnd5eApplyConditionBody(
   // -- Validate statusId against CONFIG.statusEffects.
   const statusEffects = CONFIG?.statusEffects;
   if (!Array.isArray(statusEffects)) {
-    return fail(
-      `CONFIG.statusEffects is unavailable — the D&D 5e system may not be loaded.`,
-      { reason: 'STATUS_EFFECTS_UNAVAILABLE' },
-    );
+    return fail(`CONFIG.statusEffects is unavailable — the D&D 5e system may not be loaded.`, {
+      reason: 'STATUS_EFFECTS_UNAVAILABLE',
+    });
   }
   const statusRow = (statusEffects as StatusEffectLike[]).find(
     (r) => r !== null && typeof r === 'object' && r.id === input.statusId,

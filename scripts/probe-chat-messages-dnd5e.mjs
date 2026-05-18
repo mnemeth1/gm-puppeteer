@@ -145,7 +145,7 @@ try {
     const withTimeout = (p, ms) =>
       Promise.race([
         Promise.resolve(p)
-          .then((v) => ({ settled: true }))
+          .then(() => ({ settled: true }))
           .catch((e) => ({ settled: true, error: e?.message ?? String(e) })),
         new Promise((res) => setTimeout(() => res({ timedOut: true }), ms)),
       ]);
@@ -185,9 +185,7 @@ try {
         );
       }
       if (typeof npc.rollSkill === 'function') {
-        await genRoll('skill', () =>
-          npc.rollSkill({ skill: skillKey }, { configure: false }, {}),
-        );
+        await genRoll('skill', () => npc.rollSkill({ skill: skillKey }, { configure: false }, {}));
         // Q3: advantage — two d20 results, one kept.
         await genRoll('skill+advantage', () =>
           npc.rollSkill({ skill: skillKey, advantage: true }, { configure: false }, {}),

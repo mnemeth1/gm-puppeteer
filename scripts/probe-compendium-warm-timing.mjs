@@ -74,18 +74,21 @@ try {
   let totalDocs = 0;
   let firstWarmed = null;
   for (const collection of selection.collections) {
-    const r = await page.evaluate(async ({ collection, chunkSize }) => {
-      const pack = globalThis.game.packs.get(collection);
-      const t = performance.now();
-      const ids = (await pack.getIndex()).contents.map((e) => e._id).filter(Boolean);
-      let docs = 0;
-      for (let i = 0; i < ids.length; i += chunkSize) {
-        const chunk = ids.slice(i, i + chunkSize);
-        const res = await Promise.allSettled(chunk.map((id) => pack.getDocument(id)));
-        docs += res.filter((x) => x.status === 'fulfilled' && x.value).length;
-      }
-      return { docs, ms: +(performance.now() - t).toFixed(1), firstId: ids[0] ?? null };
-    }, { collection, chunkSize: 16 });
+    const r = await page.evaluate(
+      async ({ collection, chunkSize }) => {
+        const pack = globalThis.game.packs.get(collection);
+        const t = performance.now();
+        const ids = (await pack.getIndex()).contents.map((e) => e._id).filter(Boolean);
+        let docs = 0;
+        for (let i = 0; i < ids.length; i += chunkSize) {
+          const chunk = ids.slice(i, i + chunkSize);
+          const res = await Promise.allSettled(chunk.map((id) => pack.getDocument(id)));
+          docs += res.filter((x) => x.status === 'fulfilled' && x.value).length;
+        }
+        return { docs, ms: +(performance.now() - t).toFixed(1), firstId: ids[0] ?? null };
+      },
+      { collection, chunkSize: 16 },
+    );
     totalDocs += r.docs;
     if (!firstWarmed && r.firstId) firstWarmed = { collection, id: r.firstId };
     log.info({ collection, docs: r.docs, ms: r.ms }, 'Q3 — pack warmed');

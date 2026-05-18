@@ -61,7 +61,11 @@ try {
     }
     return out;
   });
-  check('C1 JournalEntry packs found, getIndex omits pages[]', c1.packs.length > 0 && c1.indexHasPages === false, c1);
+  check(
+    'C1 JournalEntry packs found, getIndex omits pages[]',
+    c1.packs.length > 0 && c1.indexHasPages === false,
+    c1,
+  );
 
   // S1 — locate a rule by page name.
   const s1 = await run({ query: 'grappled', limit: 20 });
@@ -69,7 +73,14 @@ try {
   check(
     'S1 "grappled" finds the Grappled rule page',
     !!grappled && grappled.matchField === 'page.name' && grappled.pageText.length > 0,
-    grappled ? { pageName: grappled.pageName, pageType: grappled.pageType, pack: grappled.pack, pageUuid: grappled.pageUuid } : { hitCount: s1.hitCount },
+    grappled
+      ? {
+          pageName: grappled.pageName,
+          pageType: grappled.pageType,
+          pack: grappled.pack,
+          pageUuid: grappled.pageUuid,
+        }
+      : { hitCount: s1.hitCount },
   );
 
   // S2 — pageTypes scope.
@@ -85,7 +96,10 @@ try {
   check(
     'S3 broad query yields a page.text match',
     s3.ok && s3.hits.some((h) => h.matchField === 'page.text'),
-    { hitCount: s3.ok ? s3.hitCount : null, fields: s3.ok ? [...new Set(s3.hits.map((h) => h.matchField))] : null },
+    {
+      hitCount: s3.ok ? s3.hitCount : null,
+      fields: s3.ok ? [...new Set(s3.hits.map((h) => h.matchField))] : null,
+    },
   );
 
   // S4 — packs filter.

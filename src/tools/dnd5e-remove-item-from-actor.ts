@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   dnd5eRemoveItemFromActorBody,
   type Dnd5eRemoveItemFromActorResult,
@@ -40,7 +40,7 @@ const Dnd5eRemoveItemFromActorInput = z
       .describe(
         '`delete`: remove the item entry entirely. Deleting a container ejects its direct ' +
           'contents to the inventory root (dnd5e leaves them orphaned otherwise) — those promoted ' +
-          'items are surfaced in `ejectedToTopLevel`. `decrement`: reduce the item\'s quantity by ' +
+          "items are surfaced in `ejectedToTopLevel`. `decrement`: reduce the item's quantity by " +
           '`quantity`. If the resulting quantity is 0 and `deleteIfZero` is true (default), the ' +
           'item is deleted (operation becomes `decrementedAndDeleted`); otherwise the entry ' +
           'persists at qty 0. `quantity` and `deleteIfZero` are only valid when `mode` is ' +
@@ -129,7 +129,7 @@ export const dnd5eRemoveItemFromActorTool: ToolDefinition<typeof Dnd5eRemoveItem
       args,
     )) as Dnd5eRemoveItemFromActorResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     const logCtx: Record<string, unknown> = {
       actorId: result.actor.id,

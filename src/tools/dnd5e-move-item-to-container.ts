@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   dnd5eMoveItemToContainerBody,
   type Dnd5eMoveItemToContainerResult,
@@ -30,7 +30,7 @@ const Dnd5eMoveItemToContainerInput = z
       .nullable()
       .describe(
         'Destination: the item id of a container (type "container") on the SAME actor, OR null ' +
-          "to move the item to the inventory root. Foundry does not enforce that this points at " +
+          'to move the item to the inventory root. Foundry does not enforce that this points at ' +
           'an actual container, nor does it reject cycles — the tool rejects non-container ids ' +
           'and moves that would make the item its own ancestor.',
       ),
@@ -74,7 +74,7 @@ export const dnd5eMoveItemToContainerTool: ToolDefinition<typeof Dnd5eMoveItemTo
       args,
     )) as Dnd5eMoveItemToContainerResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     ctx.log.info(
       {

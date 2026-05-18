@@ -72,8 +72,9 @@ async function call(input) {
 // `callRaw` calls the evaluator directly (skips zod) — used for probe 10
 // which exercises the evaluator's defensive value-zero guard.
 async function callRaw(page, args) {
-  const { setConditionValueBody } = await import('../dist/evaluators/set-condition-value.js');
-  const result = await page.evaluate(setConditionValueBody, args);
+  const { pf2eSetConditionValueBody } =
+    await import('../dist/evaluators/pf2e-set-condition-value.js');
+  const result = await page.evaluate(pf2eSetConditionValueBody, args);
   return result;
 }
 

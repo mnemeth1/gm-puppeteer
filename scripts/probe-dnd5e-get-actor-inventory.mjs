@@ -70,9 +70,8 @@ try {
       });
     }
     const pickBest = (t) =>
-      actors
-        .filter((a) => a.type === t)
-        .sort((x, y) => y.physicalCount - x.physicalCount)[0] ?? null;
+      actors.filter((a) => a.type === t).sort((x, y) => y.physicalCount - x.physicalCount)[0] ??
+      null;
     return {
       systemId: game.system?.id,
       actorCount: actors.length,
@@ -83,9 +82,11 @@ try {
   });
   log.info({ survey }, 'Q0: world survey + candidate actors');
   check('Q0 world system is dnd5e', survey.systemId === 'dnd5e', survey.systemId);
-  check('Q0 at least one actor with a physical inventory exists',
+  check(
+    'Q0 at least one actor with a physical inventory exists',
     survey.actors.some((a) => a.physicalCount > 0),
-    survey.actors.map((a) => `${a.name}:${a.physicalCount}`));
+    survey.actors.map((a) => `${a.name}:${a.physicalCount}`),
+  );
 
   const charId = survey.character?.id ?? null;
   const npcId = survey.npc?.id ?? null;
@@ -103,9 +104,7 @@ try {
       const game = globalThis.game;
       const a = game.actors?.get(id);
       if (!a) return { error: 'not found' };
-      const PHYSICAL = new Set([
-        'weapon', 'equipment', 'consumable', 'tool', 'loot', 'container',
-      ]);
+      const PHYSICAL = new Set(['weapon', 'equipment', 'consumable', 'tool', 'loot', 'container']);
       const types = {};
       const physicalItems = [];
       for (const item of a.items?.contents ?? []) {
@@ -155,11 +154,16 @@ try {
   // Q5 — actor currency shape: five denominations incl. electrum.
   for (const d of dumps) {
     const keys = d.actorCurrencyKeys ?? [];
-    check(`Q5 ${d.type} "${d.name}" currency has pp/gp/ep/sp/cp`,
+    check(
+      `Q5 ${d.type} "${d.name}" currency has pp/gp/ep/sp/cp`,
       ['pp', 'gp', 'ep', 'sp', 'cp'].every((k) => keys.includes(k)),
-      { keys, currency: d.actorCurrency });
-    check(`Q5 ${d.type} "${d.name}" currency NOT at system.coins`,
-      d.hasCoinsKey === false, d.hasCoinsKey);
+      { keys, currency: d.actorCurrency },
+    );
+    check(
+      `Q5 ${d.type} "${d.name}" currency NOT at system.coins`,
+      d.hasCoinsKey === false,
+      d.hasCoinsKey,
+    );
   }
 
   // Q3 — physical-item field paths. `equipped` is a bare boolean on every
@@ -169,16 +173,22 @@ try {
     const items = d.physicalItems ?? [];
     const nonLoot = items.filter((i) => i.type !== 'loot');
     const loot = items.filter((i) => i.type === 'loot');
-    check(`Q3 ${d.type} "${d.name}" non-loot physical items have boolean equipped`,
+    check(
+      `Q3 ${d.type} "${d.name}" non-loot physical items have boolean equipped`,
       nonLoot.every((i) => i.equippedType === 'boolean'),
-      nonLoot.map((i) => `${i.name}:${i.equippedType}`));
-    check(`Q3 ${d.type} "${d.name}" loot items carry no equipped field`,
+      nonLoot.map((i) => `${i.name}:${i.equippedType}`),
+    );
+    check(
+      `Q3 ${d.type} "${d.name}" loot items carry no equipped field`,
       loot.every((i) => i.equippedType === 'undefined'),
-      loot.map((i) => `${i.name}:${i.equippedType}`));
-    check(`Q3 ${d.type} "${d.name}" price is {value,denomination,valueInGP}`,
+      loot.map((i) => `${i.name}:${i.equippedType}`),
+    );
+    check(
+      `Q3 ${d.type} "${d.name}" price is {value,denomination,valueInGP}`,
       items.length === 0 ||
         items.every((i) => i.price && typeof i.price === 'object' && 'denomination' in i.price),
-      items.map((i) => i.price));
+      items.map((i) => i.price),
+    );
   }
 
   // Q6 — container per-item currency pool.
@@ -186,20 +196,22 @@ try {
     (d.physicalItems ?? []).filter((i) => i.type === 'container'),
   );
   if (containers.length > 0) {
-    check('Q6 container items expose a system.currency pool',
+    check(
+      'Q6 container items expose a system.currency pool',
       containers.some((c) => c.currency !== null),
-      containers.map((c) => ({ name: c.name, currency: c.currency })));
+      containers.map((c) => ({ name: c.name, currency: c.currency })),
+    );
   } else {
     log.warn('Q6 skipped — no container-type items on the probed actors');
   }
 
   // Q7 — uses shape: max is a number when finite, "" when unlimited.
-  const usesItems = dumps.flatMap((d) =>
-    (d.physicalItems ?? []).filter((i) => i.uses !== null),
-  );
+  const usesItems = dumps.flatMap((d) => (d.physicalItems ?? []).filter((i) => i.uses !== null));
   if (usesItems.length > 0) {
-    log.info({ usesItems: usesItems.map((i) => ({ name: i.name, uses: i.uses })) },
-      'Q7: system.uses shapes observed');
+    log.info(
+      { usesItems: usesItems.map((i) => ({ name: i.name, uses: i.uses })) },
+      'Q7: system.uses shapes observed',
+    );
   } else {
     log.warn('Q7 skipped — no items with a system.uses block on the probed actors');
   }
@@ -213,23 +225,32 @@ try {
 
   const PHYSICAL = ['weapon', 'equipment', 'consumable', 'tool', 'loot', 'container'];
 
-  for (const [label, id] of [['character', charId], ['npc', npcId]]) {
+  for (const [label, id] of [
+    ['character', charId],
+    ['npc', npcId],
+  ]) {
     if (!id) {
       log.warn(`S1 ${label} skipped — no such actor in world`);
       continue;
     }
     const r = await run(id);
-    check(`S1 ${label} → ok with items array + currency`,
+    check(
+      `S1 ${label} → ok with items array + currency`,
       r.ok && Array.isArray(r.items) && r.currency && typeof r.currency === 'object',
-      r.ok ? { actorName: r.actorName, itemCount: r.items.length } : r);
-    check(`S1 ${label} items are all physical types only`,
+      r.ok ? { actorName: r.actorName, itemCount: r.items.length } : r,
+    );
+    check(
+      `S1 ${label} items are all physical types only`,
       r.ok && r.items.every((i) => PHYSICAL.includes(i.type)),
-      r.ok ? [...new Set(r.items.map((i) => i.type))] : r);
-    check(`S1 ${label} currency has five numeric denominations`,
-      r.ok &&
-        ['pp', 'gp', 'ep', 'sp', 'cp'].every((k) => typeof r.currency[k] === 'number'),
-      r.ok ? r.currency : r);
-    check(`S1 ${label} every item has the structural fields`,
+      r.ok ? [...new Set(r.items.map((i) => i.type))] : r,
+    );
+    check(
+      `S1 ${label} currency has five numeric denominations`,
+      r.ok && ['pp', 'gp', 'ep', 'sp', 'cp'].every((k) => typeof r.currency[k] === 'number'),
+      r.ok ? r.currency : r,
+    );
+    check(
+      `S1 ${label} every item has the structural fields`,
       r.ok &&
         r.items.every(
           (i) =>
@@ -241,7 +262,8 @@ try {
             typeof i.identified === 'boolean' &&
             (i.container === null || typeof i.container === 'string'),
         ),
-      r.ok ? r.items.find((i) => typeof i.id !== 'string') ?? 'all-well-formed' : r);
+      r.ok ? (r.items.find((i) => typeof i.id !== 'string') ?? 'all-well-formed') : r,
+    );
     if (r.ok) {
       const withUses = r.items.filter((i) => i.uses);
       const withCurrency = r.items.filter((i) => i.currency);
@@ -254,19 +276,26 @@ try {
         },
         `S1 ${label}: uses + container-currency observed`,
       );
-      check(`S1 ${label} uses block (when present) is only on finite-charge items`,
+      check(
+        `S1 ${label} uses block (when present) is only on finite-charge items`,
         withUses.every((i) => i.uses.max > 0),
-        withUses.map((i) => i.uses));
-      check(`S1 ${label} currency field appears only on container items`,
+        withUses.map((i) => i.uses),
+      );
+      check(
+        `S1 ${label} currency field appears only on container items`,
         withCurrency.every((i) => i.type === 'container'),
-        withCurrency.map((i) => i.type));
+        withCurrency.map((i) => i.type),
+      );
     }
   }
 
   // S2 — ACTOR_NOT_FOUND error path.
   const s2 = await run(BOGUS_ID);
-  check('S2 bogus actor id → ok:false ACTOR_NOT_FOUND',
-    !s2.ok && s2.error.code === 'ACTOR_NOT_FOUND', s2);
+  check(
+    'S2 bogus actor id → ok:false ACTOR_NOT_FOUND',
+    !s2.ok && s2.error.code === 'ACTOR_NOT_FOUND',
+    s2,
+  );
 
   if (failures > 0) {
     log.error({ failures }, 'probe completed with failures');

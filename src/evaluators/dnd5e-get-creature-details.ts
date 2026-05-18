@@ -288,9 +288,7 @@ export interface Dnd5eGetCreatureDetailsErr {
   };
 }
 
-export type Dnd5eGetCreatureDetailsResult =
-  | Dnd5eGetCreatureDetailsOk
-  | Dnd5eGetCreatureDetailsErr;
+export type Dnd5eGetCreatureDetailsResult = Dnd5eGetCreatureDetailsOk | Dnd5eGetCreatureDetailsErr;
 
 declare function fromUuid(uuid: string): Promise<unknown>;
 
@@ -585,9 +583,7 @@ export async function dnd5eGetCreatureDetailsBody(
       .filter((s) => s.length > 0)
       .join(', ');
     const propsArr = Array.isArray(labels.properties) ? (labels.properties as unknown[]) : [];
-    const properties = propsArr
-      .map((p) => str(get(obj(p), 'label')))
-      .filter((s) => s.length > 0);
+    const properties = propsArr.map((p) => str(get(obj(p), 'label'))).filter((s) => s.length > 0);
     const activationsArr = Array.isArray(labels.activations)
       ? (labels.activations as unknown[])
       : [];
@@ -596,13 +592,12 @@ export async function dnd5eGetCreatureDetailsBody(
       name: str(item.name),
       itemType: str(item.type),
       attackBonus:
-        str(get(firstAttack, 'toHit')) || (typeof labels.toHit === 'string' ? labels.toHit : '') ||
+        str(get(firstAttack, 'toHit')) ||
+        (typeof labels.toHit === 'string' ? labels.toHit : '') ||
         null,
       damage: damageStr || (typeof labels.damage === 'string' ? labels.damage : '') || null,
-      range:
-        str(labels.range) || str(labels.reach) || str(get(activationsArr[0], 'range')) || null,
-      activation:
-        str(labels.activation) || str(get(obj(activationsArr[0]), 'activation')) || null,
+      range: str(labels.range) || str(labels.reach) || str(get(activationsArr[0], 'range')) || null,
+      activation: str(labels.activation) || str(get(obj(activationsArr[0]), 'activation')) || null,
       properties,
     };
   };
@@ -652,8 +647,7 @@ export async function dnd5eGetCreatureDetailsBody(
     for (const item of itemContents) {
       if (!item || !item.id) continue;
       const labels = obj(item.labels) ?? {};
-      const hasAttack =
-        Array.isArray(labels.attacks) && (labels.attacks as unknown[]).length > 0;
+      const hasAttack = Array.isArray(labels.attacks) && (labels.attacks as unknown[]).length > 0;
       if (item.type === 'weapon' || (item.type === 'feat' && hasAttack)) {
         attacks.push(projectAttack(item));
       } else if (item.type === 'feat') {
@@ -777,9 +771,10 @@ export async function dnd5eGetCreatureDetailsBody(
       speeds: projectSpeeds(),
       capacity: {
         cargo: { value: num(cargoRaw.value), units: str(cargoRaw.units) },
-        creature: typeof capacityRaw.creature === 'string'
-          ? capacityRaw.creature
-          : String(num(capacityRaw.creature)),
+        creature:
+          typeof capacityRaw.creature === 'string'
+            ? capacityRaw.creature
+            : String(num(capacityRaw.creature)),
       },
       dimensions: str(get(traits, 'dimensions')),
       damageInteractions: projectDamageInteractions(),

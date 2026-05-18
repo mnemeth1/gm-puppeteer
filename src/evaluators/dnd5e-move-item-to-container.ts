@@ -207,11 +207,9 @@ export async function dnd5eMoveItemToContainerBody(
   });
 
   // Verbatim displayed name (NOT the PF2e canonical-identified resolver).
-  const nameOf = (item: ItemDocLike): string =>
-    typeof item.name === 'string' ? item.name : '';
+  const nameOf = (item: ItemDocLike): string => (typeof item.name === 'string' ? item.name : '');
 
-  const typeOf = (item: ItemDocLike): string =>
-    typeof item.type === 'string' ? item.type : '';
+  const typeOf = (item: ItemDocLike): string => (typeof item.type === 'string' ? item.type : '');
 
   // Normalize `system.container` to a single shape: a non-empty string
   // (the owning container's id) or `null` (item at inventory root).
@@ -257,10 +255,11 @@ export async function dnd5eMoveItemToContainerBody(
   // -- Resolve target item on actor.
   const target = actor.items?.get?.(input.itemId);
   if (!target || !target.id) {
-    return fail(
-      `No item found on actor ${actor.id ?? input.actorId} for itemId: ${input.itemId}`,
-      { reason: 'ITEM_NOT_FOUND_ON_ACTOR', actorId: input.actorId, itemId: input.itemId },
-    );
+    return fail(`No item found on actor ${actor.id ?? input.actorId} for itemId: ${input.itemId}`, {
+      reason: 'ITEM_NOT_FOUND_ON_ACTOR',
+      actorId: input.actorId,
+      itemId: input.itemId,
+    });
   }
   const targetId: string = target.id;
   const targetType = typeOf(target);
@@ -375,9 +374,7 @@ export async function dnd5eMoveItemToContainerBody(
     const matchId: string = mergeMatch.id;
     const previousQuantity = qtyOf(mergeMatch);
     const newQuantity = previousQuantity + targetQty;
-    await actor.updateEmbeddedDocuments('Item', [
-      { _id: matchId, 'system.quantity': newQuantity },
-    ]);
+    await actor.updateEmbeddedDocuments('Item', [{ _id: matchId, 'system.quantity': newQuantity }]);
     await actor.deleteEmbeddedDocuments('Item', [targetId]);
     const merged: Dnd5eMoveItemToContainerOk = {
       ok: true,

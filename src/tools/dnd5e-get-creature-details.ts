@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   dnd5eGetCreatureDetailsBody,
   SUPPORTED_CREATURE_TYPES,
@@ -56,7 +56,7 @@ const Dnd5eGetCreatureDetailsInput = z
 export const dnd5eGetCreatureDetailsTool: ToolDefinition<typeof Dnd5eGetCreatureDetailsInput> = {
   name: 'dnd5e_get_creature_details',
   description:
-    "Read-only fetch of full per-creature stat-block data for a D&D 5e Foundry Actor of type " +
+    'Read-only fetch of full per-creature stat-block data for a D&D 5e Foundry Actor of type ' +
     "'npc' or 'vehicle' by UUID. Returns identification (name, CR, creature type, size), " +
     'provenance (source book, compendium source UUID), description, and a per-type projection ' +
     'block. For NPCs: AC, HP, proficiency bonus, XP, alignment, initiative, ability scores ' +
@@ -85,7 +85,7 @@ export const dnd5eGetCreatureDetailsTool: ToolDefinition<typeof Dnd5eGetCreature
       args,
     )) as Dnd5eGetCreatureDetailsResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     if (!KNOWN_TYPES.has(result.type)) {
       ctx.log.warn(

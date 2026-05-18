@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   listJournalOwnershipBody,
   type ListJournalOwnershipResult,
@@ -32,7 +32,7 @@ export const listJournalOwnershipTool: ToolDefinition<typeof ListJournalOwnershi
       entryId: input.entryId,
     })) as ListJournalOwnershipResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     return [jsonText(result)];
   },

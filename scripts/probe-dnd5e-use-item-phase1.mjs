@@ -54,9 +54,7 @@ try {
 
     const pc = game.actors?.contents.find((a) => a.type === 'character');
     const npc = game.actors?.contents.find((a) => a.type === 'npc');
-    const other = game.actors?.contents.find(
-      (a) => a.type !== 'character' && a.type !== 'npc',
-    );
+    const other = game.actors?.contents.find((a) => a.type !== 'character' && a.type !== 'npc');
     report.actors = {
       pc: pc ? { id: pc.id, name: pc.name } : null,
       npc: npc ? { id: npc.id, name: npc.name } : null,
@@ -69,8 +67,7 @@ try {
     report.itemUseSurface = {
       use: typeof probeItem.use,
       activitiesGetter: typeof probeItem.system?.activities,
-      useSource:
-        typeof probeItem.use === 'function' ? String(probeItem.use).slice(0, 900) : null,
+      useSource: typeof probeItem.use === 'function' ? String(probeItem.use).slice(0, 900) : null,
     };
 
     // Discover a Potion of Healing + a generic potion.
@@ -85,9 +82,8 @@ try {
         continue;
       }
       const hit =
-        index.find(
-          (e) => e.type === 'consumable' && /potion of healing/i.test(e.name ?? ''),
-        ) ?? index.find((e) => e.type === 'consumable' && e.system?.type?.value === 'potion');
+        index.find((e) => e.type === 'consumable' && /potion of healing/i.test(e.name ?? '')) ??
+        index.find((e) => e.type === 'consumable' && e.system?.type?.value === 'potion');
       if (hit) {
         potionUuid = hit.uuid;
         potionName = hit.name;
@@ -135,9 +131,7 @@ try {
   }
 
   // Baseline chat-message ids so teardown can delete only what we post.
-  const baseMsgIds = await page.evaluate(() =>
-    globalThis.game.messages.contents.map((m) => m.id),
-  );
+  const baseMsgIds = await page.evaluate(() => globalThis.game.messages.contents.map((m) => m.id));
 
   // ====================================================================
   // Stage B — create temp items, run the use pipeline, observe.
@@ -146,8 +140,7 @@ try {
     async (pcId, potionUuid, spellUuid) => {
       const game = globalThis.game;
       const fromUuid = globalThis.fromUuid;
-      const Item5e =
-        globalThis.dnd5e?.documents?.Item5e ?? globalThis.CONFIG?.Item?.documentClass;
+      const Item5e = globalThis.dnd5e?.documents?.Item5e ?? globalThis.CONFIG?.Item?.documentClass;
       const actor = game.actors.get(pcId);
       const report = { created: [], attempts: [] };
 
@@ -179,7 +172,7 @@ try {
           length: Array.isArray(val) ? val.length : null,
           keys: typeof val === 'object' ? Object.keys(val).slice(0, 20) : null,
           messageId:
-            val?.message?.id ?? (Array.isArray(val) ? val[0]?.id ?? null : val?.id ?? null),
+            val?.message?.id ?? (Array.isArray(val) ? (val[0]?.id ?? null) : (val?.id ?? null)),
         };
       };
 
@@ -230,12 +223,8 @@ try {
           })),
         };
       };
-      report.scrollActivities = scrollId
-        ? describeActs(actor.items.get(scrollId))
-        : null;
-      report.potionActivities = potionId
-        ? describeActs(actor.items.get(potionId))
-        : null;
+      report.scrollActivities = scrollId ? describeActs(actor.items.get(scrollId)) : null;
+      report.potionActivities = potionId ? describeActs(actor.items.get(potionId)) : null;
       report.noActActivities = describeActs(actor.items.get(noActId));
 
       // -- Q1/Q2/Q3/Q5: run use() on the potion ---------------------
@@ -266,9 +255,7 @@ try {
         item.use({}, { configure: false }, {}),
       );
       // Potion again — second use.
-      await runUse('potion use() 2nd', potionId, (item) =>
-        item.use({}, { configure: false }, {}),
-      );
+      await runUse('potion use() 2nd', potionId, (item) => item.use({}, { configure: false }, {}));
 
       // Q8: spell-scroll cast.
       await runUse('scroll cast use({},{configure:false},{})', scrollId, (item) =>

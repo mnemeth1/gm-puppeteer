@@ -50,10 +50,14 @@ try {
 
   // S1 — name-only.
   const s1 = await run({ query: 'goblin', limit: 20 });
-  check('S1 name search returns goblins', s1.returned > 0 && s1.results.every((r) => /goblin/i.test(r.name)), {
-    total: s1.total,
-    sample: s1.results.slice(0, 4).map((r) => r.name),
-  });
+  check(
+    'S1 name search returns goblins',
+    s1.returned > 0 && s1.results.every((r) => /goblin/i.test(r.name)),
+    {
+      total: s1.total,
+      sample: s1.results.slice(0, 4).map((r) => r.name),
+    },
+  );
 
   // S2 — Item range + set filter.
   const s2 = await run({
@@ -62,17 +66,29 @@ try {
     filters: { level: { min: 1, max: 3 }, school: ['evo'] },
     limit: 100,
   });
-  check('S2 evocation spells level 1-3', s2.returned > 0 && s2.results.every((r) => r.spellLevel >= 1 && r.spellLevel <= 3), {
-    total: s2.total,
-    sample: s2.results.slice(0, 3).map((r) => `${r.name} (L${r.spellLevel})`),
-  });
+  check(
+    'S2 evocation spells level 1-3',
+    s2.returned > 0 && s2.results.every((r) => r.spellLevel >= 1 && r.spellLevel <= 3),
+    {
+      total: s2.total,
+      sample: s2.results.slice(0, 3).map((r) => `${r.name} (L${r.spellLevel})`),
+    },
+  );
 
   // S3 — Actor range + set filter.
-  const s3 = await run({ types: ['npc'], filters: { cr: { min: 1, max: 3 }, size: ['lg', 'huge'] }, limit: 50 });
-  check('S3 npc CR 1-3, large/huge', s3.returned > 0 && s3.results.every((r) => r.cr >= 1 && r.cr <= 3), {
-    total: s3.total,
-    sample: s3.results.slice(0, 4).map((r) => `${r.name} (CR${r.cr})`),
+  const s3 = await run({
+    types: ['npc'],
+    filters: { cr: { min: 1, max: 3 }, size: ['lg', 'huge'] },
+    limit: 50,
   });
+  check(
+    'S3 npc CR 1-3, large/huge',
+    s3.returned > 0 && s3.results.every((r) => r.cr >= 1 && r.cr <= 3),
+    {
+      total: s3.total,
+      sample: s3.results.slice(0, 4).map((r) => `${r.name} (CR${r.cr})`),
+    },
+  );
 
   // S4 — derived createFilter filter.
   const s4 = await run({ types: ['npc'], filters: { movement: ['fly'] }, limit: 50 });
@@ -83,9 +99,13 @@ try {
 
   // S5 — unknownFilterKeys.
   const s5 = await run({ types: ['spell'], filters: { cr: { min: 1 } }, limit: 5 });
-  check('S5 cr is unknown for spells', Array.isArray(s5.unknownFilterKeys) && s5.unknownFilterKeys.includes('cr'), {
-    unknownFilterKeys: s5.unknownFilterKeys,
-  });
+  check(
+    'S5 cr is unknown for spells',
+    Array.isArray(s5.unknownFilterKeys) && s5.unknownFilterKeys.includes('cr'),
+    {
+      unknownFilterKeys: s5.unknownFilterKeys,
+    },
+  );
 
   // S6 — multi-type routing.
   const s6 = await run({ types: ['spell', 'npc'], query: 'a', limit: 100 });
@@ -97,10 +117,14 @@ try {
 
   // S7 — unknownTypes.
   const s7 = await run({ types: ['bogus-subtype'], query: 'dragon', limit: 5 });
-  check('S7 bogus subtype reported', Array.isArray(s7.unknownTypes) && s7.unknownTypes.includes('bogus-subtype'), {
-    unknownTypes: s7.unknownTypes,
-    returned: s7.returned,
-  });
+  check(
+    'S7 bogus subtype reported',
+    Array.isArray(s7.unknownTypes) && s7.unknownTypes.includes('bogus-subtype'),
+    {
+      unknownTypes: s7.unknownTypes,
+      returned: s7.returned,
+    },
+  );
 
   // S8 — descriptionMatch.
   const s8 = await run({ types: ['spell'], descriptionMatch: 'acid', limit: 5 });

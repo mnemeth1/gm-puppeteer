@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   dnd5eUpdateItemUsesBody,
   type Dnd5eUpdateItemUsesResult,
@@ -48,7 +48,7 @@ const Dnd5eUpdateItemUsesInput = z
       .min(0)
       .describe(
         'Absolute REMAINING charge count to leave on the item. Must be a non-negative integer ' +
-          '≤ the item\'s `uses.max`. The tool writes `system.uses.spent = max − value` under the ' +
+          "≤ the item's `uses.max`. The tool writes `system.uses.spent = max − value` under the " +
           'hood (5e stores spent, not remaining). Zero is allowed (depleted-but-present — does ' +
           'NOT trigger autoDestroy; use dnd5e_remove_item_from_actor if you also want to delete ' +
           'the item). Use dnd5e_get_item_details to read the current `uses` block first.',
@@ -70,7 +70,7 @@ export const dnd5eUpdateItemUsesTool: ToolDefinition<typeof Dnd5eUpdateItemUsesI
     'charged magic items, and feats/spells with limited activations (e.g. Bardic Inspiration, ' +
     'Misty Step) all qualify. Items whose `uses.max` does not resolve to a positive number are ' +
     'rejected with ITEM_HAS_NO_USES_TRACKER; use dnd5e_get_item_details to inspect first. ' +
-    'value must be ≤ the item\'s max — 5e cannot over-charge; value > max is rejected with ' +
+    "value must be ≤ the item's max — 5e cannot over-charge; value > max is rejected with " +
     'REMAINING_EXCEEDS_MAX. value: 0 is a legitimate "depleted" state and does NOT trigger ' +
     'autoDestroy (that fires only in the 5e use pipeline); use dnd5e_remove_item_from_actor to ' +
     'delete an item. ' +
@@ -89,7 +89,7 @@ export const dnd5eUpdateItemUsesTool: ToolDefinition<typeof Dnd5eUpdateItemUsesI
       args,
     )) as Dnd5eUpdateItemUsesResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     ctx.log.info(
       {

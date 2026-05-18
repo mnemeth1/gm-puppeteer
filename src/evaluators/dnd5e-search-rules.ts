@@ -124,8 +124,7 @@ export async function dnd5eSearchRulesBody(
     };
   }
   const queryLower = query.toLowerCase();
-  const limit =
-    typeof input.limit === 'number' && input.limit > 0 ? Math.floor(input.limit) : 20;
+  const limit = typeof input.limit === 'number' && input.limit > 0 ? Math.floor(input.limit) : 20;
   const snippetLength =
     typeof input.snippetLength === 'number' && input.snippetLength >= 40
       ? Math.floor(input.snippetLength)
@@ -135,9 +134,7 @@ export async function dnd5eSearchRulesBody(
   const wantPacks =
     Array.isArray(input.packs) && input.packs.length > 0 ? new Set(input.packs) : null;
   const wantPageTypes =
-    Array.isArray(input.pageTypes) && input.pageTypes.length > 0
-      ? new Set(input.pageTypes)
-      : null;
+    Array.isArray(input.pageTypes) && input.pageTypes.length > 0 ? new Set(input.pageTypes) : null;
 
   // ---- Inlined helpers — evaluator scope only. ---------------------------
   // Strip HTML to prose via the DOM, collapse whitespace.
@@ -148,8 +145,7 @@ export async function dnd5eSearchRulesBody(
     return (tmp.textContent ?? '').replace(/\s+/g, ' ').trim();
   };
 
-  const truncate = (s: string, n: number): string =>
-    s.length > n ? `${s.slice(0, n - 1)}…` : s;
+  const truncate = (s: string, n: number): string => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
 
   // Window `snippetLength` chars around the first match; ellipsize the cut
   // edges. Falls back to a head slice when the query is not present.
@@ -179,8 +175,7 @@ export async function dnd5eSearchRulesBody(
   const globals = globalThis as unknown as BrowserGlobals;
   const allPacks = globals.game?.packs ? Array.from(globals.game.packs) : [];
   const journalPacks = allPacks.filter(
-    (p) =>
-      p.documentName === 'JournalEntry' && (wantPacks === null || wantPacks.has(p.collection)),
+    (p) => p.documentName === 'JournalEntry' && (wantPacks === null || wantPacks.has(p.collection)),
   );
 
   interface RankedHit extends Dnd5eRulesHit {
@@ -242,9 +237,7 @@ export async function dnd5eSearchRulesBody(
           if (!nameHit && !bodyHit) continue;
 
           const pageUuid =
-            typeof page.uuid === 'string'
-              ? page.uuid
-              : `${entryUuid}.JournalEntryPage.${page.id}`;
+            typeof page.uuid === 'string' ? page.uuid : `${entryUuid}.JournalEntryPage.${page.id}`;
           // A page is one hit: name match outranks a body-only match.
           ranked.push({
             pack: pack.collection,

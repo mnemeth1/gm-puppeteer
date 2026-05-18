@@ -102,15 +102,12 @@ try {
         const html = await TextEditor.enrichHTML(expr, { rollData });
         entry.html = html;
         entry.hasAnchor = typeof html === 'string' && /<a\b/.test(html);
-        entry.spanOnly =
-          typeof html === 'string' && !/<a\b/.test(html) && /<span\b/.test(html);
+        entry.spanOnly = typeof html === 'string' && !/<a\b/.test(html) && /<span\b/.test(html);
         if (typeof html === 'string') {
           entry.anchorClasses = [
             ...new Set([...html.matchAll(/<a[^>]*class="([^"]*)"/gi)].map((m) => m[1])),
           ];
-          entry.dataAttrs = [
-            ...new Set([...html.matchAll(/data-[a-z0-9-]+/gi)].map((m) => m[0])),
-          ];
+          entry.dataAttrs = [...new Set([...html.matchAll(/data-[a-z0-9-]+/gi)].map((m) => m[0]))];
         }
       } catch (e) {
         entry.error = e?.message ?? String(e);
@@ -121,8 +118,7 @@ try {
     // Q4: ownership resolution.
     if (pc) {
       report.pc = { id: pc.id, name: pc.name };
-      const owners =
-        game.users?.contents.filter((u) => pc.testUserPermission(u, 'OWNER')) ?? [];
+      const owners = game.users?.contents.filter((u) => pc.testUserPermission(u, 'OWNER')) ?? [];
       report.owners = owners.map((u) => ({ id: u.id, name: u.name, isGM: u.isGM }));
     } else {
       report.pc = null;
@@ -150,8 +146,7 @@ try {
           usedExpr: firstClickable.expr,
           id: msg?.id ?? null,
           storedHasAnchor: typeof msg?.content === 'string' && /<a\b/.test(msg.content),
-          storedContentSample:
-            typeof msg?.content === 'string' ? msg.content.slice(0, 400) : null,
+          storedContentSample: typeof msg?.content === 'string' ? msg.content.slice(0, 400) : null,
         };
       } catch (e) {
         report.createError = e?.message ?? String(e);

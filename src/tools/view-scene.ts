@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import { viewSceneBody, type ViewSceneResult } from '../evaluators/view-scene.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
@@ -37,8 +37,7 @@ export const viewSceneTool: ToolDefinition<typeof ViewSceneInput> = {
       sceneId: input.sceneId,
     })) as ViewSceneResult;
     if (!result.ok) {
-      const code = result.error.code === 'SCENE_NOT_FOUND' ? 'INVALID_INPUT' : 'EVAL_FAILED';
-      throw new ToolError(code, result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     return [
       jsonText({

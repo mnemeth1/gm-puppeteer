@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   removeCombatantsBody,
   type RemoveCombatantsResult,
@@ -48,8 +48,7 @@ export const removeCombatantsTool: ToolDefinition<typeof RemoveCombatantsInput> 
     };
     const result = (await page.evaluate(removeCombatantsBody, args)) as RemoveCombatantsResult;
     if (!result.ok) {
-      const code = result.error.code === 'REMOVE_FAILED' ? 'EVAL_FAILED' : 'INVALID_INPUT';
-      throw new ToolError(code, result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     ctx.log.info(
       {

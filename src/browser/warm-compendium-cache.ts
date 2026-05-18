@@ -264,9 +264,7 @@ async function listPackEntryIdsBody(collection: string): Promise<string[]> {
   if (!pack) return [];
   try {
     const idx = await pack.getIndex();
-    return idx.contents
-      .map((e) => e._id)
-      .filter((id): id is string => typeof id === 'string');
+    return idx.contents.map((e) => e._id).filter((id): id is string => typeof id === 'string');
   } catch {
     return [];
   }
@@ -297,9 +295,7 @@ async function warmDocBatchBody(args: WarmBatchArgs): Promise<WarmBatchResult> {
   interface FoundryGame {
     packs?: { get(id: string): FoundryPack | undefined };
   }
-  const pack = (globalThis as unknown as { game?: FoundryGame }).game?.packs?.get(
-    args.collection,
-  );
+  const pack = (globalThis as unknown as { game?: FoundryGame }).game?.packs?.get(args.collection);
   if (!pack) return { docCount: 0, errorCount: args.ids.length };
 
   let docCount = 0;

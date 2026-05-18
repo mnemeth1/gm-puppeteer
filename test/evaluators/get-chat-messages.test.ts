@@ -336,7 +336,9 @@ describe('getChatMessagesBody', () => {
         itemId: 'itm1',
         itemUuid: 'Actor.a1.Item.itm1',
         itemName: 'Scimitar',
-        targets: [{ name: 'Beiro', uuid: 'Scene.s.Token.t.Actor.beiro1', actorId: 'beiro1', ac: 15 }],
+        targets: [
+          { name: 'Beiro', uuid: 'Scene.s.Token.t.Actor.beiro1', actorId: 'beiro1', ac: 15 },
+        ],
       });
     }
   });

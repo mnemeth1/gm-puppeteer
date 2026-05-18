@@ -463,8 +463,7 @@ try {
       const postSig = new Map();
       for (const item of actor.items.contents) {
         const qty = typeof item.system?.quantity === 'number' ? item.system.quantity : 1;
-        const spent =
-          typeof item.system?.uses?.spent === 'number' ? item.system.uses.spent : null;
+        const spent = typeof item.system?.uses?.spent === 'number' ? item.system.uses.spent : null;
         const k = sigOf(item.name ?? '', item.type ?? '', qty, spent);
         postSig.set(k, (postSig.get(k) ?? 0) + 1);
       }

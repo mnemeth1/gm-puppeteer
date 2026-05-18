@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   placeTokenAtScreenPixelBody,
   type PlaceTokenAtScreenPixelResult,
@@ -76,8 +76,7 @@ export const placeTokenAtScreenPixelTool: ToolDefinition<typeof PlaceTokenAtScre
       args,
     )) as PlaceTokenAtScreenPixelResult;
     if (!result.ok) {
-      const code = result.error.code === 'CREATE_FAILED' ? 'EVAL_FAILED' : 'INVALID_INPUT';
-      throw new ToolError(code, result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     return [
       jsonText({

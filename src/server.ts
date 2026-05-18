@@ -16,7 +16,7 @@ import { selectTools } from './tools/index.js';
 import type { ToolContext } from './tools/types.js';
 
 const SERVER_NAME = 'gm-puppeteer';
-const SERVER_VERSION = '0.1.0-dev';
+const SERVER_VERSION = '1.0.0';
 
 export function createServer(browser: BrowserSession, log: Logger, config: Config): Server {
   const server = new Server(

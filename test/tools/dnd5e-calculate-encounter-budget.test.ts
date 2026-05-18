@@ -62,10 +62,7 @@ function legacyProbe(): Dnd5eEncounterBudgetProbeOk {
   };
 }
 
-const input = (
-  partyLevels: number[],
-  difficulty: string,
-): Dnd5eCalculateEncounterBudgetInputT =>
+const input = (partyLevels: number[], difficulty: string): Dnd5eCalculateEncounterBudgetInputT =>
   ({ partyLevels, difficulty }) as Dnd5eCalculateEncounterBudgetInputT;
 
 describe('dnd5e_calculate_encounter_budget — modern (2024)', () => {
@@ -211,8 +208,8 @@ describe('dnd5e_calculate_encounter_budget — input schema', () => {
   });
 
   it('rejects unexpected keys (.strict())', () => {
-    expect(
-      schema.safeParse({ partyLevels: [5], difficulty: 'low', extra: 'nope' }).success,
-    ).toBe(false);
+    expect(schema.safeParse({ partyLevels: [5], difficulty: 'low', extra: 'nope' }).success).toBe(
+      false,
+    );
   });
 });

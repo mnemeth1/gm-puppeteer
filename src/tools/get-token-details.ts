@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   getTokenDetailsBody,
   type GetTokenDetailsResult,
@@ -64,7 +64,7 @@ export const getTokenDetailsTool: ToolDefinition<typeof GetTokenDetailsInput> = 
     };
     const result = (await page.evaluate(getTokenDetailsBody, args)) as GetTokenDetailsResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     return [jsonText(result)];
   },

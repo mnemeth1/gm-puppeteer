@@ -95,9 +95,7 @@ try {
   const actorIds = await page.evaluate(() => {
     const pc = globalThis.game.actors.find((a) => a.type === 'character');
     const npc = globalThis.game.actors.find((a) => a.type === 'npc');
-    const other = globalThis.game.actors.find(
-      (a) => a.type !== 'character' && a.type !== 'npc',
-    );
+    const other = globalThis.game.actors.find((a) => a.type !== 'character' && a.type !== 'npc');
     return {
       pc: pc ? { id: pc.id, name: pc.name } : null,
       npc: npc ? { id: npc.id, name: npc.name } : null,
@@ -120,8 +118,7 @@ try {
   async function scrubActor(actorId) {
     return page.evaluate(async (id) => {
       const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-      const setArr = (s) =>
-        s && typeof s[Symbol.iterator] === 'function' ? Array.from(s) : [];
+      const setArr = (s) => (s && typeof s[Symbol.iterator] === 'function' ? Array.from(s) : []);
       const actor = globalThis.game.actors.get(id);
       if (!actor) return { error: `actor ${id} not found` };
 
@@ -170,8 +167,7 @@ try {
     return page.evaluate(async (id) => {
       const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       await sleep(120);
-      const setArr = (s) =>
-        s && typeof s[Symbol.iterator] === 'function' ? Array.from(s) : [];
+      const setArr = (s) => (s && typeof s[Symbol.iterator] === 'function' ? Array.from(s) : []);
       const actor = globalThis.game.actors.get(id);
       return {
         statuses: setArr(actor.statuses).sort(),
@@ -363,11 +359,9 @@ try {
     const res = await callRemove({ actorId: 'deadbeefdeadbeef', statusId: 'prone' });
     log.info({ probe: 9, res }, 'probe 9: bogus actorId');
     assert(res.isError === true, 'probe 9: error', { res });
-    assert(
-      res.error?.details?.reason === 'ACTOR_NOT_FOUND',
-      'probe 9: reason=ACTOR_NOT_FOUND',
-      { reason: res.error?.details?.reason },
-    );
+    assert(res.error?.details?.reason === 'ACTOR_NOT_FOUND', 'probe 9: reason=ACTOR_NOT_FOUND', {
+      reason: res.error?.details?.reason,
+    });
   }
 
   // --------------------------------------------------------------------
@@ -393,11 +387,9 @@ try {
     const res = await callRemove({ actorId: PC_ID, statusId: 'pronified' });
     log.info({ probe: 11, res }, 'probe 11: bogus statusId');
     assert(res.isError === true, 'probe 11: error', { res });
-    assert(
-      res.error?.details?.reason === 'STATUS_NOT_FOUND',
-      'probe 11: reason=STATUS_NOT_FOUND',
-      { reason: res.error?.details?.reason },
-    );
+    assert(res.error?.details?.reason === 'STATUS_NOT_FOUND', 'probe 11: reason=STATUS_NOT_FOUND', {
+      reason: res.error?.details?.reason,
+    });
   }
 
   // --------------------------------------------------------------------
@@ -420,11 +412,11 @@ try {
       `probe 12: ${snap.name} status set restored`,
       { actor: snap.name, post: post.statuses, expected: snap.statuses },
     );
-    assert(
-      post.exhaustion === snap.exhaustion,
-      `probe 12: ${snap.name} exhaustion restored`,
-      { actor: snap.name, post: post.exhaustion, expected: snap.exhaustion },
-    );
+    assert(post.exhaustion === snap.exhaustion, `probe 12: ${snap.name} exhaustion restored`, {
+      actor: snap.name,
+      post: post.exhaustion,
+      expected: snap.exhaustion,
+    });
     assert(
       JSON.stringify(post.effects) === JSON.stringify(snap.effects),
       `probe 12: ${snap.name} effect-name multiset restored`,

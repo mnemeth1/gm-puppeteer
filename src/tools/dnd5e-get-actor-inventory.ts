@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   dnd5eGetActorInventoryBody,
   type Dnd5eGetActorInventoryResult,
@@ -37,7 +37,7 @@ export const dnd5eGetActorInventoryTool: ToolDefinition<typeof Dnd5eGetActorInve
       actorId: input.actorId,
     })) as Dnd5eGetActorInventoryResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     return [
       jsonText({

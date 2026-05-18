@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   postChatMessageBody,
   type PostChatMessageResult,
@@ -82,7 +82,7 @@ export const postChatMessageTool: ToolDefinition<typeof PostChatMessageInput> = 
     };
     const result = (await page.evaluate(postChatMessageBody, args)) as PostChatMessageResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     ctx.log.info(
       {

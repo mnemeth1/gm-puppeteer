@@ -92,9 +92,7 @@ try {
   // --------------------------------------------------------------------
   const actorIds = await page.evaluate(() => {
     const pc = globalThis.game.actors.find((a) => a.type === 'character');
-    const other = globalThis.game.actors.find(
-      (a) => a.type !== 'character' && a.type !== 'npc',
-    );
+    const other = globalThis.game.actors.find((a) => a.type !== 'character' && a.type !== 'npc');
     return {
       pc: pc ? { id: pc.id, name: pc.name, uuid: pc.uuid } : null,
       other: other ? { id: other.id, name: other.name, type: other.type } : null,
@@ -269,7 +267,9 @@ try {
       assert(res.data.operation === 'created', 'probe 1: operation=created', {
         op: res.data.operation,
       });
-      assert(res.data.item?.quantity === 1, 'probe 1: quantity=1', { qty: res.data.item?.quantity });
+      assert(res.data.item?.quantity === 1, 'probe 1: quantity=1', {
+        qty: res.data.item?.quantity,
+      });
       assert(
         res.data.item?.sourceUuid === WEAPON_UUID,
         'probe 1: sourceUuid echoed (compendiumSource populated)',
@@ -413,11 +413,9 @@ try {
           { op: res.data.operation, warnings: res.data.warnings },
         );
       } else {
-        assert(
-          res.data.operation === 'created',
-          'probe 6: merge=never created a separate entry',
-          { op: res.data.operation },
-        );
+        assert(res.data.operation === 'created', 'probe 6: merge=never created a separate entry', {
+          op: res.data.operation,
+        });
         assert(res.data.item?.quantity === 2, 'probe 6: separate stack qty=2', {
           qty: res.data.item?.quantity,
         });
@@ -440,11 +438,9 @@ try {
       assert(res.data.operation === 'created', 'probe 7: operation=created', {
         op: res.data.operation,
       });
-      assert(
-        res.data.item?.container === grantedContainerId,
-        'probe 7: container reflected',
-        { container: res.data.item?.container },
-      );
+      assert(res.data.item?.container === grantedContainerId, 'probe 7: container reflected', {
+        container: res.data.item?.container,
+      });
     }
   } else {
     log.info({ probe: 7 }, 'probe 7: skipped — no container available');
@@ -624,9 +620,7 @@ try {
       // 1. Delete orphans (one-by-one to tolerate cascade auto-deletes).
       const deleted = [];
       const deleteFailures = [];
-      const orphanIds = actor.items.contents
-        .filter((i) => !snapshotIds.has(i.id))
-        .map((i) => i.id);
+      const orphanIds = actor.items.contents.filter((i) => !snapshotIds.has(i.id)).map((i) => i.id);
       for (const id of orphanIds) {
         const existing = actor.items.get(id);
         if (!existing) continue;

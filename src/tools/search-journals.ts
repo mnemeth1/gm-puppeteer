@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import { searchJournalsBody, type SearchJournalsResult } from '../evaluators/search-journals.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
@@ -75,7 +75,7 @@ export const searchJournalsTool: ToolDefinition<typeof SearchJournalsInput> = {
       entryId: input.entryId,
     })) as SearchJournalsResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     return [jsonText(result)];
   },

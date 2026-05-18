@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   deleteJournalPageBody,
   type DeleteJournalPageResult,
@@ -32,8 +32,7 @@ export const deleteJournalPageTool: ToolDefinition<typeof DeleteJournalPageInput
       pageId: input.pageId,
     })) as DeleteJournalPageResult;
     if (!result.ok) {
-      const code = result.error.code === 'FOUNDRY_REJECTED' ? 'EVAL_FAILED' : 'INVALID_INPUT';
-      throw new ToolError(code, result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     ctx.log.info(
       { entryId: result.entryId, pageId: result.pageId, name: result.name },

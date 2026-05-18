@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   dnd5eAddItemToActorBody,
   type Dnd5eAddItemToActorResult,
@@ -69,7 +69,7 @@ export const dnd5eAddItemToActorTool: ToolDefinition<typeof Dnd5eAddItemToActorI
   description:
     'Grant a physical inventory item from a compendium source to a D&D 5e character or npc. ' +
     'Handles quantity, container placement, identification status, and automatic stack-merging ' +
-    "(matching the Foundry UI's drag-to-merge behavior). Returns either {operation: \"merged\", " +
+    '(matching the Foundry UI\'s drag-to-merge behavior). Returns either {operation: "merged", ' +
     'mergedInto} when the new stack folded into an existing one, or {operation: "created", item} ' +
     'when a fresh item was created. Physical inventory only — weapon, equipment, consumable, ' +
     'tool, loot, container. Non-physical items (spells, feats, classes, backgrounds, races, ' +
@@ -94,7 +94,7 @@ export const dnd5eAddItemToActorTool: ToolDefinition<typeof Dnd5eAddItemToActorI
       args,
     )) as Dnd5eAddItemToActorResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     ctx.log.info(
       {

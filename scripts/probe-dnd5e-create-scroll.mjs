@@ -287,11 +287,9 @@ try {
   {
     const res = await call({ actorId: 'deadbeefdeadbeef', spellUuid: fixtures.lvl1.uuid });
     log.info({ probe: 7, res }, 'probe 7: bogus actorId');
-    assert(
-      res.error?.details?.reason === 'ACTOR_NOT_FOUND',
-      'probe 7: reason=ACTOR_NOT_FOUND',
-      { d: res.error?.details },
-    );
+    assert(res.error?.details?.reason === 'ACTOR_NOT_FOUND', 'probe 7: reason=ACTOR_NOT_FOUND', {
+      d: res.error?.details,
+    });
   }
 
   // -- Probe 8: non-spell UUID. ---------------------------------------
@@ -341,11 +339,9 @@ try {
       containerId: weaponId,
     });
     log.info({ probe: 11, res }, 'probe 11: containerId is a weapon');
-    assert(
-      res.error?.details?.reason === 'NOT_A_CONTAINER',
-      'probe 11: reason=NOT_A_CONTAINER',
-      { d: res.error?.details },
-    );
+    assert(res.error?.details?.reason === 'NOT_A_CONTAINER', 'probe 11: reason=NOT_A_CONTAINER', {
+      d: res.error?.details,
+    });
   }
 
   // -- Probe 12: unsupported actor type (disposable vehicle). ---------

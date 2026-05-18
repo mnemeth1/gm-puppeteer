@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { ToolError, toolErrorFromEvaluator } from '../errors.js';
 import {
   dnd5eCalculateEncounterBudgetBody,
   type Dnd5eEncounterBudgetProbeOk,
@@ -147,14 +147,7 @@ const MIX_BAND_FLOOR = 0.85;
 const Dnd5eCalculateEncounterBudgetInput = z
   .object({
     partyLevels: z
-      .array(
-        z
-          .number()
-          .int()
-          .min(1)
-          .max(20)
-          .describe('A single player character’s level, 1-20.'),
-      )
+      .array(z.number().int().min(1).max(20).describe('A single player character’s level, 1-20.'))
       .min(1)
       .max(12)
       .describe(
@@ -276,9 +269,7 @@ function resolveTemplate(
   if (template.kind === 'group') {
     const count = template.count;
     const multiplier = multOf(count);
-    let best:
-      | { cr: string; xp: number; rawXp: number; adjustedXp: number }
-      | null = null;
+    let best: { cr: string; xp: number; rawXp: number; adjustedXp: number } | null = null;
     for (const entry of crMap) {
       const rawXp = count * entry.xp;
       const adjustedXp = rawXp * multiplier;
@@ -291,9 +282,7 @@ function resolveTemplate(
     return {
       label: template.label,
       tier,
-      creatures: [
-        { role: template.role, cr: best.cr, count, xpPerCreature: best.xp },
-      ],
+      creatures: [{ role: template.role, cr: best.cr, count, xpPerCreature: best.xp }],
       creatureCount: count,
       rawXp: best.rawXp,
       multiplier,
@@ -306,16 +295,14 @@ function resolveTemplate(
   // boss-group: one boss + `groupCount` weaker creatures.
   const totalCount = 1 + template.groupCount;
   const multiplier = multOf(totalCount);
-  let best:
-    | {
-        bossCr: string;
-        bossXp: number;
-        groupCr: string;
-        groupXp: number;
-        rawXp: number;
-        adjustedXp: number;
-      }
-    | null = null;
+  let best: {
+    bossCr: string;
+    bossXp: number;
+    groupCr: string;
+    groupXp: number;
+    rawXp: number;
+    adjustedXp: number;
+  } | null = null;
   for (const boss of crMap) {
     for (const minion of crMap) {
       if (minion.xp >= boss.xp) continue; // the boss must be strictly bigger
@@ -462,7 +449,7 @@ export const dnd5eCalculateEncounterBudgetTool: ToolDefinition<
       dnd5eCalculateEncounterBudgetBody,
     )) as Dnd5eEncounterBudgetProbeResult;
     if (!probe.ok) {
-      throw new ToolError('FOUNDRY_NOT_READY', probe.error.message, probe.error.details);
+      throw toolErrorFromEvaluator(probe.error);
     }
 
     const tiers = probe.rulesVersion === 'modern' ? MODERN_TIERS : LEGACY_TIERS;

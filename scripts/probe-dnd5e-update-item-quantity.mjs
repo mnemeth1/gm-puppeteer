@@ -256,7 +256,9 @@ try {
     const res = await callRaw({ actorId: ACTOR_ID, itemId: tempA, quantity: 0 });
     log.info({ probe: 5, res }, 'probe 5: quantity 0 via raw handler');
     assert(res.isError === true, 'probe 5: error', { res });
-    assert(res.error?.code === 'INVALID_INPUT', 'probe 5: INVALID_INPUT', { code: res.error?.code });
+    assert(res.error?.code === 'INVALID_INPUT', 'probe 5: INVALID_INPUT', {
+      code: res.error?.code,
+    });
     assert(res.error?.details?.reason === 'QUANTITY_ZERO', 'probe 5: reason=QUANTITY_ZERO', {
       d: res.error?.details,
     });
@@ -394,8 +396,7 @@ try {
       }
       if (updates.length > 0) await actor.updateEmbeddedDocuments('Item', updates);
 
-      const sigOf = (name, type, qty, container) =>
-        `${name}|${type}|${qty}|${container ?? ''}`;
+      const sigOf = (name, type, qty, container) => `${name}|${type}|${qty}|${container ?? ''}`;
       const postSig = new Map();
       for (const item of actor.items.contents) {
         const qty = typeof item.system?.quantity === 'number' ? item.system.quantity : 1;

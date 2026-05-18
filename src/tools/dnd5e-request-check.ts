@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   dnd5eRequestCheckBody,
   type Dnd5eRequestCheckResult,
@@ -77,7 +77,7 @@ export const dnd5eRequestCheckTool: ToolDefinition<typeof Dnd5eRequestCheckInput
     };
     const result = (await page.evaluate(dnd5eRequestCheckBody, args)) as Dnd5eRequestCheckResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     ctx.log.info(
       {

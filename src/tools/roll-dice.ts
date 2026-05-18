@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import { rollDiceBody, type RollDiceResult } from '../evaluators/roll-dice.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
@@ -74,7 +74,7 @@ export const rollDiceTool: ToolDefinition<typeof RollDiceInput> = {
     };
     const result = (await page.evaluate(rollDiceBody, args)) as RollDiceResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     ctx.log.info(
       {

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import { beginCombatBody, type BeginCombatResult } from '../evaluators/begin-combat.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
@@ -35,8 +35,7 @@ export const beginCombatTool: ToolDefinition<typeof BeginCombatInput> = {
     };
     const result = (await page.evaluate(beginCombatBody, args)) as BeginCombatResult;
     if (!result.ok) {
-      const code = result.error.code === 'BEGIN_FAILED' ? 'EVAL_FAILED' : 'INVALID_INPUT';
-      throw new ToolError(code, result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     ctx.log.info(
       {

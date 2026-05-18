@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   dnd5eSearchRulesBody,
   type Dnd5eSearchRulesResult,
@@ -80,7 +80,7 @@ export const dnd5eSearchRulesTool: ToolDefinition<typeof Dnd5eSearchRulesInput> 
       snippetLength: input.snippetLength,
     })) as Dnd5eSearchRulesResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     return [jsonText(result)];
   },

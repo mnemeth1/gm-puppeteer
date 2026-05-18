@@ -157,9 +157,7 @@ export async function dnd5eCreateScrollBody(
 
   // -- Resolve the dnd5e scroll factory. ------------------------------
   const config = (globalThis as unknown as { CONFIG?: AnyRecord }).CONFIG;
-  const Item5e = (config?.Item as AnyRecord | undefined)?.documentClass as
-    | Item5eStatic
-    | undefined;
+  const Item5e = (config?.Item as AnyRecord | undefined)?.documentClass as Item5eStatic | undefined;
   if (typeof Item5e?.createScrollFromSpell !== 'function') {
     return fail(
       'CONFIG.Item.documentClass.createScrollFromSpell is not available — the dnd5e ' +
@@ -169,9 +167,11 @@ export async function dnd5eCreateScrollBody(
   }
 
   // -- Resolve actor. -------------------------------------------------
-  const game = (globalThis as unknown as {
-    game?: { actors?: { get(id: string): ActorDocLike | undefined } };
-  }).game;
+  const game = (
+    globalThis as unknown as {
+      game?: { actors?: { get(id: string): ActorDocLike | undefined } };
+    }
+  ).game;
   const actor = game?.actors?.get(input.actorId);
   if (!actor) {
     return fail(`No actor found for actorId: ${input.actorId}`, {
@@ -265,11 +265,7 @@ export async function dnd5eCreateScrollBody(
   // -- Build the scroll via the dnd5e factory. ------------------------
   let scrollDoc: ItemDocLike | undefined;
   try {
-    scrollDoc = await Item5e.createScrollFromSpell(
-      spell,
-      {},
-      { dialog: false, level: castLevel },
-    );
+    scrollDoc = await Item5e.createScrollFromSpell(spell, {}, { dialog: false, level: castLevel });
   } catch (e: unknown) {
     return fail(
       `createScrollFromSpell threw for spell '${spell.name ?? input.spellUuid}': ${

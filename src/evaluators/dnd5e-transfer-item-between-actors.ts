@@ -275,11 +275,9 @@ export async function dnd5eTransferItemBetweenActorsBody(
   });
 
   // Verbatim displayed name (NOT the PF2e canonical-identified resolver).
-  const nameOf = (item: ItemDocLike): string =>
-    typeof item.name === 'string' ? item.name : '';
+  const nameOf = (item: ItemDocLike): string => (typeof item.name === 'string' ? item.name : '');
 
-  const typeOf = (item: ItemDocLike): string =>
-    typeof item.type === 'string' ? item.type : '';
+  const typeOf = (item: ItemDocLike): string => (typeof item.type === 'string' ? item.type : '');
 
   const containerOf = (item: ItemDocLike): string | null => {
     const raw = (item.system as AnyRecord | undefined)?.container;
@@ -379,7 +377,11 @@ export async function dnd5eTransferItemBetweenActorsBody(
     return fail(
       `No item found on source actor ${sourceActor.id ?? input.sourceActorId} for itemId: ` +
         `${input.itemId}`,
-      { reason: 'ITEM_NOT_FOUND_ON_ACTOR', sourceActorId: input.sourceActorId, itemId: input.itemId },
+      {
+        reason: 'ITEM_NOT_FOUND_ON_ACTOR',
+        sourceActorId: input.sourceActorId,
+        itemId: input.itemId,
+      },
     );
   }
   const targetId: string = target.id;
@@ -814,9 +816,7 @@ export async function dnd5eTransferItemBetweenActorsBody(
     const newId = oldToNew.get(node.oldId);
     if (!newId) continue;
     const liveItem = destinationActor.items?.get?.(newId);
-    const parentNewId = node.originalContainer
-      ? (oldToNew.get(node.originalContainer) ?? '')
-      : '';
+    const parentNewId = node.originalContainer ? (oldToNew.get(node.originalContainer) ?? '') : '';
     descendants.push({
       oldId: node.oldId,
       newId,

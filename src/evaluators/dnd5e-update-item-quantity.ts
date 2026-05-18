@@ -69,9 +69,7 @@ export interface Dnd5eUpdateItemQuantityErr {
   };
 }
 
-export type Dnd5eUpdateItemQuantityResult =
-  | Dnd5eUpdateItemQuantityOk
-  | Dnd5eUpdateItemQuantityErr;
+export type Dnd5eUpdateItemQuantityResult = Dnd5eUpdateItemQuantityOk | Dnd5eUpdateItemQuantityErr;
 
 /** Actor types this tool will mutate. Mirrors the dnd5e tool family. */
 export const SUPPORTED_ACTOR_TYPES = ['character', 'npc'] as const;
@@ -149,10 +147,11 @@ export async function dnd5eUpdateItemQuantityBody(
   // -- Resolve target item on actor.
   const target = actor.items?.get?.(input.itemId);
   if (!target || !target.id) {
-    return fail(
-      `No item found on actor ${actor.id ?? input.actorId} for itemId: ${input.itemId}`,
-      { reason: 'ITEM_NOT_FOUND_ON_ACTOR', actorId: input.actorId, itemId: input.itemId },
-    );
+    return fail(`No item found on actor ${actor.id ?? input.actorId} for itemId: ${input.itemId}`, {
+      reason: 'ITEM_NOT_FOUND_ON_ACTOR',
+      actorId: input.actorId,
+      itemId: input.itemId,
+    });
   }
 
   const targetType: string = typeof target.type === 'string' ? target.type : '';
@@ -191,8 +190,7 @@ export async function dnd5eUpdateItemQuantityBody(
 
   // -- Read current quantity for the response.
   const qtyRaw = target.system?.quantity;
-  const qtyBefore =
-    typeof qtyRaw === 'number' && Number.isFinite(qtyRaw) ? qtyRaw : 1;
+  const qtyBefore = typeof qtyRaw === 'number' && Number.isFinite(qtyRaw) ? qtyRaw : 1;
 
   // -- Apply. Foundry no-ops cleanly when the new value equals the current
   // value: updateEmbeddedDocuments returns an empty array, no throw. The

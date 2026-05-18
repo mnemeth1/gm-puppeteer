@@ -145,9 +145,7 @@ try {
 
   const actorIds = await page.evaluate(() => {
     const pc = globalThis.game.actors.find((a) => a.type === 'character');
-    const other = globalThis.game.actors.find(
-      (a) => a.type !== 'character' && a.type !== 'npc',
-    );
+    const other = globalThis.game.actors.find((a) => a.type !== 'character' && a.type !== 'npc');
     return {
       pc: pc ? { id: pc.id, name: pc.name } : null,
       other: other ? { id: other.id, name: other.name, type: other.type } : null,
@@ -313,7 +311,9 @@ try {
     log.info({ probe: 3, res }, 'probe 3: split transfer');
     assert(res.ok === true, 'probe 3: ok', { res });
     if (res.ok) {
-      assert(res.data.operation === 'split', 'probe 3: operation=split', { op: res.data.operation });
+      assert(res.data.operation === 'split', 'probe 3: operation=split', {
+        op: res.data.operation,
+      });
       assert(res.data.sourceItem?.qtyAfter === 6, 'probe 3: source qtyAfter=6', {
         qtyAfter: res.data.sourceItem?.qtyAfter,
       });
@@ -427,7 +427,9 @@ try {
       destinationContainerId: null,
     });
     log.info({ probe: 6, res, before }, 'probe 6: equip/attune reset');
-    assert(res.ok === true && res.data.operation === 'transferred', 'probe 6: transferred', { res });
+    assert(res.ok === true && res.data.operation === 'transferred', 'probe 6: transferred', {
+      res,
+    });
     if (res.ok) {
       const onDest = await readItem(page, DEST_ID, res.data.item?.newId);
       assert(
@@ -628,9 +630,7 @@ try {
 
       const actor = globalThis.game.actors.get(sourceId);
       const snapshotIds = new Set(snap.items.map((i) => i.id));
-      const orphanIds = actor.items.contents
-        .filter((i) => !snapshotIds.has(i.id))
-        .map((i) => i.id);
+      const orphanIds = actor.items.contents.filter((i) => !snapshotIds.has(i.id)).map((i) => i.id);
       for (const id of orphanIds) {
         if (actor.items.get(id)) await actor.items.get(id).delete();
       }
@@ -667,8 +667,7 @@ try {
         ),
       );
       const signaturesMatch =
-        snapSigs.length === finalSigs.length &&
-        snapSigs.every((s, idx) => s === finalSigs[idx]);
+        snapSigs.length === finalSigs.length && snapSigs.every((s, idx) => s === finalSigs[idx]);
       return {
         destActorDeleted: !globalThis.game.actors.get(destId),
         orphansDeleted: orphanIds.length,

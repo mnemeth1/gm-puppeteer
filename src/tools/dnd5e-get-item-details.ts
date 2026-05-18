@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   dnd5eGetItemDetailsBody,
   PROJECTED_ITEM_TYPES,
@@ -63,7 +63,7 @@ export const dnd5eGetItemDetailsTool: ToolDefinition<typeof Dnd5eGetItemDetailsI
     'consumable, tool, loot, container, spell, feat, background, class, subclass, race, ' +
     'facility. Companion to dnd5e_search_compendium — pass any `uuid` it returns here to read ' +
     'full item detail. NOT for D&D 5e rules text (the rules glossary) — use dnd5e_search_rules. ' +
-    "NOT for creature stat blocks — use dnd5e_get_creature_details. Pass `includeEffects: true` " +
+    'NOT for creature stat blocks — use dnd5e_get_creature_details. Pass `includeEffects: true` ' +
     "for the item's Active Effects, `includeRawSystem: true` for the full system blob.",
   inputSchema: Dnd5eGetItemDetailsInput,
   async handler(input, ctx) {
@@ -79,7 +79,7 @@ export const dnd5eGetItemDetailsTool: ToolDefinition<typeof Dnd5eGetItemDetailsI
       args,
     )) as Dnd5eGetItemDetailsResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     if (!KNOWN_PROJECTIONS.has(result.type)) {
       ctx.log.warn(

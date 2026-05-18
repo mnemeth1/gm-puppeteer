@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import { rollNpcsBody, type RollNpcsResult } from '../evaluators/roll-npcs.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
@@ -10,7 +10,7 @@ const RollNpcsInput = z
       .min(1)
       .optional()
       .describe(
-        "Scene id whose combat encounter to roll NPC initiative for; " +
+        'Scene id whose combat encounter to roll NPC initiative for; ' +
           'defaults to the world-active scene.',
       ),
   })
@@ -37,8 +37,7 @@ export const rollNpcsTool: ToolDefinition<typeof RollNpcsInput> = {
     };
     const result = (await page.evaluate(rollNpcsBody, args)) as RollNpcsResult;
     if (!result.ok) {
-      const code = result.error.code === 'ROLL_FAILED' ? 'EVAL_FAILED' : 'INVALID_INPUT';
-      throw new ToolError(code, result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     ctx.log.info(
       {

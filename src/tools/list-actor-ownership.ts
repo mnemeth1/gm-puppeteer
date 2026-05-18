@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   listActorOwnershipBody,
   type ListActorOwnershipResult,
@@ -40,7 +40,7 @@ export const listActorOwnershipTool: ToolDefinition<typeof ListActorOwnershipInp
       actorId: input.actorId,
     })) as ListActorOwnershipResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     return [jsonText(result)];
   },

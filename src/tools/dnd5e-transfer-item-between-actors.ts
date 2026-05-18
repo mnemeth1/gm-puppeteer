@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   dnd5eTransferItemBetweenActorsBody,
   type Dnd5eTransferItemBetweenActorsResult,
@@ -80,7 +80,7 @@ export const dnd5eTransferItemBetweenActorsTool: ToolDefinition<
     'Move a physical inventory item from one D&D 5e actor to another. Handles single-stack ' +
     'transfer, partial-stack split transfer (move N of a stack), stack-merging into matching ' +
     'destination stacks, and full-cascade transfer of a container plus everything nested inside ' +
-    'it. Identification status and other system properties carry over via the source item\'s ' +
+    "it. Identification status and other system properties carry over via the source item's " +
     'toObject() payload; equipped state and per-actor attunement (system.attuned) are reset ' +
     'because the destination actor has done nothing to wield, wear, or attune the item. ' +
     'Returns a discriminated union: {operation: "transferred", item} for a full single-item ' +
@@ -113,7 +113,7 @@ export const dnd5eTransferItemBetweenActorsTool: ToolDefinition<
       args,
     )) as Dnd5eTransferItemBetweenActorsResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     const logFields: Record<string, unknown> = {
       sourceActorId: result.sourceActor.id,

@@ -101,9 +101,7 @@ export interface Dnd5eUseItemErr {
 
 export type Dnd5eUseItemResult = Dnd5eUseItemOk | Dnd5eUseItemErr;
 
-export async function dnd5eUseItemBody(
-  input: Dnd5eUseItemInput,
-): Promise<Dnd5eUseItemResult> {
+export async function dnd5eUseItemBody(input: Dnd5eUseItemInput): Promise<Dnd5eUseItemResult> {
   // Inlined: module-scope identifiers do NOT survive page.evaluate
   // serialization — only the function source is shipped to the browser.
   type AnyRecord = Record<string, unknown> & { [k: string]: unknown };
@@ -173,12 +171,14 @@ export async function dnd5eUseItemBody(
   };
 
   // -- Resolve actor. -------------------------------------------------
-  const game = (globalThis as unknown as {
-    game?: {
-      actors?: { get(id: string): ActorDocLike | undefined };
-      messages?: MessagesLike;
-    };
-  }).game;
+  const game = (
+    globalThis as unknown as {
+      game?: {
+        actors?: { get(id: string): ActorDocLike | undefined };
+        messages?: MessagesLike;
+      };
+    }
+  ).game;
   const actor = game?.actors?.get(input.actorId);
   if (!actor) {
     return fail(`No actor found for actorId: ${input.actorId}`, {
@@ -197,10 +197,11 @@ export async function dnd5eUseItemBody(
   // -- Resolve target item. -------------------------------------------
   const item = actor.items?.get?.(input.itemId);
   if (!item || !item.id) {
-    return fail(
-      `No item found on actor ${actor.id ?? input.actorId} for itemId: ${input.itemId}`,
-      { reason: 'ITEM_NOT_FOUND_ON_ACTOR', actorId: input.actorId, itemId: input.itemId },
-    );
+    return fail(`No item found on actor ${actor.id ?? input.actorId} for itemId: ${input.itemId}`, {
+      reason: 'ITEM_NOT_FOUND_ON_ACTOR',
+      actorId: input.actorId,
+      itemId: input.itemId,
+    });
   }
   const itemName = typeof item.name === 'string' ? item.name : '';
   const itemType = typeof item.type === 'string' ? item.type : '';
@@ -224,15 +225,12 @@ export async function dnd5eUseItemBody(
   if (input.activityId !== null) {
     activity = activities?.get?.(input.activityId);
     if (!activity) {
-      return fail(
-        `Item '${itemName}' has no activity with id '${input.activityId}'.`,
-        {
-          reason: 'ACTIVITY_NOT_FOUND',
-          itemId: input.itemId,
-          activityId: input.activityId,
-          availableActivityIds: activityList.map((a) => a.id ?? ''),
-        },
-      );
+      return fail(`Item '${itemName}' has no activity with id '${input.activityId}'.`, {
+        reason: 'ACTIVITY_NOT_FOUND',
+        itemId: input.itemId,
+        activityId: input.activityId,
+        availableActivityIds: activityList.map((a) => a.id ?? ''),
+      });
     }
   } else {
     // Auto-selection prefers a non-`cast` activity so a multi-activity
@@ -297,12 +295,12 @@ export async function dnd5eUseItemBody(
     activity
       .use({ event: { shiftKey: true } }, { configure: false }, {})
       .then((v): UseRace => ({ value: v }))
-      .catch((e: unknown): UseRace => ({
-        error: e instanceof Error ? e.message : String(e),
-      })),
-    new Promise<UseRace>((res) =>
-      setTimeout(() => res({ timedOut: true }), USE_TIMEOUT_MS),
-    ),
+      .catch(
+        (e: unknown): UseRace => ({
+          error: e instanceof Error ? e.message : String(e),
+        }),
+      ),
+    new Promise<UseRace>((res) => setTimeout(() => res({ timedOut: true }), USE_TIMEOUT_MS)),
   ]);
   if ('timedOut' in raced) {
     return fail(

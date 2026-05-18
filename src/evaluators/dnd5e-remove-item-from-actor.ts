@@ -216,11 +216,9 @@ export async function dnd5eRemoveItemFromActorBody(
     return typeof raw === 'string' ? raw : null;
   };
 
-  const nameOf = (item: ItemDocLike): string =>
-    typeof item.name === 'string' ? item.name : '';
+  const nameOf = (item: ItemDocLike): string => (typeof item.name === 'string' ? item.name : '');
 
-  const typeOf = (item: ItemDocLike): string =>
-    typeof item.type === 'string' ? item.type : '';
+  const typeOf = (item: ItemDocLike): string => (typeof item.type === 'string' ? item.type : '');
 
   // -- Resolve actor.
   const game = (globalThis as unknown as { game?: FoundryGameLike }).game;
@@ -245,10 +243,11 @@ export async function dnd5eRemoveItemFromActorBody(
   // -- Resolve target item on actor.
   const target = actor.items?.get?.(input.itemId);
   if (!target || !target.id) {
-    return fail(
-      `No item found on actor ${actor.id ?? input.actorId} for itemId: ${input.itemId}`,
-      { reason: 'ITEM_NOT_FOUND_ON_ACTOR', actorId: input.actorId, itemId: input.itemId },
-    );
+    return fail(`No item found on actor ${actor.id ?? input.actorId} for itemId: ${input.itemId}`, {
+      reason: 'ITEM_NOT_FOUND_ON_ACTOR',
+      actorId: input.actorId,
+      itemId: input.itemId,
+    });
   }
 
   const targetId: string = target.id;
@@ -296,9 +295,7 @@ export async function dnd5eRemoveItemFromActorBody(
   // deleted id (probe Q1) — this tool nulls it so callers never see a
   // dangling graph edge. The eject runs AFTER the delete so a failed
   // delete leaves the container graph untouched.
-  const deleteAndEject = async (
-    contained: Dnd5eRemoveEjectedEntry[],
-  ): Promise<void> => {
+  const deleteAndEject = async (contained: Dnd5eRemoveEjectedEntry[]): Promise<void> => {
     await actor.deleteEmbeddedDocuments('Item', [targetId]);
     const survivors = contained.filter((c) => Boolean(actor.items?.get?.(c.id)));
     if (survivors.length > 0) {
@@ -350,9 +347,7 @@ export async function dnd5eRemoveItemFromActorBody(
   const newQty = Math.max(0, currentQty - input.quantity);
 
   if (newQty > 0) {
-    await actor.updateEmbeddedDocuments('Item', [
-      { _id: targetId, 'system.quantity': newQty },
-    ]);
+    await actor.updateEmbeddedDocuments('Item', [{ _id: targetId, 'system.quantity': newQty }]);
     return {
       ok: true,
       actor: { id: actor.id ?? input.actorId, name: actor.name ?? '' },

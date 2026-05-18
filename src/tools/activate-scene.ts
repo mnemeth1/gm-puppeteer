@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import { activateSceneBody, type ActivateSceneResult } from '../evaluators/activate-scene.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
@@ -36,8 +36,7 @@ export const activateSceneTool: ToolDefinition<typeof ActivateSceneInput> = {
       sceneId: input.sceneId,
     })) as ActivateSceneResult;
     if (!result.ok) {
-      const code = result.error.code === 'SCENE_NOT_FOUND' ? 'INVALID_INPUT' : 'EVAL_FAILED';
-      throw new ToolError(code, result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     return [
       jsonText({

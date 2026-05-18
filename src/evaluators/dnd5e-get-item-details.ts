@@ -530,7 +530,7 @@ export async function dnd5eGetItemDetailsBody(
         duration: ((): Record<string, unknown> => {
           const d = obj(get(sys, 'duration')) ?? {};
           return {
-            value: typeof d.value === 'number' ? d.value : d.value ?? null,
+            value: typeof d.value === 'number' ? d.value : (d.value ?? null),
             units: str(d.units) || null,
             concentration: d.concentration === true,
             label: str(get(labels, 'duration')) || null,
@@ -539,7 +539,7 @@ export async function dnd5eGetItemDetailsBody(
         range: ((): Record<string, unknown> => {
           const r = obj(get(sys, 'range')) ?? {};
           return {
-            value: typeof r.value === 'number' ? r.value : r.value ?? null,
+            value: typeof r.value === 'number' ? r.value : (r.value ?? null),
             units: str(r.units) || null,
             label: str(get(labels, 'range')) || null,
           };

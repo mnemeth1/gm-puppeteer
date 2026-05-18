@@ -220,10 +220,9 @@ export async function dnd5eRemoveConditionBody(
   // -- Validate statusId against CONFIG.statusEffects.
   const statusEffects = CONFIG?.statusEffects;
   if (!Array.isArray(statusEffects)) {
-    return fail(
-      `CONFIG.statusEffects is unavailable — the D&D 5e system may not be loaded.`,
-      { reason: 'STATUS_EFFECTS_UNAVAILABLE' },
-    );
+    return fail(`CONFIG.statusEffects is unavailable — the D&D 5e system may not be loaded.`, {
+      reason: 'STATUS_EFFECTS_UNAVAILABLE',
+    });
   }
   const statusRow = (statusEffects as StatusEffectLike[]).find(
     (r) => r !== null && typeof r === 'object' && r.id === input.statusId,

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   dnd5eApplyConditionBody,
   type Dnd5eApplyConditionResult,
@@ -85,7 +85,7 @@ export const dnd5eApplyConditionTool: ToolDefinition<typeof Dnd5eApplyConditionI
       args,
     )) as Dnd5eApplyConditionResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     if (result.operation === 'applied') {
       ctx.log.info(

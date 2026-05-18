@@ -215,10 +215,7 @@ try {
   if (rolled.windowsAfter.length > rolled.windowsBefore.length) {
     log.warn({ rolled }, 'probe 2: rollNPC opened a UI window — review');
   }
-  log.info(
-    { messageDelta: rolled.messageDelta },
-    'probe 2 note: chat messages posted by rollNPC',
-  );
+  log.info({ messageDelta: rolled.messageDelta }, 'probe 2 note: chat messages posted by rollNPC');
 
   // --------------------------------------------------------------------
   // Probe 3: a second rollNPC() leaves already-rolled NPCs unchanged.
@@ -248,9 +245,13 @@ try {
   }, combatId);
   log.info({ probe: 3, reroll }, 'probe 3: second rollNPC() is idempotent');
 
-  assert(reroll.threw === null || reroll.threw === undefined, 'probe 3: second rollNPC did not throw', {
-    threw: reroll.threw,
-  });
+  assert(
+    reroll.threw === null || reroll.threw === undefined,
+    'probe 3: second rollNPC did not throw',
+    {
+      threw: reroll.threw,
+    },
+  );
   assert(
     (reroll.combatants ?? []).every((cb) => cb.initiative === initBefore[cb.id]),
     'probe 3: already-rolled NPC initiatives unchanged by a second rollNPC',
@@ -289,8 +290,7 @@ try {
           started: c2?.started ?? null,
           freshId,
           freshBefore,
-          freshAfter:
-            c2?.combatants?.contents?.find((cb) => cb.id === freshId)?.initiative ?? null,
+          freshAfter: c2?.combatants?.contents?.find((cb) => cb.id === freshId)?.initiative ?? null,
         };
       } catch (err) {
         return { error: `mid-combat threw: ${err?.message ?? String(err)}` };
@@ -309,9 +309,13 @@ try {
     assert(midCombat.round === 1, 'probe 4: combat is at round 1 (started)', {
       round: midCombat.round,
     });
-    assert(midCombat.freshBefore === null, 'probe 4: fresh combatant started with null initiative', {
-      freshBefore: midCombat.freshBefore,
-    });
+    assert(
+      midCombat.freshBefore === null,
+      'probe 4: fresh combatant started with null initiative',
+      {
+        freshBefore: midCombat.freshBefore,
+      },
+    );
     assert(
       typeof midCombat.freshAfter === 'number',
       'probe 4: rollNPC rolled the mid-combat NPC combatant',

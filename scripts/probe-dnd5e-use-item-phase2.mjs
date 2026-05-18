@@ -20,16 +20,13 @@ const session = new BrowserSession(config, log);
 try {
   const { page } = await session.ensureStarted();
 
-  const baseMsgIds = await page.evaluate(() =>
-    globalThis.game.messages.contents.map((m) => m.id),
-  );
+  const baseMsgIds = await page.evaluate(() => globalThis.game.messages.contents.map((m) => m.id));
 
   // -- Stage A: bake a scroll, dump the cast-activity use source. ------
   const stageA = await page.evaluate(async () => {
     const game = globalThis.game;
     const fromUuid = globalThis.fromUuid;
-    const Item5e =
-      globalThis.dnd5e?.documents?.Item5e ?? globalThis.CONFIG?.Item?.documentClass;
+    const Item5e = globalThis.dnd5e?.documents?.Item5e ?? globalThis.CONFIG?.Item?.documentClass;
     const actor = game.actors.find((a) => a.type === 'character');
     const spell = await fromUuid('Compendium.dnd5e.spells.Item.0xmXiPiuYws1OGcX');
     const scrollDoc = await Item5e.createScrollFromSpell(spell, {}, { dialog: false });

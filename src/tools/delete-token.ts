@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { ToolError, toolErrorFromEvaluator } from '../errors.js';
 import { deleteTokenBody, type DeleteTokenResult } from '../evaluators/delete-token.js';
 import {
   verifyTokensPresentBody,
@@ -82,13 +82,7 @@ export const deleteTokenTool: ToolDefinition<typeof DeleteTokenInput> = {
         args,
       )) as VerifyTokensPresentResult;
       if (!verify.ok) {
-        throw new ToolError(
-          verify.error.code === 'SCENE_NOT_FOUND' || verify.error.code === 'NO_ACTIVE_SCENE'
-            ? 'INVALID_INPUT'
-            : 'EVAL_FAILED',
-          `delete_token recovery: ${verify.error.message}`,
-          verify.error.details,
-        );
+        throw toolErrorFromEvaluator(verify.error, 'delete_token recovery');
       }
       if (verify.stillPresent.length > 0) {
         throw new ToolError(
@@ -125,8 +119,7 @@ export const deleteTokenTool: ToolDefinition<typeof DeleteTokenInput> = {
     }
 
     if (!result.ok) {
-      const code = result.error.code === 'DELETE_FAILED' ? 'EVAL_FAILED' : 'INVALID_INPUT';
-      throw new ToolError(code, result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     return [
       jsonText({

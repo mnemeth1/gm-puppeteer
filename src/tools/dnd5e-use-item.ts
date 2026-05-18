@@ -1,9 +1,6 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
-import {
-  dnd5eUseItemBody,
-  type Dnd5eUseItemResult,
-} from '../evaluators/dnd5e-use-item.js';
+import { toolErrorFromEvaluator } from '../errors.js';
+import { dnd5eUseItemBody, type Dnd5eUseItemResult } from '../evaluators/dnd5e-use-item.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
 const Dnd5eUseItemInput = z
@@ -59,7 +56,7 @@ export const dnd5eUseItemTool: ToolDefinition<typeof Dnd5eUseItemInput> = {
     };
     const result = (await page.evaluate(dnd5eUseItemBody, args)) as Dnd5eUseItemResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     ctx.log.info(
       {

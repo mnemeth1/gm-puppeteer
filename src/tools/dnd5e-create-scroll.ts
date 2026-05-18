@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   dnd5eCreateScrollBody,
   type Dnd5eCreateScrollResult,
@@ -34,7 +34,7 @@ const Dnd5eCreateScrollInput = z
         "The spell-slot level the scroll casts the spell at. Defaults to the spell's base " +
           'level. Must be ≥ the base level (a scroll cannot downcast); upcasting raises the ' +
           'embedded cast level only — the scroll item template/rarity stays keyed to the ' +
-          "base level. Cantrips (base level 0) cannot be upcast.",
+          'base level. Cantrips (base level 0) cannot be upcast.',
       ),
     quantity: z
       .number()
@@ -89,12 +89,9 @@ export const dnd5eCreateScrollTool: ToolDefinition<typeof Dnd5eCreateScrollInput
       containerId: input.containerId ?? null,
       identified: input.identified ?? true,
     };
-    const result = (await page.evaluate(
-      dnd5eCreateScrollBody,
-      args,
-    )) as Dnd5eCreateScrollResult;
+    const result = (await page.evaluate(dnd5eCreateScrollBody, args)) as Dnd5eCreateScrollResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     ctx.log.info(
       {

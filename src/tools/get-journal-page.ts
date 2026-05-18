@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import { getJournalPageBody, type GetJournalPageResult } from '../evaluators/get-journal-page.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
@@ -41,7 +41,7 @@ export const getJournalPageTool: ToolDefinition<typeof GetJournalPageInput> = {
       pageId: input.pageId,
     })) as GetJournalPageResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     return [jsonText(result)];
   },

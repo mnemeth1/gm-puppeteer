@@ -2,17 +2,15 @@ import type { z } from 'zod';
 import type { Config } from '../config.js';
 import { activateSceneTool } from './activate-scene.js';
 import { addCombatantsTool } from './add-combatants.js';
-import { addItemToActorTool } from './add-item-to-actor.js';
-import { applyConditionTool } from './apply-condition.js';
 import { assignActorOwnershipTool } from './assign-actor-ownership.js';
 import { assignJournalOwnershipTool } from './assign-journal-ownership.js';
 import { beginCombatTool } from './begin-combat.js';
-import { calculateEncounterBudgetTool } from './calculate-encounter-budget.js';
 import { createActorFromCompendiumTool } from './create-actor-from-compendium.js';
 import { createJournalEntryTool } from './create-journal-entry.js';
+import { createJournalFolderTool } from './create-journal-folder.js';
 import { createJournalPageTool } from './create-journal-page.js';
-import { createScrollOrWandTool } from './create-scroll-or-wand.js';
 import { deleteJournalEntryTool } from './delete-journal-entry.js';
+import { deleteJournalFolderTool } from './delete-journal-folder.js';
 import { deleteJournalPageTool } from './delete-journal-page.js';
 import { deleteTokenTool } from './delete-token.js';
 import { dnd5eAddItemToActorTool } from './dnd5e-add-item-to-actor.js';
@@ -38,14 +36,9 @@ import { dnd5eUseItemTool } from './dnd5e-use-item.js';
 import { endCombatTool } from './end-combat.js';
 import { foundryEvalTool } from './foundry-eval.js';
 import { foundryScreenshotTool } from './foundry-screenshot.js';
-import { getActorInventoryTool } from './get-actor-inventory.js';
-import { getActorStateTool } from './get-actor-state.js';
-import { getAvailableConditionsTool } from './get-available-conditions.js';
 import { getChatMessagesTool } from './get-chat-messages.js';
 import { getCombatStateTool } from './get-combat-state.js';
-import { getCreatureDetailsTool } from './get-creature-details.js';
 import { getCurrentSceneTool } from './get-current-scene.js';
-import { getItemDetailsTool } from './get-item-details.js';
 import { getJournalEntryTool } from './get-journal-entry.js';
 import { getJournalPageTool } from './get-journal-page.js';
 import { getSceneTokensTool } from './get-scene-tokens.js';
@@ -53,54 +46,63 @@ import { getTokenDetailsTool } from './get-token-details.js';
 import { getWorldInfoTool } from './get-world-info.js';
 import { listActorOwnershipTool } from './list-actor-ownership.js';
 import { listCompendiumPacksTool } from './list-compendium-packs.js';
+import { listJournalFoldersTool } from './list-journal-folders.js';
 import { listJournalOwnershipTool } from './list-journal-ownership.js';
 import { listJournalsTool } from './list-journals.js';
 import { listScenesTool } from './list-scenes.js';
 import { listUsersTool } from './list-users.js';
 import { listWorldActorsTool } from './list-world-actors.js';
-import { moveItemToContainerTool } from './move-item-to-container.js';
 import { moveTokenTool } from './move-token.js';
+import { pf2eAddItemToActorTool } from './pf2e-add-item-to-actor.js';
+import { pf2eApplyConditionTool } from './pf2e-apply-condition.js';
+import { pf2eCalculateEncounterBudgetTool } from './pf2e-calculate-encounter-budget.js';
+import { pf2eCreateScrollOrWandTool } from './pf2e-create-scroll-or-wand.js';
+import { pf2eGetActorInventoryTool } from './pf2e-get-actor-inventory.js';
+import { pf2eGetActorStateTool } from './pf2e-get-actor-state.js';
+import { pf2eGetAvailableConditionsTool } from './pf2e-get-available-conditions.js';
+import { pf2eGetCreatureDetailsTool } from './pf2e-get-creature-details.js';
+import { pf2eGetItemDetailsTool } from './pf2e-get-item-details.js';
+import { pf2eMoveItemToContainerTool } from './pf2e-move-item-to-container.js';
+import { pf2eRemoveConditionTool } from './pf2e-remove-condition.js';
+import { pf2eRemoveItemFromActorTool } from './pf2e-remove-item-from-actor.js';
+import { pf2eRequestCheckTool } from './pf2e-request-check.js';
+import { pf2eRollCheckTool } from './pf2e-roll-check.js';
+import { pf2eSearchCompendiumTool } from './pf2e-search-compendium.js';
+import { pf2eSetConditionValueTool } from './pf2e-set-condition-value.js';
+import { pf2eTransferItemBetweenActorsTool } from './pf2e-transfer-item-between-actors.js';
+import { pf2eUpdateItemQuantityTool } from './pf2e-update-item-quantity.js';
+import { pf2eUpdateItemUsesTool } from './pf2e-update-item-uses.js';
+import { pf2eUseItemTool } from './pf2e-use-item.js';
 import { placeTokenAtGridTool } from './place-token-at-grid.js';
 import { placeTokenAtScreenPixelTool } from './place-token-at-screen-pixel.js';
 import { postChatMessageTool } from './post-chat-message.js';
 import { removeActorOwnershipTool } from './remove-actor-ownership.js';
 import { removeCombatantsTool } from './remove-combatants.js';
-import { removeConditionTool } from './remove-condition.js';
 import { removeJournalOwnershipTool } from './remove-journal-ownership.js';
-import { removeItemFromActorTool } from './remove-item-from-actor.js';
-import { requestCheckTool } from './request-check.js';
-import { rollCheckTool } from './roll-check.js';
 import { rollDiceTool } from './roll-dice.js';
 import { rollNpcsTool } from './roll-npcs.js';
-import { searchCompendiumTool } from './search-compendium.js';
 import { searchJournalsTool } from './search-journals.js';
 import { showJournalEntryTool } from './show-journal-entry.js';
 import { startCombatTool } from './start-combat.js';
-import { updateJournalEntryTool } from './update-journal-entry.js';
-import { updateJournalPageTool } from './update-journal-page.js';
-import { setConditionValueTool } from './set-condition-value.js';
-import { transferItemBetweenActorsTool } from './transfer-item-between-actors.js';
 import type { ToolDefinition } from './types.js';
-import { updateItemQuantityTool } from './update-item-quantity.js';
-import { updateItemUsesTool } from './update-item-uses.js';
+import { updateJournalEntryTool } from './update-journal-entry.js';
+import { updateJournalFolderTool } from './update-journal-folder.js';
+import { updateJournalPageTool } from './update-journal-page.js';
 import { updateTokenTool } from './update-token.js';
-import { useItemTool } from './use-item.js';
 import { viewSceneTool } from './view-scene.js';
 
 export const tools: ReadonlyArray<ToolDefinition<z.ZodTypeAny>> = [
   activateSceneTool,
   addCombatantsTool,
-  addItemToActorTool,
-  applyConditionTool,
   assignActorOwnershipTool,
   assignJournalOwnershipTool,
   beginCombatTool,
-  calculateEncounterBudgetTool,
   createActorFromCompendiumTool,
   createJournalEntryTool,
+  createJournalFolderTool,
   createJournalPageTool,
-  createScrollOrWandTool,
   deleteJournalEntryTool,
+  deleteJournalFolderTool,
   deleteJournalPageTool,
   deleteTokenTool,
   dnd5eAddItemToActorTool,
@@ -126,14 +128,9 @@ export const tools: ReadonlyArray<ToolDefinition<z.ZodTypeAny>> = [
   endCombatTool,
   foundryEvalTool,
   foundryScreenshotTool,
-  getActorInventoryTool,
-  getActorStateTool,
-  getAvailableConditionsTool,
   getChatMessagesTool,
   getCombatStateTool,
-  getCreatureDetailsTool,
   getCurrentSceneTool,
-  getItemDetailsTool,
   getJournalEntryTool,
   getJournalPageTool,
   getSceneTokensTool,
@@ -141,37 +138,48 @@ export const tools: ReadonlyArray<ToolDefinition<z.ZodTypeAny>> = [
   getWorldInfoTool,
   listActorOwnershipTool,
   listCompendiumPacksTool,
+  listJournalFoldersTool,
   listJournalOwnershipTool,
   listJournalsTool,
   listScenesTool,
   listUsersTool,
   listWorldActorsTool,
-  moveItemToContainerTool,
   moveTokenTool,
+  pf2eAddItemToActorTool,
+  pf2eApplyConditionTool,
+  pf2eCalculateEncounterBudgetTool,
+  pf2eCreateScrollOrWandTool,
+  pf2eGetActorInventoryTool,
+  pf2eGetActorStateTool,
+  pf2eGetAvailableConditionsTool,
+  pf2eGetCreatureDetailsTool,
+  pf2eGetItemDetailsTool,
+  pf2eMoveItemToContainerTool,
+  pf2eRemoveConditionTool,
+  pf2eRemoveItemFromActorTool,
+  pf2eRequestCheckTool,
+  pf2eRollCheckTool,
+  pf2eSearchCompendiumTool,
+  pf2eSetConditionValueTool,
+  pf2eTransferItemBetweenActorsTool,
+  pf2eUpdateItemQuantityTool,
+  pf2eUpdateItemUsesTool,
+  pf2eUseItemTool,
   placeTokenAtGridTool,
   placeTokenAtScreenPixelTool,
   postChatMessageTool,
   removeActorOwnershipTool,
   removeCombatantsTool,
-  removeConditionTool,
-  removeItemFromActorTool,
   removeJournalOwnershipTool,
-  requestCheckTool,
-  rollCheckTool,
   rollDiceTool,
   rollNpcsTool,
-  searchCompendiumTool,
   searchJournalsTool,
-  setConditionValueTool,
   showJournalEntryTool,
   startCombatTool,
-  transferItemBetweenActorsTool,
-  updateItemQuantityTool,
-  updateItemUsesTool,
   updateJournalEntryTool,
+  updateJournalFolderTool,
   updateJournalPageTool,
   updateTokenTool,
-  useItemTool,
   viewSceneTool,
 ];
 

@@ -55,9 +55,7 @@ try {
 
     const npc = game.actors?.contents.find((a) => a.type === 'npc');
     const pc = game.actors?.contents.find((a) => a.type === 'character');
-    const other = game.actors?.contents.find(
-      (a) => a.type !== 'npc' && a.type !== 'character',
-    );
+    const other = game.actors?.contents.find((a) => a.type !== 'npc' && a.type !== 'character');
     report.actors = {
       npc: npc ? { id: npc.id, name: npc.name, type: npc.type } : null,
       pc: pc ? { id: pc.id, name: pc.name, type: pc.type } : null,

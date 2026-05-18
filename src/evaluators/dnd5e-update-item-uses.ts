@@ -156,10 +156,11 @@ export async function dnd5eUpdateItemUsesBody(
   // -- Resolve target item on actor.
   const target = actor.items?.get?.(input.itemId);
   if (!target || !target.id) {
-    return fail(
-      `No item found on actor ${actor.id ?? input.actorId} for itemId: ${input.itemId}`,
-      { reason: 'ITEM_NOT_FOUND_ON_ACTOR', actorId: input.actorId, itemId: input.itemId },
-    );
+    return fail(`No item found on actor ${actor.id ?? input.actorId} for itemId: ${input.itemId}`, {
+      reason: 'ITEM_NOT_FOUND_ON_ACTOR',
+      actorId: input.actorId,
+      itemId: input.itemId,
+    });
   }
 
   const targetType: string = typeof target.type === 'string' ? target.type : '';

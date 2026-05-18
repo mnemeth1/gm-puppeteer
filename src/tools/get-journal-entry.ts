@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   getJournalEntryBody,
   type GetJournalEntryResult,
@@ -38,7 +38,7 @@ export const getJournalEntryTool: ToolDefinition<typeof GetJournalEntryInput> = 
       entryId: input.entryId,
     })) as GetJournalEntryResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     return [jsonText(result)];
   },

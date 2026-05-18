@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  selectWarmPacks,
-  type WarmPackInfo,
-} from '../../src/browser/warm-compendium-cache.js';
+import { selectWarmPacks, type WarmPackInfo } from '../../src/browser/warm-compendium-cache.js';
 
 const pack = (collection: string, documentType: string, size: number): WarmPackInfo => ({
   collection,

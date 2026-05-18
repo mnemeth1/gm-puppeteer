@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   dnd5eUpdateItemQuantityBody,
   type Dnd5eUpdateItemQuantityResult,
@@ -74,7 +74,7 @@ export const dnd5eUpdateItemQuantityTool: ToolDefinition<typeof Dnd5eUpdateItemQ
       args,
     )) as Dnd5eUpdateItemQuantityResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     ctx.log.info(
       {

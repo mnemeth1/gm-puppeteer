@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   placeTokenAtGridBody,
   type PlaceTokenAtGridResult,
@@ -74,8 +74,7 @@ export const placeTokenAtGridTool: ToolDefinition<typeof PlaceTokenAtGridInput> 
     };
     const result = (await page.evaluate(placeTokenAtGridBody, args)) as PlaceTokenAtGridResult;
     if (!result.ok) {
-      const code = result.error.code === 'CREATE_FAILED' ? 'EVAL_FAILED' : 'INVALID_INPUT';
-      throw new ToolError(code, result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     return [
       jsonText({

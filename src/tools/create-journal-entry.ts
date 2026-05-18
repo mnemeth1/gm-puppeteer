@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   createJournalEntryBody,
   type CreateJournalEntryResult,
@@ -59,8 +59,7 @@ export const createJournalEntryTool: ToolDefinition<typeof CreateJournalEntryInp
       defaultOwnership: input.defaultOwnership,
     })) as CreateJournalEntryResult;
     if (!result.ok) {
-      const code = result.error.code === 'FOUNDRY_REJECTED' ? 'EVAL_FAILED' : 'INVALID_INPUT';
-      throw new ToolError(code, result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     ctx.log.info(
       {

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   dnd5eGetAvailableConditionsBody,
   type Dnd5eGetAvailableConditionsResult,
@@ -44,7 +44,7 @@ export const dnd5eGetAvailableConditionsTool: ToolDefinition<
       dnd5eGetAvailableConditionsBody,
     )) as Dnd5eGetAvailableConditionsResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     ctx.log.info(
       {

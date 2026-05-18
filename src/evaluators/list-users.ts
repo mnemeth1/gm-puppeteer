@@ -91,9 +91,7 @@ export function listUsersBody(): ListUsersResult {
     const active = u.active === true;
     const lastActivityTime = typeof u.lastActivityTime === 'number' ? u.lastActivityTime : 0;
     const idleSeconds =
-      active && lastActivityTime > 0
-        ? Math.floor((Date.now() - lastActivityTime) / 1000)
-        : null;
+      active && lastActivityTime > 0 ? Math.floor((Date.now() - lastActivityTime) / 1000) : null;
     summaries.push({
       id: u.id,
       name: typeof u.name === 'string' ? u.name : '',

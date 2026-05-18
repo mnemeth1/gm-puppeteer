@@ -41,9 +41,7 @@ try {
     // Q5: world-active scene token -> actor presence.
     const active = game?.scenes?.active ?? null;
     const activeScene =
-      active && typeof active.id === 'string'
-        ? { id: active.id, name: active.name ?? '' }
-        : null;
+      active && typeof active.id === 'string' ? { id: active.id, name: active.name ?? '' } : null;
     const activeSceneActorIds = new Set();
     let activeSceneTokenCount = 0;
     for (const t of active?.tokens?.contents ?? []) {

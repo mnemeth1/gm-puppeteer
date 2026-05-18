@@ -398,8 +398,7 @@ export async function dnd5eAddItemToActorBody(
       : null;
   const createdIdentified = createdSys.identified !== false;
   const createdSourceRaw = created._stats?.compendiumSource;
-  const createdSource =
-    typeof createdSourceRaw === 'string' ? createdSourceRaw : input.sourceUuid;
+  const createdSource = typeof createdSourceRaw === 'string' ? createdSourceRaw : input.sourceUuid;
   const createdQty =
     typeof createdSys.quantity === 'number' && Number.isFinite(createdSys.quantity)
       ? createdSys.quantity

@@ -113,7 +113,7 @@ export const dnd5eSearchCompendiumTool: ToolDefinition<typeof Dnd5eSearchCompend
   name: 'dnd5e_search_compendium',
   description:
     "Search the world's compendium packs for D&D 5e documents by name and/or structured " +
-    'filters. Runs on the dnd5e system\'s own Compendium Browser engine — the same machinery ' +
+    "filters. Runs on the dnd5e system's own Compendium Browser engine — the same machinery " +
     'behind the GUI "Compendium Browser" button — so it honors the GM\'s browser source ' +
     'settings (packs disabled there are skipped) and excludes items nested inside containers. ' +
     'Filters compose with AND: `query` (name substring), `documentClass`, `types` (subtypes), ' +

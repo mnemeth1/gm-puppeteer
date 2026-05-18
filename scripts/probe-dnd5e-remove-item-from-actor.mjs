@@ -121,9 +121,7 @@ try {
   // --------------------------------------------------------------------
   const actorIds = await page.evaluate(() => {
     const pc = globalThis.game.actors.find((a) => a.type === 'character');
-    const other = globalThis.game.actors.find(
-      (a) => a.type !== 'character' && a.type !== 'npc',
-    );
+    const other = globalThis.game.actors.find((a) => a.type !== 'character' && a.type !== 'npc');
     return {
       pc: pc ? { id: pc.id, name: pc.name } : null,
       other: other ? { id: other.id, name: other.name, type: other.type } : null,
@@ -377,8 +375,7 @@ try {
         op: res.data.operation,
       });
       assert(
-        res.data.ejectedToTopLevel?.length === 1 &&
-          res.data.ejectedToTopLevel[0].id === innerId,
+        res.data.ejectedToTopLevel?.length === 1 && res.data.ejectedToTopLevel[0].id === innerId,
         'probe 7: contained item reported in ejectedToTopLevel',
         { ejected: res.data.ejectedToTopLevel },
       );
@@ -522,9 +519,7 @@ try {
       const actor = globalThis.game.actors.get(actorId);
       const snapshotIds = new Set(snap.items.map((i) => i.id));
 
-      const orphanIds = actor.items.contents
-        .filter((i) => !snapshotIds.has(i.id))
-        .map((i) => i.id);
+      const orphanIds = actor.items.contents.filter((i) => !snapshotIds.has(i.id)).map((i) => i.id);
       for (const id of orphanIds) {
         if (actor.items.get(id)) await actor.items.get(id).delete();
       }
@@ -563,8 +558,7 @@ try {
         ),
       );
       const signaturesMatch =
-        snapSigs.length === finalSigs.length &&
-        snapSigs.every((s, idx) => s === finalSigs[idx]);
+        snapSigs.length === finalSigs.length && snapSigs.every((s, idx) => s === finalSigs[idx]);
 
       return {
         orphansDeleted: orphanIds.length,
@@ -584,11 +578,10 @@ try {
   // --------------------------------------------------------------------
   // Probe 14: snapshot-equality verification.
   // --------------------------------------------------------------------
-  assert(
-    teardown.finalItemCount === snapshot.itemCount,
-    'probe 14: item count equals snapshot',
-    { snapshot: snapshot.itemCount, final: teardown.finalItemCount },
-  );
+  assert(teardown.finalItemCount === snapshot.itemCount, 'probe 14: item count equals snapshot', {
+    snapshot: snapshot.itemCount,
+    final: teardown.finalItemCount,
+  });
   assert(teardown.signaturesMatch === true, 'probe 14: signature multiset matches snapshot', {
     teardown,
   });

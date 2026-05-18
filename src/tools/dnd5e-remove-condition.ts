@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   dnd5eRemoveConditionBody,
   type Dnd5eRemoveConditionResult,
@@ -66,7 +66,7 @@ export const dnd5eRemoveConditionTool: ToolDefinition<typeof Dnd5eRemoveConditio
     'to 0. Some conditions carry rider statuses (removing unconscious also removes the ' +
     'incapacitated rider) — riders the system dropped in the call are surfaced in ' +
     'cascadeRemoved. ' +
-    'Pick statusId from dnd5e_get_actor_state (the actor\'s current conditions) or ' +
+    "Pick statusId from dnd5e_get_actor_state (the actor's current conditions) or " +
     'dnd5e_get_available_conditions; verify afterward with dnd5e_get_actor_state. Unknown ' +
     'statusId is rejected with STATUS_NOT_FOUND; vehicle / group / encounter actors with ' +
     'ACTOR_TYPE_UNSUPPORTED.',
@@ -83,7 +83,7 @@ export const dnd5eRemoveConditionTool: ToolDefinition<typeof Dnd5eRemoveConditio
       args,
     )) as Dnd5eRemoveConditionResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     if (result.operation === 'noop') {
       ctx.log.info(

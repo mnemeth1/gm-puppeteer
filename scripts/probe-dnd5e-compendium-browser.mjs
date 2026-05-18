@@ -54,9 +54,7 @@ try {
     const q1 = {
       found: !!CB,
       staticMembers: CB
-        ? Object.getOwnPropertyNames(CB).filter(
-            (k) => !['length', 'name', 'prototype'].includes(k),
-          )
+        ? Object.getOwnPropertyNames(CB).filter((k) => !['length', 'name', 'prototype'].includes(k))
         : null,
       tabs: CB?.TABS?.map((t) => ({
         tab: t.tab,
@@ -109,9 +107,7 @@ try {
     // --- Q4 ---------------------------------------------------------------
     const F = dnd5e?.Filter ?? null;
     const q4 = {
-      comparisonOperators: F?.COMPARISON_FUNCTIONS
-        ? Object.keys(F.COMPARISON_FUNCTIONS)
-        : null,
+      comparisonOperators: F?.COMPARISON_FUNCTIONS ? Object.keys(F.COMPARISON_FUNCTIONS) : null,
       booleanOperators: F?.OPERATOR_FUNCTIONS ? Object.keys(F.OPERATOR_FUNCTIONS) : null,
     };
 

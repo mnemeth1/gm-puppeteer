@@ -81,21 +81,11 @@ export interface Dnd5eSetFilterObject {
  * (include-only shorthand) or an `{include,exclude}` object, boolean filters
  * take a `boolean`.
  */
-export type Dnd5eFilterValue =
-  | Dnd5eRangeFilterValue
-  | string[]
-  | Dnd5eSetFilterObject
-  | boolean;
+export type Dnd5eFilterValue = Dnd5eRangeFilterValue | string[] | Dnd5eSetFilterObject | boolean;
 
 export type Dnd5eDocumentClass = 'Item' | 'Actor' | 'JournalEntry' | 'RollTable';
 
-export type Dnd5eRarity =
-  | 'common'
-  | 'uncommon'
-  | 'rare'
-  | 'veryRare'
-  | 'legendary'
-  | 'artifact';
+export type Dnd5eRarity = 'common' | 'uncommon' | 'rare' | 'veryRare' | 'legendary' | 'artifact';
 
 export interface Dnd5eSearchCompendiumInput {
   query?: string | undefined;
@@ -294,8 +284,7 @@ export async function dnd5eSearchCompendiumBody(
     return '';
   };
 
-  const truncate = (s: string, n: number): string =>
-    s.length > n ? `${s.slice(0, n - 3)}...` : s;
+  const truncate = (s: string, n: number): string => (s.length > n ? `${s.slice(0, n - 3)}...` : s);
 
   const excerpt = (text: string, hitIdx: number, window = 80): string => {
     if (text.length === 0) return '';
@@ -358,8 +347,7 @@ export async function dnd5eSearchCompendiumBody(
     plan.push({ dcName: 'Item', types: [] }, { dcName: 'Actor', types: [] });
   }
 
-  const wantQuery =
-    typeof input.query === 'string' && input.query.length > 0 ? input.query : null;
+  const wantQuery = typeof input.query === 'string' && input.query.length > 0 ? input.query : null;
   const inputFilters: Record<string, Dnd5eFilterValue> =
     input.filters && typeof input.filters === 'object' ? input.filters : {};
 
@@ -450,10 +438,7 @@ export async function dnd5eSearchCompendiumBody(
         }
         for (const entry of index.contents) {
           if (!entry || !entry._id || !entry.name) continue;
-          if (
-            wantQueryLower !== null &&
-            !entry.name.toLowerCase().includes(wantQueryLower)
-          ) {
+          if (wantQueryLower !== null && !entry.name.toLowerCase().includes(wantQueryLower)) {
             continue;
           }
           survivors.push({ entry, coll: pack.collection });
@@ -462,9 +447,7 @@ export async function dnd5eSearchCompendiumBody(
     }
   }
 
-  const unknownFilterKeys = Object.keys(inputFilters).filter(
-    (k) => !resolvedFilterKeys.has(k),
-  );
+  const unknownFilterKeys = Object.keys(inputFilters).filter((k) => !resolvedFilterKeys.has(k));
 
   // ---- Post-filter: pack scope + compendium-folder ancestry. -------------
   const wantPackSingle = input.pack ?? null;
@@ -532,15 +515,19 @@ export async function dnd5eSearchCompendiumBody(
     if (wantFolder !== null && !folderNames.some((n) => n.toLowerCase() === wantFolder)) {
       continue;
     }
-    const folderPath =
-      folderNames.length > 0 ? folderNames.slice().reverse().join(' / ') : null;
+    const folderPath = folderNames.length > 0 ? folderNames.slice().reverse().join(' / ') : null;
     filtered.push({ entry: s.entry, coll: s.coll, pack, folderPath });
   }
   // `fetch` sorts each document-class call by name; re-sort the merged list.
   filtered.sort((a, b) => String(a.entry.name).localeCompare(String(b.entry.name)));
 
   const buildHit = (
-    f: { entry: FoundryIndexEntry; coll: string; pack: FoundryPack | null; folderPath: string | null },
+    f: {
+      entry: FoundryIndexEntry;
+      coll: string;
+      pack: FoundryPack | null;
+      folderPath: string | null;
+    },
     extra: Partial<
       Pick<Dnd5eCompendiumHit, 'description' | 'descriptionText' | 'descriptionMatchExcerpt'>
     >,
@@ -555,9 +542,7 @@ export async function dnd5eSearchCompendiumBody(
     const creatureTypeRaw = str(sys.details?.type?.value);
     return {
       id: e._id!,
-      uuid:
-        e.uuid ??
-        `Compendium.${f.coll}.${f.pack?.documentName ?? 'Document'}.${e._id!}`,
+      uuid: e.uuid ?? `Compendium.${f.coll}.${f.pack?.documentName ?? 'Document'}.${e._id!}`,
       name: e.name!,
       type: e.type ?? f.pack?.documentName ?? null,
       pack: f.coll,

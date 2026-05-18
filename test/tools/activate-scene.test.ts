@@ -89,7 +89,10 @@ describe('activate_scene', () => {
 
     expect(err).toBeInstanceOf(ToolError);
     expect((err as ToolError).code).toBe('INVALID_INPUT');
-    expect((err as ToolError).details).toEqual({ sceneId: 'missing' });
+    expect((err as ToolError).details).toEqual({
+      sceneId: 'missing',
+      reason: 'SCENE_NOT_FOUND',
+    });
   });
 
   it('maps ACTIVATE_FAILED to EVAL_FAILED', async () => {

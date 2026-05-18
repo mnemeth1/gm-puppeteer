@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import { getCombatStateBody, type GetCombatStateResult } from '../evaluators/get-combat-state.js';
 import { jsonText, type ToolDefinition } from './types.js';
 
@@ -39,7 +39,7 @@ export const getCombatStateTool: ToolDefinition<typeof GetCombatStateInput> = {
     };
     const result = (await page.evaluate(getCombatStateBody, args)) as GetCombatStateResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     return [jsonText({ sceneId: result.sceneId, combat: result.combat })];
   },

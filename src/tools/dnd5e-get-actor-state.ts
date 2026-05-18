@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ToolError } from '../errors.js';
+import { toolErrorFromEvaluator } from '../errors.js';
 import {
   dnd5eGetActorStateBody,
   SUPPORTED_ACTOR_TYPES,
@@ -90,12 +90,9 @@ export const dnd5eGetActorStateTool: ToolDefinition<typeof Dnd5eGetActorStateInp
       includeEncounterState: input.includeEncounterState ?? false,
       includeRawSystem: input.includeRawSystem ?? false,
     };
-    const result = (await page.evaluate(
-      dnd5eGetActorStateBody,
-      args,
-    )) as Dnd5eGetActorStateResult;
+    const result = (await page.evaluate(dnd5eGetActorStateBody, args)) as Dnd5eGetActorStateResult;
     if (!result.ok) {
-      throw new ToolError('INVALID_INPUT', result.error.message, result.error.details);
+      throw toolErrorFromEvaluator(result.error);
     }
     if (!KNOWN_TYPES.has(result.actor.type)) {
       ctx.log.warn(

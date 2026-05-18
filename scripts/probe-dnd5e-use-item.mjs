@@ -150,9 +150,7 @@ async function addPotion(page, actorId, potionUuid, qty, depleteUses) {
       data.system.quantity = quantity;
       const [item] = await actor.createEmbeddedDocuments('Item', [data]);
       if (deplete) {
-        await actor.updateEmbeddedDocuments('Item', [
-          { _id: item.id, 'system.uses.spent': 1 },
-        ]);
+        await actor.updateEmbeddedDocuments('Item', [{ _id: item.id, 'system.uses.spent': 1 }]);
       }
       return { id: item.id, activityId: item.system.activities.contents[0]?.id ?? null };
     },
@@ -290,11 +288,9 @@ try {
   {
     const res = await call({ actorId: 'deadbeefdeadbeef', itemId: 'whatever' });
     log.info({ probe: 5, res }, 'probe 5: bogus actorId');
-    assert(
-      res.error?.details?.reason === 'ACTOR_NOT_FOUND',
-      'probe 5: reason=ACTOR_NOT_FOUND',
-      { d: res.error?.details },
-    );
+    assert(res.error?.details?.reason === 'ACTOR_NOT_FOUND', 'probe 5: reason=ACTOR_NOT_FOUND', {
+      d: res.error?.details,
+    });
   }
 
   // -- Probe 6: bogus itemId. -----------------------------------------
