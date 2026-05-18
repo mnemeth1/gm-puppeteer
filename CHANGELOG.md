@@ -8,6 +8,13 @@ this project adheres to [Semantic Versioning](https://semver.org/).
 
 _Nothing yet._
 
+## [1.0.1] - 2026-05-18
+
+### Changed
+
+- Prerequisites now advise stating the game system in the world
+  description so the MCP client picks the right tool suite.
+
 ## [1.0.0] - 2026-05-18
 
 First production release. GM-Puppeteer is an MCP server that drives a

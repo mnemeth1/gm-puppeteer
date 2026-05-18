@@ -1,6 +1,6 @@
 {
   "name": "gm-puppeteer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "MCP server giving an AI assistant full Foundry VTT v14 GM control via a headless Puppeteer-managed Chromium",
   "license": "Unlicense",
