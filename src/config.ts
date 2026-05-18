@@ -15,6 +15,7 @@ const ConfigSchema = z.object({
   forgeMode: z.boolean(),
   forgeProfileDir: z.string().min(1),
   forgeManualLoginTimeoutMs: z.number().int().positive(),
+  forgeWakeTimeoutMs: z.number().int().positive(),
 });
 
 export type Config = z.infer<typeof ConfigSchema>;
@@ -66,6 +67,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     // launching client and is not guaranteed to be the project directory.
     forgeProfileDir: resolve(env.FORGE_PROFILE_DIR ?? '.puppeteer-profile'),
     forgeManualLoginTimeoutMs: parseInt32(env.FORGE_MANUAL_LOGIN_TIMEOUT_MS, 300_000),
+    // A Forge instance idled for inactivity can take well over the 60s
+    // login timeout to wake from cold when a tool call reconnects to it.
+    forgeWakeTimeoutMs: parseInt32(env.FORGE_WAKE_TIMEOUT_MS, 180_000),
   });
 
   if (!parsed.success) {

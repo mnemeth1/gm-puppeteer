@@ -39,6 +39,17 @@ const CHROME_LAUNCH_ARGS = [
 
 const DEBUG_DIR = 'debug-output';
 
+// A gap longer than this since the last tool call means the cached session
+// may have gone stale while idle (e.g. a Forge-hosted world idled its
+// instance for inactivity); probe Foundry for liveness before trusting the
+// cached page on the next call.
+const STALE_PROBE_THRESHOLD_MS = 60_000;
+
+// While polling for a screen to stabilize, reload the page once after this
+// long — Forge sometimes serves its "waking up" interstitial without
+// auto-redirecting into the game once the instance is back up.
+const SCREEN_RELOAD_NUDGE_MS = 30_000;
+
 /**
  * Owns the Chromium browser and its single Foundry page.
  *
@@ -73,26 +84,120 @@ export class BrowserSession {
   private page: Page | null = null;
   private verify: LoginVerifyResult | null = null;
   private starting: Promise<void> | null = null;
+  /** Timestamp of the last tool call that reached `ensureStarted()`. */
+  private lastActivityAt = 0;
 
   constructor(
     private readonly config: Config,
     private readonly log: Logger,
   ) {}
 
+  /**
+   * Return the live Foundry session, launching or reconnecting as needed.
+   *
+   * Fast path: when the cached session is synchronously alive and a tool
+   * call ran recently, it is returned untouched — no round-trip to the page.
+   *
+   * After an idle gap the session may have gone stale: a Forge-hosted world
+   * idles its instance after inactivity, dropping Foundry's socket while the
+   * Chromium tab stays open. Recovery is funnelled through the `starting`
+   * guard so an N-way concurrent death triggers exactly one teardown +
+   * relaunch and every caller awaits it.
+   */
   async ensureStarted(): Promise<FoundrySession> {
-    if (this.browser && this.page && this.verify) {
-      return { browser: this.browser, page: this.page, verify: this.verify };
+    if (this.sessionLooksAlive() && !this.isStale()) {
+      this.lastActivityAt = Date.now();
+      return this.currentSession();
     }
     if (!this.starting) {
-      this.starting = this.launchAndLogin().finally(() => {
+      this.starting = this.ensureLive().finally(() => {
         this.starting = null;
       });
     }
     await this.starting;
+    if (!this.sessionLooksAlive()) {
+      throw new ToolError('BROWSER_NOT_READY', 'Browser failed to start or reconnect');
+    }
+    this.lastActivityAt = Date.now();
+    return this.currentSession();
+  }
+
+  /**
+   * Bring the session to a verified-live state: launch it if it has never
+   * started or is hard-dead, or — when it is synchronously alive but stale —
+   * probe Foundry and reconnect only if the probe fails. Single-flighted
+   * behind the `starting` guard by `ensureStarted()`.
+   */
+  private async ensureLive(): Promise<void> {
+    if (!this.sessionLooksAlive()) {
+      // Never started, or the Chromium process / tab died outright.
+      await this.teardownStaleSession();
+      await this.launchAndLogin();
+      return;
+    }
+    // Synchronously alive but idle long enough to have gone stale. A Forge
+    // idle is a soft death — `browser.connected` and the tab both survive,
+    // only Foundry's socket drops — so only a live probe can tell.
+    if (await this.probeGameReady()) return;
+    this.log.warn('session probe failed after idle; reconnecting');
+    await this.teardownStaleSession();
+    await this.launchAndLogin();
+  }
+
+  /** Synchronous, zero-cost liveness check — catches a dead Chromium process or tab. */
+  private sessionLooksAlive(): boolean {
+    return (
+      this.browser !== null &&
+      this.page !== null &&
+      this.verify !== null &&
+      this.browser.connected &&
+      !this.page.isClosed()
+    );
+  }
+
+  /** True when no tool call has run recently, so the cached session may be stale. */
+  private isStale(): boolean {
+    return Date.now() - this.lastActivityAt > STALE_PROBE_THRESHOLD_MS;
+  }
+
+  /** Non-null accessor for the published triple; call only after `sessionLooksAlive()`. */
+  private currentSession(): FoundrySession {
     if (!this.browser || !this.page || !this.verify) {
-      throw new ToolError('BROWSER_NOT_READY', 'Browser failed to start');
+      throw new ToolError('BROWSER_NOT_READY', 'Browser session is not available');
     }
     return { browser: this.browser, page: this.page, verify: this.verify };
+  }
+
+  /**
+   * Probe whether the cached page is still a live Foundry game. A thrown
+   * error (target detached, socket gone) counts as not-ready.
+   */
+  private async probeGameReady(): Promise<boolean> {
+    if (!this.page) return false;
+    try {
+      return await this.page.evaluate(() => {
+        const g = (globalThis as { game?: { ready?: boolean } }).game;
+        return g?.ready === true;
+      });
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Discard a dead or stale browser handle. The published fields are nulled
+   * first so a concurrent caller never observes a half-dead triple; the
+   * actual close is best-effort (the browser may already be gone).
+   */
+  private async teardownStaleSession(): Promise<void> {
+    const stale = this.browser;
+    this.browser = null;
+    this.page = null;
+    this.verify = null;
+    if (stale) {
+      this.log.warn('session lost; tearing down stale browser');
+      await stale.close().catch(() => undefined);
+    }
   }
 
   private async launchAndLogin(): Promise<void> {
@@ -215,7 +320,7 @@ export class BrowserSession {
       this.attachPageListeners(page);
       await this.navigate(page);
 
-      const screen = await this.waitForStableScreen(page);
+      const screen = await this.waitForStableScreen(page, this.config.forgeWakeTimeoutMs);
       this.log.info({ screen, url: page.url() }, 'forge: restore screen detected');
 
       if (screen === 'in-game') {
@@ -328,10 +433,15 @@ export class BrowserSession {
   }
 
   private async navigate(page: Page): Promise<void> {
+    // A cold Forge instance can take well over the login timeout to respond;
+    // give the navigation the longer Forge wake budget in Forge mode.
+    const timeout = this.config.forgeMode
+      ? this.config.forgeWakeTimeoutMs
+      : this.config.loginTimeoutMs;
     this.log.info({ url: this.config.foundryUrl }, 'navigating to foundry');
     await page.goto(this.config.foundryUrl, {
       waitUntil: 'networkidle2',
-      timeout: this.config.loginTimeoutMs,
+      timeout,
     });
   }
 
@@ -373,11 +483,24 @@ export class BrowserSession {
    * reads 'unknown'. Poll until the screen resolves to a terminal value
    * (in-game / join / setup) or the login timeout elapses.
    */
-  private async waitForStableScreen(page: Page): Promise<Screen> {
-    const deadline = Date.now() + this.config.loginTimeoutMs;
+  private async waitForStableScreen(
+    page: Page,
+    timeoutMs: number = this.config.loginTimeoutMs,
+  ): Promise<Screen> {
+    const start = Date.now();
+    const deadline = start + timeoutMs;
     let screen = await this.detectScreen(page);
+    let reloaded = false;
     while (screen === 'unknown' && Date.now() < deadline) {
       await new Promise((resolve) => setTimeout(resolve, 250));
+      // Forge can serve its "waking up" interstitial without auto-redirecting
+      // into the game once the instance is back; one reload nudges it along
+      // (and is HTTP traffic Forge counts as activity).
+      if (!reloaded && Date.now() - start > SCREEN_RELOAD_NUDGE_MS) {
+        reloaded = true;
+        this.log.info('screen still unresolved; reloading once to nudge it');
+        await page.reload({ waitUntil: 'networkidle2' }).catch(() => undefined);
+      }
       screen = await this.detectScreen(page);
     }
     return screen;

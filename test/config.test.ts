@@ -14,6 +14,7 @@ describe('loadConfig', () => {
     expect(cfg.allowEval).toBe(false);
     expect(cfg.forgeMode).toBe(false);
     expect(cfg.forgeManualLoginTimeoutMs).toBe(300_000);
+    expect(cfg.forgeWakeTimeoutMs).toBe(180_000);
     expect(isAbsolute(cfg.forgeProfileDir)).toBe(true);
     expect(cfg.forgeProfileDir.endsWith('.puppeteer-profile')).toBe(true);
   });
@@ -44,6 +45,12 @@ describe('loadConfig', () => {
     expect(loadConfig({ FORGE_MANUAL_LOGIN_TIMEOUT_MS: 'nope' }).forgeManualLoginTimeoutMs).toBe(
       300_000,
     );
+  });
+
+  it('parses FORGE_WAKE_TIMEOUT_MS as an integer', () => {
+    expect(loadConfig({ FORGE_WAKE_TIMEOUT_MS: '240000' }).forgeWakeTimeoutMs).toBe(240_000);
+    // Invalid values fall back to default rather than throwing.
+    expect(loadConfig({ FORGE_WAKE_TIMEOUT_MS: 'nope' }).forgeWakeTimeoutMs).toBe(180_000);
   });
 
   it('parses ALLOW_EVAL as boolean, defaulting to false', () => {
