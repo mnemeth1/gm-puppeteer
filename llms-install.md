@@ -86,7 +86,7 @@ run and let them do it. See `README.md` → "Forge-hosted Foundry".
 ## Step 4 — Register with the MCP client
 
 Add an entry to the client's `mcpServers` config. Use the absolute path
-to `dist/index.js` from Step 2.
+to the clone directory from Step 2 as `cwd`.
 
 Standard (client and server on the same OS):
 
@@ -95,16 +95,19 @@ Standard (client and server on the same OS):
   "mcpServers": {
     "gm-puppeteer": {
       "command": "node",
-      "args": ["--env-file=.env", "/abs/path/to/gm-puppeteer/dist/index.js"]
+      "args": ["--env-file=.env", "dist/index.js"],
+      "cwd": "/abs/path/to/gm-puppeteer"
     }
   }
 }
 ```
 
 `--env-file=.env` makes Node load the `.env` from Step 3 (Node 24 has it
-built in; there is no automatic discovery, so the flag is required). The
-path passed to `--env-file` is resolved against the process working
-directory — if in doubt, give it as an absolute path too.
+built in; there is no automatic discovery, so the flag is required). Both
+`--env-file=.env` and `dist/index.js` are relative paths — they resolve
+against `cwd`, so the `cwd` entry is **required**. Set it to the absolute
+path of the clone directory; without it the server starts in the client's
+own working directory and fails to find `.env`.
 
 If the MCP client runs on **Windows** while Foundry and this server run
 in **WSL**, launch through `wsl` so the server runs inside WSL:
@@ -129,15 +132,30 @@ file is the reliable channel — use it rather than an `env` block.
 
 ## Step 5 — Verify
 
-1. Restart the MCP client so it picks up the new server.
-2. Confirm `gm-puppeteer` appears in the client's MCP server list.
-3. Smoke-test by calling the **`get_world_info`** tool. A successful
-   response — world name, system, Foundry version, logged-in user —
-   confirms login, the browser session, and the tool surface end to end.
+There are two distinct checkpoints. The first confirms the install; the
+second needs a live Foundry world.
 
-If launch fails, set `FOUNDRY_HEADLESS=false` and `LOG_LEVEL=debug` in
-`.env` and restart to watch the Chromium window and login sequence. The
-usual cause is a missing or misnamed GM user (Step 1).
+**Install succeeded** — verifiable with no Foundry running:
+
+1. Restart the MCP client so it picks up the new server.
+2. Confirm `gm-puppeteer` appears in the client's MCP server list,
+   **connected**, with its tools listed. The server completes the MCP
+   handshake without contacting Foundry — it connects to Foundry lazily,
+   on the first tool call — so a connected server with visible tools
+   means the install itself is done. Stop here if Foundry is not running.
+
+**Live-world smoke test** — the user's final check once Foundry is up:
+
+3. With a Foundry world launched and active (Step 1), call the
+   **`get_world_info`** tool. A successful response — world name, system,
+   Foundry version, logged-in user — confirms login, the browser session,
+   and the tool surface end to end. Until a world is running this call is
+   expected to fail; that is not an install failure.
+
+If `get_world_info` fails with a world running, set
+`FOUNDRY_HEADLESS=false` and `LOG_LEVEL=debug` in `.env` and restart to
+watch the Chromium window and login sequence. The usual cause is a
+missing or misnamed GM user (Step 1).
 
 ## Reference
 
