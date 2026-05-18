@@ -17,6 +17,7 @@ import { deleteJournalPageTool } from './delete-journal-page.js';
 import { deleteTokenTool } from './delete-token.js';
 import { dnd5eAddItemToActorTool } from './dnd5e-add-item-to-actor.js';
 import { dnd5eApplyConditionTool } from './dnd5e-apply-condition.js';
+import { dnd5eCalculateEncounterBudgetTool } from './dnd5e-calculate-encounter-budget.js';
 import { dnd5eGetActorInventoryTool } from './dnd5e-get-actor-inventory.js';
 import { dnd5eGetActorStateTool } from './dnd5e-get-actor-state.js';
 import { dnd5eGetAvailableConditionsTool } from './dnd5e-get-available-conditions.js';
@@ -102,6 +103,7 @@ export const tools: ReadonlyArray<ToolDefinition<z.ZodTypeAny>> = [
   deleteTokenTool,
   dnd5eAddItemToActorTool,
   dnd5eApplyConditionTool,
+  dnd5eCalculateEncounterBudgetTool,
   dnd5eGetActorInventoryTool,
   dnd5eGetActorStateTool,
   dnd5eGetAvailableConditionsTool,

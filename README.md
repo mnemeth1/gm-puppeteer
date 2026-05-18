@@ -194,6 +194,10 @@ Require the D&D 5e system loaded on the world.
 - **`dnd5e_roll_check`** — roll a non-PC D&D 5e actor's real ability, skill, saving-throw, or tool check through the dnd5e roll pipeline and post the result; supply a DC for a success/failure outcome.
 - **`dnd5e_request_check`** — post a whispered, clickable D&D 5e check button asking a player to roll an ability, skill, save, or tool check for their own character.
 
+#### Encounters
+
+- **`dnd5e_calculate_encounter_budget`** — compute a D&D 5e encounter XP budget for a party given per-character levels. Reads the world's rules edition live: 2024 (modern) rules return the three-tier low/moderate/high budget; 2014 (legacy) rules return the four-tier easy/medium/hard/deadly thresholds plus the encounter-size multiplier model. Returns the per-tier XP budgets, a CR-to-XP cost table with how many of each CR fit, and suggested creature-mix skeletons (solo boss, boss + minions, gang, horde, …).
+
 #### Compendium & utilities
 
 - **`dnd5e_search_compendium`** — name/structured-filter search across D&D 5e compendium packs, on the system's native Compendium Browser engine.
