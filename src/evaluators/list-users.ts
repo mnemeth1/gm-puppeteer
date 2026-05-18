@@ -16,12 +16,35 @@
  *   - `active` — whether the user is currently logged in (Foundry
  *                sets this transiently). Useful for "who's playing
  *                right now" UX but unrelated to ownership.
+ *   - `idle`   — Foundry's "away" flag (the "zzz" badge in the
+ *                players panel): an `active` user who has produced no
+ *                input recently. `User#idle` is a plain boolean on
+ *                the document.
+ *   - `idleSeconds` — seconds since the user's last activity, or
+ *                `null` when unknown. Derived from `User#lastActivityTime`
+ *                (epoch ms): `Math.floor((Date.now() - lastActivityTime)
+ *                / 1000)` for an `active` user with a non-zero
+ *                timestamp, else `null`. Computed inside this body so
+ *                the browser clock is used consistently on both ends.
+ *
+ * Caveat — the headless self client. The MCP logs in as `AI-GM`; that
+ * headless Chromium produces no mouse/keyboard input, so Foundry
+ * always reports `AI-GM` as `idle: true` with `lastActivityTime === 0`
+ * (hence `idleSeconds: null`). `idle`/`idleSeconds` are only
+ * meaningful for *other* `active` users; the self user's idle state
+ * is noise. Inactive (not-logged-in) users report `idle: false`,
+ * `idleSeconds: null`.
  *
  * Confirmed by `probe-actor-ownership-phase1.mjs`:
  *   - Sandbox returns 3 users: AI-GM (GM, role 4), Human-GM
  *     (GM, role 4), Player (TRUSTED, role 2, not active).
  *   - `game.users.get(<bogusId>)` returns `null` cleanly — caller-side
  *     validation in the assign/remove tools can rely on this.
+ *
+ * `idle` / `lastActivityTime` confirmed by a live `foundry_eval` probe
+ * against Foundry v14.361: `User#idle` is a boolean, `User#lastActivityTime`
+ * a getter returning epoch ms (0 for the self client and never-connected
+ * users).
  *
  * Note: This function is serialized via Puppeteer's `page.evaluate`,
  * which ships only the function's own source string to the browser.
@@ -34,6 +57,8 @@ export interface UserSummary {
   role: number;
   isGM: boolean;
   active: boolean;
+  idle: boolean;
+  idleSeconds: number | null;
 }
 
 export interface ListUsersResult {
@@ -47,6 +72,8 @@ export function listUsersBody(): ListUsersResult {
     role?: number;
     isGM?: boolean;
     active?: boolean;
+    idle?: boolean;
+    lastActivityTime?: number;
   }
   interface FoundryUsersCollection {
     contents?: FoundryUserLike[];
@@ -61,12 +88,20 @@ export function listUsersBody(): ListUsersResult {
   const summaries: UserSummary[] = [];
   for (const u of all) {
     if (!u || typeof u.id !== 'string') continue;
+    const active = u.active === true;
+    const lastActivityTime = typeof u.lastActivityTime === 'number' ? u.lastActivityTime : 0;
+    const idleSeconds =
+      active && lastActivityTime > 0
+        ? Math.floor((Date.now() - lastActivityTime) / 1000)
+        : null;
     summaries.push({
       id: u.id,
       name: typeof u.name === 'string' ? u.name : '',
       role: typeof u.role === 'number' ? u.role : 0,
       isGM: u.isGM === true,
-      active: u.active === true,
+      active,
+      idle: u.idle === true,
+      idleSeconds,
     });
   }
 
