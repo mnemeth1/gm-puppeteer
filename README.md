@@ -182,6 +182,8 @@ Require the D&D 5e system loaded on the world.
 - **`dnd5e_update_item_uses`** — set the remaining charges of a uses-tracking item (wand, staff, charged magic item, or feat/spell with limited activations) on a D&D 5e character or npc.
 - **`dnd5e_move_item_to_container`** — relocate a physical item between containers, or to/from the inventory root, on a single D&D 5e character or npc; cycle-checked, with optional stack-merging at the destination.
 - **`dnd5e_transfer_item_between_actors`** — move a physical item from one D&D 5e actor to another: full-stack transfer, partial-stack split, stack-merging into a matching destination stack, or full-cascade transfer of a container plus its nested contents.
+- **`dnd5e_create_scroll`** — generate a D&D 5e spell-scroll consumable from a Spell UUID and place it on a character or npc; runs the dnd5e scroll factory, with optional upcast cast-level, quantity, container placement, and identification. Scroll-only — D&D 5e has no per-spell wand generation; grant finished named wands with `dnd5e_add_item_to_actor`.
+- **`dnd5e_use_item`** — run the D&D 5e activity/use pipeline for a single item on a character or npc: posts the chat card and consumes charges or quantity (a potion heal, a wand charge, a weapon or feat activation), reporting before/after quantity and uses. Spell-scroll `cast` activities are rejected — casting a scroll through the API orphans a cached-spell document that corrupts world load, so cast scrolls from the Foundry UI instead.
 
 #### Conditions
 

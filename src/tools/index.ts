@@ -18,6 +18,7 @@ import { deleteTokenTool } from './delete-token.js';
 import { dnd5eAddItemToActorTool } from './dnd5e-add-item-to-actor.js';
 import { dnd5eApplyConditionTool } from './dnd5e-apply-condition.js';
 import { dnd5eCalculateEncounterBudgetTool } from './dnd5e-calculate-encounter-budget.js';
+import { dnd5eCreateScrollTool } from './dnd5e-create-scroll.js';
 import { dnd5eGetActorInventoryTool } from './dnd5e-get-actor-inventory.js';
 import { dnd5eGetActorStateTool } from './dnd5e-get-actor-state.js';
 import { dnd5eGetAvailableConditionsTool } from './dnd5e-get-available-conditions.js';
@@ -33,6 +34,7 @@ import { dnd5eSearchRulesTool } from './dnd5e-search-rules.js';
 import { dnd5eTransferItemBetweenActorsTool } from './dnd5e-transfer-item-between-actors.js';
 import { dnd5eUpdateItemQuantityTool } from './dnd5e-update-item-quantity.js';
 import { dnd5eUpdateItemUsesTool } from './dnd5e-update-item-uses.js';
+import { dnd5eUseItemTool } from './dnd5e-use-item.js';
 import { endCombatTool } from './end-combat.js';
 import { foundryEvalTool } from './foundry-eval.js';
 import { foundryScreenshotTool } from './foundry-screenshot.js';
@@ -104,6 +106,7 @@ export const tools: ReadonlyArray<ToolDefinition<z.ZodTypeAny>> = [
   dnd5eAddItemToActorTool,
   dnd5eApplyConditionTool,
   dnd5eCalculateEncounterBudgetTool,
+  dnd5eCreateScrollTool,
   dnd5eGetActorInventoryTool,
   dnd5eGetActorStateTool,
   dnd5eGetAvailableConditionsTool,
@@ -119,6 +122,7 @@ export const tools: ReadonlyArray<ToolDefinition<z.ZodTypeAny>> = [
   dnd5eTransferItemBetweenActorsTool,
   dnd5eUpdateItemQuantityTool,
   dnd5eUpdateItemUsesTool,
+  dnd5eUseItemTool,
   endCombatTool,
   foundryEvalTool,
   foundryScreenshotTool,
