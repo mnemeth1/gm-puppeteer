@@ -7,7 +7,7 @@ MCP/stdio. The **core** tool suite is system-agnostic; the `pf2e_` and
 system that tool expects, and the live world's system is whatever
 `get_world_info` reports.
 
-See `@README.md` for the full tool catalog, installation, configuration,
+See `README.md` for the full tool catalog, installation, configuration,
 and the Forge-hosted setup flow. This file covers development only.
 
 ## Architecture
