@@ -23,10 +23,9 @@ debug-output/
 # Local Claude Code MCP project-scope config (dev convenience)
 .mcp.json
 
-# Internal dev docs — private-repo only, never ported to the public repo.
+# Internal dev doc — private-repo only, never ported to the public repo.
 # Belt-and-suspenders: the public repo is built by copy-paste, so a stray
-# `git add .` could otherwise catch these if they were ever copied in.
-CLAUDE.md
+# `git add .` could otherwise catch it if it were ever copied in.
 TODO.md
 
 # Local dev smoke-test harness for the browser login flow

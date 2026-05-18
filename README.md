@@ -355,7 +355,7 @@ redirect, and re-visiting it as the authenticated game owner lands on the Forge
 
 - **A display is required for the first login.** `headless: false` cannot open
   a window on a server with no desktop. Do the initial login on a machine with
-  a GUI (the project's WSL2 + WSLg dev box works), then copy the
+  a GUI (WSL2 with WSLg counts), then copy the
   `FORGE_PROFILE_DIR` directory to the headless host.
 - **`FORGE_PROFILE_DIR` holds a live session** — effectively a credential. Keep
   it gitignored (the default `.puppeteer-profile/` already is), restrict its
@@ -407,8 +407,8 @@ same-OS entry looks like:
 }
 ```
 
-On this project's dev box the Foundry host is **WSL on Windows** while the MCP
-client is a Windows application, so the server is launched through `wsl`:
+If your MCP client runs on Windows while Foundry and this server run inside
+WSL, the client must launch the server through `wsl`:
 
 ```json
 {
@@ -429,9 +429,7 @@ client is a Windows application, so the server is launched through `wsl`:
 Configuration reaches the server through environment variables. A Windows MCP
 client's `env` block does **not** cross the `wsl --` boundary on its own — WSL
 forwards only the variables named in `WSLENV`, so a bare `env` block arrives
-empty at the Node process. (Verified on this dev box: `LOG_LEVEL` and
-`ALLOW_EVAL` set in an `env` block produced no values inside WSL until each
-name was added to `WSLENV`.)
+empty at the Node process.
 
 The reliable path is a `.env` file, loaded by Node *inside* WSL where the
 boundary is irrelevant. Copy `.env.example` to `.env` and fill it in; the
