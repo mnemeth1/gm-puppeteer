@@ -82,6 +82,7 @@ system.
 
 - **`start_combat`** — create (or return) the combat encounter for a scene; round 0.
 - **`begin_combat`** — advance a scene's encounter to round 1 after initiative is rolled.
+- **`roll_npcs`** — roll initiative for every unrolled NPC combatant; PCs left for the GM.
 - **`end_combat`** — delete a scene's combat encounter (Foundry "End Combat"); idempotent.
 - **`add_combatants`** — add scene tokens to the combat as combatants; partial success.
 - **`remove_combatants`** — remove combatants from the combat by id; partial success.

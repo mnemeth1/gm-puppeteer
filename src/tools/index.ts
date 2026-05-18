@@ -68,6 +68,7 @@ import { removeItemFromActorTool } from './remove-item-from-actor.js';
 import { requestCheckTool } from './request-check.js';
 import { rollCheckTool } from './roll-check.js';
 import { rollDiceTool } from './roll-dice.js';
+import { rollNpcsTool } from './roll-npcs.js';
 import { searchCompendiumTool } from './search-compendium.js';
 import { searchJournalsTool } from './search-journals.js';
 import { showJournalEntryTool } from './show-journal-entry.js';
@@ -152,6 +153,7 @@ export const tools: ReadonlyArray<ToolDefinition<z.ZodTypeAny>> = [
   requestCheckTool,
   rollCheckTool,
   rollDiceTool,
+  rollNpcsTool,
   searchCompendiumTool,
   searchJournalsTool,
   setConditionValueTool,
