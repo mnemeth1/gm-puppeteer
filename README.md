@@ -1,9 +1,9 @@
+[Available on MCP Market](https://mcpmarket.com/server/gm-puppeteer)
+
 # GM-Puppeteer
 
 **Hand your AI assistant the keys to your virtual tabletop — on Forge or
 self-hosted.**
-
-[Available on MCP Market](https://mcpmarket.com/server/gm-puppeteer)
 
 GM-Puppeteer is a powerful, module-free MCP server that lets your AI fully
 control Foundry VTT v14 as a Game Master. It can build balanced encounters,
