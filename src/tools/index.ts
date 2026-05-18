@@ -25,6 +25,8 @@ import { dnd5eGetItemDetailsTool } from './dnd5e-get-item-details.js';
 import { dnd5eMoveItemToContainerTool } from './dnd5e-move-item-to-container.js';
 import { dnd5eRemoveConditionTool } from './dnd5e-remove-condition.js';
 import { dnd5eRemoveItemFromActorTool } from './dnd5e-remove-item-from-actor.js';
+import { dnd5eRequestCheckTool } from './dnd5e-request-check.js';
+import { dnd5eRollCheckTool } from './dnd5e-roll-check.js';
 import { dnd5eSearchCompendiumTool } from './dnd5e-search-compendium.js';
 import { dnd5eSearchRulesTool } from './dnd5e-search-rules.js';
 import { dnd5eTransferItemBetweenActorsTool } from './dnd5e-transfer-item-between-actors.js';
@@ -107,6 +109,8 @@ export const tools: ReadonlyArray<ToolDefinition<z.ZodTypeAny>> = [
   dnd5eMoveItemToContainerTool,
   dnd5eRemoveConditionTool,
   dnd5eRemoveItemFromActorTool,
+  dnd5eRequestCheckTool,
+  dnd5eRollCheckTool,
   dnd5eSearchCompendiumTool,
   dnd5eSearchRulesTool,
   dnd5eTransferItemBetweenActorsTool,
